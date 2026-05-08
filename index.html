@@ -50,7 +50,7 @@
         <div id="start-section">
             <h1 style="margin: 30px 0; color: var(--primary); font-size: 32px; letter-spacing: 3px; text-align:center;">WORLD CUP 2026</h1>
             <div id="user-modal">
-                <div class="info-msg">⚠️ ATTENTION: Use your existing <b>Rolletto</b> username.</div>
+                <div class="info-msg">⚠️ ATTENTION: To participate, please use your existing <b>Rolletto</b> username.</div>
                 <input type="text" id="username" placeholder="USERNAME" style="padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff;">
                 <input type="password" id="password" placeholder="PASSWORD" style="padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff;">
                 <button class="btn-green" onclick="startGame()">LOGIN / JOIN</button>
@@ -145,8 +145,24 @@
 
         async function saveCurrentDay() {
             const user = localStorage.getItem('wc_user');
-            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return alert("Select all matches!");
-            fetch(`${BASE_URL}/save-prediction`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: user, dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(() => location.reload());
+            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) {
+                return alert("Select all matches!");
+            }
+            
+            document.getElementById('loader').style.display = 'flex';
+            try {
+                const response = await fetch(`${BASE_URL}/save-prediction`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username: user, dayId: SELECTED_DAY, answers: TEMP_ANSWERS})
+                }).then(r => r.json());
+
+                if(response.success) {
+                    await startGame(); // ჩუმად განაახლებს ინფორმაციას გვერდიდან გაგდების გარეშე
+                    alert("Predictions saved successfully!");
+                } else alert(response.message);
+            } catch(e) { alert("Error saving predictions."); }
+            document.getElementById('loader').style.display = 'none';
         }
 
         async function loadLB() {
