@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rolletto Predictor | World Cup 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00ffcc; --primary-glow: rgba(0, 255, 204, 0.4); --bg-dark: #061218; --glass: rgba(15, 33, 42, 0.9); --accent-gold: #ffcc00; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        h1, h2, h3, .team-name, .lb-rank { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; }
+        body { 
+            background-color: var(--bg-dark); color: #fff;
+            background-image: radial-gradient(circle at 50% 0%, rgba(0, 255, 204, 0.15) 0%, transparent 50%),
+                linear-gradient(rgba(6,18,24,0.7), rgba(6,18,24,0.9)), 
+                url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg');
+            background-size: cover; background-attachment: fixed; background-position: center;
+        }
+        header { background: rgba(15, 33, 42, 0.95); backdrop-filter: blur(15px); padding: 15px; display: flex; justify-content: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 1000; }
+        .logo { height: 38px; cursor: pointer; }
+        .main-content { padding: 20px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
+        .info-msg { color: var(--primary); font-size: 13px; font-weight: 700; margin-bottom: 20px; padding: 15px; background: rgba(0, 255, 204, 0.1); border-radius: 12px; border-left: 4px solid var(--primary); }
+        .leaderboard-container { margin-top: 35px; background: var(--glass); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .lb-row td { padding: 16px 10px; background: rgba(255,255,255,0.03); border-radius: 12px; text-align: center; }
+        .lb-username { text-align: left !important; padding-left: 15px !important; color: #fff; }
+        .lb-score { color: var(--accent-gold) !important; font-weight: 700; }
+        .my-row-highlight td { border-top: 1px solid var(--primary); border-bottom: 1px solid var(--primary); background: rgba(0,255,204,0.1) !important; }
+        .tabs-wrapper { overflow-x: auto; display: flex; gap: 12px; padding: 15px 0; scrollbar-width: none; }
+        .day-tab { padding: 12px 25px; background: rgba(255,255,255,0.05); cursor: pointer; border-radius: 12px; font-weight: 700; color: #aab8c2; white-space: nowrap; transition: 0.3s; }
+        .day-tab.active { background: var(--primary); color: var(--bg-dark); }
+        .game-card { background: var(--glass); padding: 25px; margin: 15px 0; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); }
+        .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .vs-divider { font-size: 11px; color: var(--primary); font-weight: 800; padding: 6px 14px; background: rgba(0,255,204,0.12); border-radius: 8px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .opt-btn { padding: 15px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .opt-btn.selected, .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; }
+        .res-wrong { background: #ff4d4d !important; }
+        .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; }
+        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 18px; border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; }
+        #loader { display: none; position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; justify-content: center; align-items: center; }
+        .spinner { border: 4px solid rgba(0,255,204,0.1); border-left-color: var(--primary); width: 40px; height: 40px; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo" onclick="location.reload()"></header>
+    <div id="loader"><div class="spinner"></div></div>
+    <div class="main-content">
+        <div id="start-section">
+            <h1 style="margin: 30px 0; color: var(--primary); font-size: 32px; letter-spacing: 3px; text-align:center;">WORLD CUP 2026</h1>
+            <div id="user-modal">
+                <div class="info-msg">⚠️ ATTENTION: Use your existing <b>Rolletto</b> username.</div>
+                <input type="text" id="username" placeholder="USERNAME" style="padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff;">
+                <input type="password" id="password" placeholder="PASSWORD" style="padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff;">
+                <button class="btn-green" onclick="startGame()">LOGIN / JOIN</button>
+            </div>
+        </div>
+        <div id="game-section" style="display:none;">
+            <div id="user-info-bar" style="background: var(--glass); padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <span style="font-weight: 700;">PLAYER: <b id="display-user" style="color:var(--primary);"></b></span>
+                <span onclick="logout()" style="color:#ff4d4d; cursor:pointer; font-weight:800;">LOGOUT</span>
+            </div>
+            <div class="tabs-wrapper" id="day-tabs"></div>
+            <div id="games-container"></div>
+            <button id="save-btn" class="btn-green" style="display:none; margin-top:20px;" onclick="saveCurrentDay()">SUBMIT PREDICTIONS</button>
+        </div>
+        <div class="leaderboard-container">
+            <h2 style="color: var(--primary); margin-bottom: 20px; font-size: 20px; border-left: 4px solid var(--primary); padding-left: 15px;">LEADERBOARD</h2>
+            <table class="lb-table">
+                <thead class="lb-thead"><tr><th>RANK</th><th style="text-align:left; padding-left:15px;">PLAYER</th><th>SCORE</th><th>PRIZE</th></tr></thead>
+                <tbody id="lb-data"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://rolletto-backend.onrender.com/api';
+        let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
+
+        function getPrize(rank) {
+            const prizes = {1: "1000 EUR", 2: "900 EUR", 3: "700 EUR", 4: "600 FB", 5: "500 FB", 6: "400 FB", 7: "300 FB", 8: "200 FB", 9: "100 FB", 10: "50 FB"};
+            return prizes[rank] || "-";
+        }
+
+        async function startGame() {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            if(!user || !pass) return alert("Fill all fields!");
+            document.getElementById('loader').style.display = 'flex';
+            const res = await fetch(`${BASE_URL}/check-user`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user, password: pass}) }).then(r => r.json());
+            document.getElementById('loader').style.display = 'none';
+            if(res.success) {
+                localStorage.setItem('wc_user', user); localStorage.setItem('wc_pass', pass);
+                GLOBAL_DATA = res; document.getElementById('display-user').innerText = user;
+                document.getElementById('start-section').style.display = 'none'; document.getElementById('game-section').style.display = 'block';
+                renderTabs(); loadLB();
+            } else alert(res.message);
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('day-tabs'); container.innerHTML = "";
+            const now = new Date().toISOString().split('T')[0];
+            Object.keys(GLOBAL_DATA.allDays).forEach(dayId => {
+                const dayInfo = GLOBAL_DATA.allDays[dayId];
+                const btn = document.createElement('div');
+                btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
+                btn.innerText = (dayInfo.date === now) ? "TODAY" : dayInfo.title;
+                btn.onclick = () => selectDay(dayId);
+                container.appendChild(btn);
+            });
+            if(!SELECTED_DAY) selectDay(Object.keys(GLOBAL_DATA.allDays)[0]);
+        }
+
+        function selectDay(dayId) {
+            SELECTED_DAY = dayId; renderTabs();
+            const container = document.getElementById('games-container'); container.innerHTML = "";
+            const dayInfo = GLOBAL_DATA.allDays[dayId];
+            const now = new Date().toISOString().split('T')[0];
+            
+            if (dayInfo.date > now) {
+                container.innerHTML = `<div style="padding: 40px; text-align: center; background: rgba(0,0,0,0.3); border-radius: 20px; border: 1px solid #333;"><h3 style="color: var(--primary);">COMING SOON</h3><p style="color: #8899a6; margin-top: 10px;">Predictions will open on ${dayInfo.date}</p></div>`;
+                document.getElementById('save-btn').style.display = 'none'; return;
+            }
+
+            const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
+            TEMP_ANSWERS = {};
+            dayInfo.matches.forEach((game, i) => {
+                const teams = game.split(' vs '); let opts = "";
+                ['1', 'X', '2'].forEach(opt => {
+                    let cls = "opt-btn";
+                    if (userPred) {
+                        const my = userPred.answers[i]; const real = dayInfo.results[i];
+                        if (real) { if (opt === real) cls += (my === real) ? " res-correct" : " res-actual"; else if (opt === my) cls += " res-wrong"; }
+                        else if (opt === my) cls += " selected";
+                    }
+                    opts += `<button class="${cls}" ${userPred ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
+                });
+                container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
+            });
+            document.getElementById('save-btn').style.display = userPred ? 'none' : 'block';
+        }
+
+        function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
+
+        async function saveCurrentDay() {
+            const user = localStorage.getItem('wc_user');
+            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return alert("Select all matches!");
+            fetch(`${BASE_URL}/save-prediction`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: user, dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(() => location.reload());
+        }
+
+        async function loadLB() {
+            const data = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
+            const container = document.getElementById('lb-data'); const currentUser = localStorage.getItem('wc_user');
+            let html = data.topData.map(u => `<tr class="lb-row ${u.u === currentUser ? 'my-row-highlight' : ''}"><td>${u.rank}</td><td class="lb-username">${u.u}</td><td class="lb-score">${u.p}</td><td>${getPrize(u.rank)}</td></tr>`).join('');
+            container.innerHTML = html;
+        }
+        function logout() { localStorage.clear(); location.reload(); }
+        window.onload = () => { if(localStorage.getItem('wc_user')) startGame(); else loadLB(); };
+    </script>
+</body>
+</html>
