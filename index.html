@@ -17,13 +17,11 @@
             background-size: cover; background-attachment: fixed; background-position: center;
         }
 
-        /* ✨ Toast Notification */
         .toast {
             position: fixed; top: 20px; right: 20px; left: 20px; max-width: 400px; margin-left: auto;
             padding: 15px 20px; border-radius: 12px; font-weight: 700;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10001;
-            display: none; animation: slideIn 0.4s ease; border: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
+            display: none; animation: slideIn 0.4s ease; border: 1px solid rgba(255,255,255,0.1); text-align: center;
         }
         @keyframes slideIn { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -31,32 +29,33 @@
         .logo { height: 32px; cursor: pointer; }
         .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
 
-        /* Auth Card */
+        /* User Info & Stats */
+        .my-stats-card { background: linear-gradient(135deg, rgba(0,255,204,0.2), rgba(0,0,0,0.4)); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center; gap: 10px; }
+        .stat-item span { display: block; font-size: 10px; color: #8899a6; text-transform: uppercase; }
+        .stat-item b { font-size: 18px; color: var(--primary); font-family: 'Rajdhani'; }
+
         .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-top: 20px; }
         input { padding: 16px; border-radius: 12px; width: 100%; margin-bottom: 12px; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
         .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 18px; border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 15px; transition: 0.2s; }
-        .btn-green:active { transform: scale(0.98); }
 
-        /* Leaderboard */
+        /* Leaderboard Style */
         .leaderboard-container { margin-top: 30px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         .lb-row td { padding: 14px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; text-align: center; font-size: 14px; }
-        .lb-username { text-align: left !important; padding-left: 12px !important; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border-top: 1px solid var(--primary); border-bottom: 1px solid var(--primary); }
+        .lb-username { text-align: left !important; padding-left: 12px !important; }
 
-        /* Tabs & Games */
-        .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-        .tabs-wrapper::-webkit-scrollbar { display: none; }
+        /* Game Elements */
+        .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); cursor: pointer; border-radius: 10px; font-weight: 700; color: #aab8c2; white-space: nowrap; font-size: 13px; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
-
         .game-card { background: var(--glass); padding: 20px; margin: 12px 0; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); }
-        .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .team-name { flex: 1; font-weight: 700; font-size: 14px; text-align: center; font-family: 'Rajdhani'; }
         .vs-divider { font-size: 10px; color: var(--primary); font-weight: 800; padding: 5px 10px; background: rgba(0,255,204,0.1); border-radius: 6px; }
-        
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .opt-btn { padding: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .opt-btn { padding: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
         .opt-btn.selected, .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; }
         .res-wrong { background: #ff4d4d !important; }
         .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; }
@@ -64,11 +63,6 @@
         #loader { display: none; position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; justify-content: center; align-items: center; }
         .spinner { border: 3px solid rgba(0,255,204,0.1); border-left-color: var(--primary); width: 35px; height: 35px; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        @media (max-width: 480px) {
-            .team-name { font-size: 13px; }
-            .lb-username { max-width: 90px; }
-        }
     </style>
 </head>
 <body>
@@ -77,12 +71,18 @@
     <div id="loader"><div class="spinner"></div></div>
 
     <div class="main-content">
+        <!-- My Status Panel (ახალი) -->
+        <div id="my-status" class="my-stats-card">
+            <div class="stats-grid">
+                <div class="stat-item"><span>Your Rank</span><b id="my-rank">-</b></div>
+                <div class="stat-item"><span>Your Score</span><b id="my-score">0</b></div>
+                <div class="stat-item" onclick="logout()" style="cursor:pointer;"><span>Action</span><b style="color:#ff4d4d; font-size:12px;">LOGOUT</b></div>
+            </div>
+        </div>
+
         <div id="start-section">
             <h1 style="margin: 25px 0; color: var(--primary); font-size: 30px; text-align:center; font-family:'Rajdhani';">WORLD CUP 2026</h1>
             <div class="card-auth">
-                <div class="info-msg" style="margin-bottom:15px; font-size:12px; color:var(--primary); background:rgba(0,255,204,0.1); padding:12px; border-radius:10px; border-left:3px solid var(--primary);">
-                    ⚠️ ATTENTION: Use your <b>Rolletto</b> username to participate.
-                </div>
                 <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                 <input type="password" id="password" placeholder="PASSWORD">
                 <button class="btn-green" onclick="startGame()">LOGIN / JOIN</button>
@@ -90,17 +90,13 @@
         </div>
 
         <div id="game-section" style="display:none;">
-            <div style="background: var(--glass); padding: 12px 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                <span style="font-size:13px;">PLAYER: <b id="display-user" style="color:var(--primary);"></b></span>
-                <span onclick="logout()" style="color:#ff4d4d; cursor:pointer; font-weight:800; font-size: 11px; text-transform:uppercase;">Logout</span>
-            </div>
             <div class="tabs-wrapper" id="day-tabs"></div>
             <div id="games-container"></div>
             <button id="save-btn" class="btn-green" style="display:none; margin-top:15px;" onclick="saveCurrentDay()">SUBMIT PREDICTIONS</button>
         </div>
 
         <div class="leaderboard-container">
-            <h2 style="color: var(--primary); margin-bottom: 15px; font-size: 18px; border-left: 3px solid var(--primary); padding-left: 12px; font-family:'Rajdhani';">LEADERBOARD</h2>
+            <h2 style="color: var(--primary); margin-bottom: 15px; font-size: 18px; border-left: 3px solid var(--primary); padding-left: 12px; font-family:'Rajdhani';">TOP 10 LEADERBOARD</h2>
             <table class="lb-table">
                 <thead><tr style="font-size:11px; color:#8899a6; text-transform:uppercase;"><th>Rank</th><th style="text-align:left; padding-left:12px;">Player</th><th>Score</th><th>Prize</th></tr></thead>
                 <tbody id="lb-data"></tbody>
@@ -127,11 +123,9 @@
         }
 
         async function startGame() {
-            // სესიის შენარჩუნება: ჯერ ვამოწმებთ შენახულ მონაცემებს
             const user = localStorage.getItem('wc_user') || document.getElementById('username').value.trim();
             const pass = localStorage.getItem('wc_pass') || document.getElementById('password').value.trim();
-
-            if(!user || !pass) return; // თუ არც ინპუტშია და არც მეხსიერებაში, არაფერს ვაკეთებთ
+            if(!user || !pass) return;
             
             document.getElementById('loader').style.display = 'flex';
             try {
@@ -141,17 +135,15 @@
                 }).then(r => r.json());
                 
                 if(res.success) {
-                    localStorage.setItem('wc_user', user);
-                    localStorage.setItem('wc_pass', pass);
-                    GLOBAL_DATA = res; 
-                    document.getElementById('display-user').innerText = user;
+                    localStorage.setItem('wc_user', user); localStorage.setItem('wc_pass', pass);
+                    GLOBAL_DATA = res;
+                    document.getElementById('my-rank').innerText = `#${res.userRank}`;
+                    document.getElementById('my-score').innerText = res.userScore;
+                    document.getElementById('my-status').style.display = 'block';
                     document.getElementById('start-section').style.display = 'none'; 
                     document.getElementById('game-section').style.display = 'block';
                     renderTabs(); loadLB();
-                } else {
-                    localStorage.clear();
-                    if(document.getElementById('username').value) showToast(res.message);
-                }
+                } else { localStorage.clear(); if(document.getElementById('username').value) showToast(res.message); }
             } catch(e) { showToast("Connection error"); }
             document.getElementById('loader').style.display = 'none';
         }
@@ -175,12 +167,10 @@
             const container = document.getElementById('games-container'); container.innerHTML = "";
             const dayInfo = GLOBAL_DATA.allDays[dayId];
             const now = new Date().toISOString().split('T')[0];
-            
             if (dayInfo.date > now) {
                 container.innerHTML = `<div style="padding: 30px; text-align: center; background: rgba(0,0,0,0.2); border-radius: 15px;"><h3 style="color: var(--primary); font-size:16px;">COMING SOON</h3><p style="color: #8899a6; margin-top: 5px; font-size:12px;">Starts on ${dayInfo.date}</p></div>`;
                 document.getElementById('save-btn').style.display = 'none'; return;
             }
-
             const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             TEMP_ANSWERS = {};
             dayInfo.matches.forEach((game, i) => {
@@ -220,7 +210,10 @@
             try {
                 const data = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
                 const container = document.getElementById('lb-data'); const currentUser = localStorage.getItem('wc_user');
-                container.innerHTML = data.topData.map(u => `<tr class="lb-row ${u.u === currentUser ? 'my-row-highlight' : ''}"><td>${u.rank}</td><td class="lb-username">${u.u}</td><td style="color:var(--accent-gold); font-weight:700;">${u.p}</td><td style="font-size:12px;">${getPrize(u.rank)}</td></tr>`).join('');
+                container.innerHTML = data.topData.map(u => {
+                    const isMe = u.u === currentUser;
+                    return `<tr class="lb-row ${isMe ? 'my-row-highlight' : ''}"><td>${u.rank}</td><td class="lb-username">${u.u} ${isMe ? '<span style="color:var(--primary); font-size:10px;">(YOU)</span>' : ''}</td><td style="color:var(--accent-gold); font-weight:700;">${u.p}</td><td style="font-size:12px;">${getPrize(u.rank)}</td></tr>`;
+                }).join('');
             } catch(e) {}
         }
         function logout() { localStorage.clear(); location.reload(); }
