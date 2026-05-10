@@ -27,7 +27,7 @@
         .stat-item span { font-size: 10px; color: #8899a6; text-transform: uppercase; display: block; }
         .stat-item b { font-size: 18px; color: var(--primary); font-family: 'Rajdhani'; }
 
-        .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
         input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
         
         .btn-green { 
@@ -37,13 +37,11 @@
         }
         .btn-green:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
 
-        /* 🏆 ლიდერბორდი */
         .leaderboard-container { margin-top: 25px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
         .lb-username { text-align: left !important; padding-left: 15px !important; }
 
-        /* ⚽ თამაშები */
         .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
@@ -61,20 +59,14 @@
         .res-wrong { background: #ff4d4d !important; opacity: 0.7; }
         .res-actual { border: 1px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
 
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; text-align: center; display: none; min-width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; text-align: center; display: none; min-width: 300px; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* 📱 სპეციალური სტილები მობილურისთვის (ეკრანი < 600px) */
         @media (max-width: 600px) {
-            .main-content { padding: 10px; }
             .stat-item b { font-size: 15px; }
-            .card-auth { padding: 15px; }
-            input { padding: 12px; font-size: 14px; }
-            .btn-green { padding: 12px; font-size: 13px; }
             .lb-row td { font-size: 12px; padding: 10px 5px; }
             .team-name { font-size: 12px; }
-            .opt-btn { padding: 10px; font-size: 12px; }
             .logo { height: 24px; }
         }
     </style>
@@ -129,30 +121,61 @@
         function showToast(m, isErr = true) {
             const t = document.getElementById('toast'); t.innerText = m;
             t.style.background = isErr ? 'rgba(255, 77, 77, 0.95)' : 'rgba(0, 255, 204, 0.95)';
-            t.style.color = isErr ? 'white' : '#061218';
-            t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
+            t.style.color = 'white'; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
         }
 
         async function startGame() {
-            const btn = document.getElementById('login-btn');
-            const txt = document.getElementById('btn-text');
-            const ldr = document.getElementById('btn-loader');
-            const user = localStorage.getItem('wc_user') || document.getElementById('username').value.trim();
-            const pass = localStorage.getItem('wc_pass') || document.getElementById('password').value.trim();
+            const userField = document.getElementById('username');
+            const passField = document.getElementById('password');
+            const loginBtn = document.getElementById('login-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+
+            const user = localStorage.getItem('wc_user') || userField.value.trim();
+            const pass = localStorage.getItem('wc_pass') || passField.value.trim();
+            
             if(!user || !pass) return;
-            btn.disabled = true; txt.innerText = "WAIT..."; ldr.style.display = "block";
+
+            loginBtn.disabled = true;
+            btnText.innerText = "CONNECTING...";
+            btnLoader.style.display = "block";
+
             try {
-                const res = await fetch(`${BASE_URL}/check-user`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user, password: pass}) }).then(r => r.json());
+                const res = await fetch(`${BASE_URL}/check-user`, { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({user, password: pass}) 
+                }).then(r => r.json());
+                
                 if(res.success) {
-                    localStorage.setItem('wc_user', user); localStorage.setItem('wc_pass', pass);
-                    GLOBAL_DATA = res; document.getElementById('my-rank').innerText = `#${res.userRank}`; document.getElementById('my-score').innerText = res.userScore;
-                    document.getElementById('my-status').style.display = 'block'; document.getElementById('start-section').style.display = 'none'; document.getElementById('game-section').style.display = 'block';
+                    localStorage.setItem('wc_user', user); 
+                    localStorage.setItem('wc_pass', pass);
+                    GLOBAL_DATA = res;
+                    document.getElementById('my-rank').innerText = `#${res.userRank}`;
+                    document.getElementById('my-score').innerText = res.userScore;
+                    document.getElementById('my-status').style.display = 'block';
+                    document.getElementById('start-section').style.display = 'none'; 
+                    document.getElementById('game-section').style.display = 'block';
                     renderTabs(); loadLB();
-                } else { localStorage.clear(); showToast(res.message); resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN'); }
-            } catch(e) { showToast("Error"); resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN'); }
+                } else { 
+                    // ✨ მნიშვნელოვანი: აქ აღარ ვშლით localStorage-ს, თუ უბრალოდ სერვერმა დააგვიანა
+                    showToast(res.message); 
+                    resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN');
+                }
+            } catch(e) { 
+                showToast("Connection error. Try refreshing."); 
+                resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN');
+            }
         }
 
-        function resetBtn(b, t, l, txt) { document.getElementById(b).disabled = false; document.getElementById(t).innerText = txt; document.getElementById(l).style.display = "none"; }
+        function resetBtn(b, t, l, txt) { 
+            const btn = document.getElementById(b);
+            if(btn) btn.disabled = false;
+            const text = document.getElementById(t);
+            if(text) text.innerText = txt;
+            const loader = document.getElementById(l);
+            if(loader) loader.style.display = "none";
+        }
 
         function renderTabs() {
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
@@ -193,23 +216,46 @@
             document.getElementById('save-btn').style.display = userPred ? 'none' : 'block';
         }
 
-        function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
+        function pick(btn, idx, val) { 
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
+            btn.classList.add('selected'); 
+            TEMP_ANSWERS[idx] = val; 
+        }
 
         async function saveCurrentDay() {
-            const btn = document.getElementById('save-btn'); const txt = document.getElementById('save-text'); const ldr = document.getElementById('save-loader');
-            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Select all!");
-            btn.disabled = true; txt.innerText = "WAIT..."; ldr.style.display = "block";
+            const btn = document.getElementById('save-btn'); 
+            const txt = document.getElementById('save-text'); 
+            const ldr = document.getElementById('save-loader');
+            const user = localStorage.getItem('wc_user');
+            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Select all matches!");
+            
+            btn.disabled = true; txt.innerText = "SAVING..."; ldr.style.display = "block";
             try {
-                const res = await fetch(`${BASE_URL}/save-prediction`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
-                if(res.success) { showToast("Saved!", false); GLOBAL_DATA.userPredictions.push({ dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS} }); selectDay(SELECTED_DAY); }
-                else { showToast(res.message); resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT'); }
-            } catch(e) { showToast("Error"); resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT'); }
+                const res = await fetch(`${BASE_URL}/save-prediction`, { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({username: user, dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) 
+                }).then(r => r.json());
+                
+                if(res.success) { 
+                    showToast("Saved!", false); 
+                    GLOBAL_DATA.userPredictions.push({ dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS} }); 
+                    selectDay(SELECTED_DAY); 
+                } else { 
+                    showToast(res.message); 
+                    resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); 
+                }
+            } catch(e) { 
+                showToast("Error saving. Try again!"); 
+                resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); 
+            }
         }
 
         async function loadLB() {
             try {
                 const data = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
-                const container = document.getElementById('lb-data'); const cUser = (localStorage.getItem('wc_user') || "").toLowerCase();
+                const container = document.getElementById('lb-data'); 
+                const cUser = (localStorage.getItem('wc_user') || "").toLowerCase();
                 container.innerHTML = data.topData.map(u => {
                     const isMe = u.u.toLowerCase() === cUser;
                     let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "*".repeat(u.u.length-2) + u.u[u.u.length-1] : u.u[0] + "*");
@@ -217,8 +263,18 @@
                 }).join('');
             } catch(e) {}
         }
-        function logout() { localStorage.clear(); location.reload(); }
-        window.onload = () => { if(localStorage.getItem('wc_user')) startGame(); else loadLB(); };
+
+        function logout() { 
+            if(confirm("Are you sure you want to logout?")) {
+                localStorage.clear(); 
+                location.reload(); 
+            }
+        }
+        
+        window.onload = () => { 
+            if(localStorage.getItem('wc_user')) startGame(); 
+            else loadLB(); 
+        };
     </script>
 </body>
 </html>
