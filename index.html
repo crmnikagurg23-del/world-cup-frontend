@@ -54,9 +54,12 @@
         .vs-divider { font-size: 10px; color: var(--primary); font-weight: 800; padding: 5px 10px; background: rgba(0,255,204,0.1); border-radius: 6px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .opt-btn { padding: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
-        .opt-btn.selected, .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; }
-        .res-wrong { background: #ff4d4d !important; }
-        .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; }
+        
+        /* ✨ სწორი/არასწორი პასუხების სტილები */
+        .opt-btn.selected { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800 !important; box-shadow: 0 0 15px var(--primary-glow); }
+        .res-wrong { background: #ff4d4d !important; color: white !important; opacity: 0.7; }
+        .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; font-weight: 800 !important; background: transparent !important; }
 
         #loader { display: none; position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; justify-content: center; align-items: center; }
         .spinner { border: 3px solid rgba(0,255,204,0.1); border-left-color: var(--primary); width: 35px; height: 35px; border-radius: 50%; animation: spin 1s linear infinite; }
@@ -162,6 +165,9 @@
             if(!SELECTED_DAY) selectDay(Object.keys(GLOBAL_DATA.allDays).sort()[0]);
         }
 
+        // =========================================================
+        // 🔄 ✨ სრულად გასწორებული დათვალიერების ფუნქცია
+        // =========================================================
         function selectDay(dayId) {
             SELECTED_DAY = dayId; renderTabs();
             const container = document.getElementById('games-container'); container.innerHTML = "";
@@ -180,13 +186,28 @@
                 const teams = game.split(' vs '); let opts = "";
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
+                    
+                    // თუ მომხმარებელს გაკეთებული აქვს პროგნოზი
                     if (userPred) {
-                        const my = userPred.answers[i]; const real = dayInfo.results ? dayInfo.results[i] : null;
+                        const my = userPred.answers[i]; 
+                        const real = dayInfo.results ? dayInfo.results[i] : null;
+
+                        // ა) თუ შედეგი ცნობილია (ექსელში წერია) -> ვაფერადებთ
                         if (real && real !== "") {
-                            if (opt === real) cls += (my === real) ? " res-correct" : " res-actual";
-                            else if (opt === my) cls += " res-wrong";
-                        } else if (opt === my) cls += " selected";
+                            if (opt === real) {
+                                // ეს არის სწორი პასუხი
+                                cls += (my === real) ? " res-correct" : " res-actual";
+                            } else if (opt === my) {
+                                // ეს არის მომხმარებლის არასწორი პასუხი
+                                cls += " res-wrong";
+                            }
+                        } 
+                        // ბ) თუ შედეგი ჯერ უცნობია -> უბრალოდ ვნიშნავთ არჩეულს
+                        else if (opt === my) {
+                            cls += " selected";
+                        }
                     }
+                    
                     opts += `<button class="${cls}" ${userPred ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
@@ -217,7 +238,6 @@
 
                 if(response.success) {
                     showToast("Success! Your prediction is saved.", false);
-                    // 🚀 ლოკალური განახლება: აღარ ვიძახებთ startGame-ს ხელახლა
                     GLOBAL_DATA.userPredictions.push({ dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS} });
                     selectDay(SELECTED_DAY);
                 } else {
