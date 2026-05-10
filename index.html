@@ -55,11 +55,11 @@
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .opt-btn { padding: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
         
-        /* ✨ სწორი/არასწორი პასუხების სტილები */
-        .opt-btn.selected { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+        /* სწორი/არასწორი პასუხების ვიზუალი */
         .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800 !important; box-shadow: 0 0 15px var(--primary-glow); }
         .res-wrong { background: #ff4d4d !important; color: white !important; opacity: 0.7; }
-        .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; font-weight: 800 !important; background: transparent !important; }
+        .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
+        .selected { background: rgba(255,255,255,0.2) !important; border: 1px solid var(--primary) !important; }
 
         #loader { display: none; position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; justify-content: center; align-items: center; }
         .spinner { border: 3px solid rgba(0,255,204,0.1); border-left-color: var(--primary); width: 35px; height: 35px; border-radius: 50%; animation: spin 1s linear infinite; }
@@ -153,8 +153,10 @@
 
         function renderTabs() {
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
+            const days = Object.keys(GLOBAL_DATA.allDays).sort();
             const now = new Date().toISOString().split('T')[0];
-            Object.keys(GLOBAL_DATA.allDays).sort().forEach(dayId => {
+            
+            days.forEach(dayId => {
                 const dayInfo = GLOBAL_DATA.allDays[dayId];
                 const btn = document.createElement('div');
                 btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
@@ -162,12 +164,9 @@
                 btn.onclick = () => selectDay(dayId);
                 container.appendChild(btn);
             });
-            if(!SELECTED_DAY) selectDay(Object.keys(GLOBAL_DATA.allDays).sort()[0]);
+            if(!SELECTED_DAY) selectDay(days[0]);
         }
 
-        // =========================================================
-        // 🔄 ✨ სრულად გასწორებული დათვალიერების ფუნქცია
-        // =========================================================
         function selectDay(dayId) {
             SELECTED_DAY = dayId; renderTabs();
             const container = document.getElementById('games-container'); container.innerHTML = "";
@@ -186,28 +185,15 @@
                 const teams = game.split(' vs '); let opts = "";
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
-                    
-                    // თუ მომხმარებელს გაკეთებული აქვს პროგნოზი
                     if (userPred) {
-                        const my = userPred.answers[i]; 
+                        const my = userPred.answers[i];
                         const real = dayInfo.results ? dayInfo.results[i] : null;
 
-                        // ა) თუ შედეგი ცნობილია (ექსელში წერია) -> ვაფერადებთ
                         if (real && real !== "") {
-                            if (opt === real) {
-                                // ეს არის სწორი პასუხი
-                                cls += (my === real) ? " res-correct" : " res-actual";
-                            } else if (opt === my) {
-                                // ეს არის მომხმარებლის არასწორი პასუხი
-                                cls += " res-wrong";
-                            }
-                        } 
-                        // ბ) თუ შედეგი ჯერ უცნობია -> უბრალოდ ვნიშნავთ არჩეულს
-                        else if (opt === my) {
-                            cls += " selected";
-                        }
+                            if (opt === real) cls += (my === real) ? " res-correct" : " res-actual";
+                            else if (opt === my) cls += " res-wrong";
+                        } else if (opt === my) cls += " selected";
                     }
-                    
                     opts += `<button class="${cls}" ${userPred ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
@@ -223,45 +209,53 @@
 
         async function saveCurrentDay() {
             const user = localStorage.getItem('wc_user');
-            const totalMatches = GLOBAL_DATA.allDays[SELECTED_DAY].matches.length;
-            if(Object.keys(TEMP_ANSWERS).length < totalMatches) return showToast("Select all matches!");
+            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Select all matches!");
 
             const saveBtn = document.getElementById('save-btn');
-            saveBtn.disabled = true;
-            saveBtn.innerText = "SAVING... PLEASE WAIT";
+            saveBtn.disabled = true; saveBtn.innerText = "SAVING...";
 
             try {
-                const response = await fetch(`${BASE_URL}/save-prediction`, {
+                const res = await fetch(`${BASE_URL}/save-prediction`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({username: user, dayId: SELECTED_DAY, answers: TEMP_ANSWERS})
                 }).then(r => r.json());
 
-                if(response.success) {
-                    showToast("Success! Your prediction is saved.", false);
+                if(res.success) {
+                    showToast("Saved successfully!", false);
                     GLOBAL_DATA.userPredictions.push({ dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS} });
                     selectDay(SELECTED_DAY);
-                } else {
-                    showToast(response.message);
-                    saveBtn.disabled = false;
-                    saveBtn.innerText = "SUBMIT PREDICTIONS";
-                }
-            } catch(e) {
-                showToast("Error saving. Check your connection.");
-                saveBtn.disabled = false;
-                saveBtn.innerText = "SUBMIT PREDICTIONS";
-            }
+                } else { showToast(res.message); saveBtn.disabled = false; saveBtn.innerText = "SUBMIT PREDICTIONS"; }
+            } catch(e) { showToast("Error connecting to server"); saveBtn.disabled = false; saveBtn.innerText = "SUBMIT PREDICTIONS"; }
         }
 
         async function loadLB() {
             try {
                 const data = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
-                const container = document.getElementById('lb-data'); const currentUser = localStorage.getItem('wc_user');
+                const container = document.getElementById('lb-data'); 
+                const currentUser = localStorage.getItem('wc_user') ? localStorage.getItem('wc_user').toLowerCase() : null;
+
                 container.innerHTML = data.topData.map(u => {
-                    const isMe = u.u === currentUser;
-                    return `<tr class="lb-row ${isMe ? 'my-row-highlight' : ''}"><td>${u.rank}</td><td class="lb-username">${u.u} ${isMe ? '<span style="color:var(--primary); font-size:10px;">(YOU)</span>' : ''}</td><td style="color:var(--accent-gold); font-weight:700;">${u.p}</td><td style="font-size:12px;">${getPrize(u.rank)}</td></tr>`;
+                    const isMe = u.u.toLowerCase() === currentUser;
+                    
+                    // ✨ "დაფიფქვის" ლოგიკა
+                    let displayName = u.u;
+                    if (!isMe && u.u.length > 2) {
+                        const first = u.u[0]; const last = u.u[u.u.length - 1];
+                        displayName = first + "*".repeat(u.u.length - 2) + last;
+                    } else if (!isMe && u.u.length <= 2) {
+                        displayName = u.u[0] + "*";
+                    }
+
+                    return `<tr class="lb-row ${isMe ? 'my-row-highlight' : ''}">
+                        <td>${u.rank}</td>
+                        <td class="lb-username">${displayName} ${isMe ? '<span style="color:var(--primary); font-size:10px;">(YOU)</span>' : ''}</td>
+                        <td style="color:var(--accent-gold); font-weight:700;">${u.p}</td>
+                        <td style="font-size:12px;">${getPrize(u.rank)}</td>
+                    </tr>`;
                 }).join('');
             } catch(e) {}
         }
+
         function logout() { localStorage.clear(); location.reload(); }
         window.onload = () => { if(localStorage.getItem('wc_user')) startGame(); else loadLB(); };
     </script>
