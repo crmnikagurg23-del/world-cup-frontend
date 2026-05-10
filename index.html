@@ -38,72 +38,34 @@
         .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; }
         .res-wrong { background: #ff4d4d !important; opacity: 0.7; }
         .res-actual { border: 1px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; text-align: center; display: none; min-width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; text-align: center; display: none; min-width: 280px; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 600px) { .stat-item b { font-size: 15px; } .lb-row td { font-size: 12px; padding: 10px 5px; } .team-name { font-size: 12px; } .logo { height: 24px; } }
     </style>
 </head>
 <body>
     <div id="toast" class="toast"></div>
-    <header>
-        <img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo" onclick="window.open('https://rolletto.com/en/', '_blank')">
-    </header>
-
+    <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo" onclick="window.open('https://rolletto.com/en/', '_blank')"></header>
     <div class="main-content">
-        <div id="my-status" class="my-stats-card">
-            <div class="stats-grid">
-                <div class="stat-item"><span>Rank</span><b id="my-rank">-</b></div>
-                <div class="stat-item"><span>Score</span><b id="my-score">0</b></div>
-                <div class="stat-item" onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d">EXIT</span><b style="color:#ff4d4d; font-size:12px;">LOGOUT</b></div>
-            </div>
-        </div>
-
+        <div id="my-status" class="my-stats-card"><div class="stats-grid"><div class="stat-item"><span>Rank</span><b id="my-rank">-</b></div><div class="stat-item"><span>Score</span><b id="my-score">0</b></div><div class="stat-item" onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d">EXIT</span><b style="color:#ff4d4d; font-size:12px;">OUT</b></div></div></div>
         <div id="start-section">
             <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">WORLD CUP 2026</h2>
-            <div class="card-auth">
-                <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
-                <input type="password" id="password" placeholder="PASSWORD">
-                <button id="login-btn" class="btn-green" onclick="startGame()">
-                    <span id="btn-text">LOGIN / JOIN</span>
-                    <div id="btn-loader" class="btn-spinner"></div>
-                </button>
-            </div>
+            <div class="card-auth"><input type="text" id="username" placeholder="USERNAME" autocomplete="off"><input type="password" id="password" placeholder="PASSWORD"><button id="login-btn" class="btn-green"><span id="btn-text">LOGIN / JOIN</span><div id="btn-loader" class="btn-spinner"></div></button></div>
         </div>
-
-        <div id="game-section" style="display:none;">
-            <div class="tabs-wrapper" id="day-tabs"></div>
-            <div id="games-container"></div>
-            <button id="save-btn" class="btn-green" style="display:none; margin-top:15px;" onclick="saveCurrentDay()">
-                <span id="save-text">SUBMIT PREDICTIONS</span>
-                <div id="save-loader" class="btn-spinner"></div>
-            </button>
-        </div>
-
-        <div class="leaderboard-container">
-            <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; border-left: 3px solid var(--primary); padding-left: 10px; font-family:'Rajdhani';">LEADERBOARD</h3>
-            <table class="lb-table">
-                <thead><tr style="font-size:10px; color:#8899a6; text-transform:uppercase;"><th>#</th><th style="text-align:left; padding-left:15px;">Player</th><th>Score</th><th>Prize</th></tr></thead>
-                <tbody id="lb-data"></tbody>
-            </table>
-        </div>
+        <div id="game-section" style="display:none;"><div class="tabs-wrapper" id="day-tabs"></div><div id="games-container"></div><button id="save-btn" class="btn-green" style="display:none; margin-top:15px;"><span id="save-text">SUBMIT PREDICTIONS</span><div id="save-loader" class="btn-spinner"></div></button></div>
+        <div class="leaderboard-container"><h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; border-left: 3px solid var(--primary); padding-left: 10px; font-family:'Rajdhani';">LEADERBOARD</h3><table class="lb-table"><thead><tr style="font-size:10px; color:#8899a6; text-transform:uppercase;"><th>#</th><th style="text-align:left; padding-left:15px;">Player</th><th>Score</th><th>Prize</th></tr></thead><tbody id="lb-data"></tbody></table></div>
     </div>
-
     <script>
-        const BASE_URL = 'შენი_ბექენდის_ლინკი/api';
+        const BASE_URL = 'https://rolletto-backend.onrender.com/api';
         let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
-
-        function showToast(m, isErr = true) {
-            const t = document.getElementById('toast'); t.innerText = m;
-            t.style.background = isErr ? 'rgba(255, 77, 77, 0.95)' : 'rgba(0, 255, 204, 0.95)';
-            t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
-        }
-
+        function showToast(m, isErr = true) { const t = document.getElementById('toast'); t.innerText = m; t.style.background = isErr ? 'rgba(255, 77, 77, 0.95)' : 'rgba(0, 255, 204, 0.95)'; t.style.color = 'white'; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
         async function startGame() {
+            const btn = document.getElementById('login-btn'); const txt = document.getElementById('btn-text'); const ldr = document.getElementById('btn-loader');
             const user = localStorage.getItem('wc_user') || document.getElementById('username').value.trim();
             const pass = localStorage.getItem('wc_pass') || document.getElementById('password').value.trim();
             if(!user || !pass) return;
-            const btn = document.getElementById('login-btn');
-            btn.disabled = true; document.getElementById('btn-text').innerText = "CONNECTING..."; document.getElementById('btn-loader').style.display = "block";
+            btn.disabled = true; txt.innerText = "WAIT..."; ldr.style.display = "block";
             try {
                 const res = await fetch(`${BASE_URL}/check-user`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user, password: pass}) }).then(r => r.json());
                 if(res.success) {
@@ -112,54 +74,35 @@
                     document.getElementById('my-status').style.display = 'block'; document.getElementById('start-section').style.display = 'none'; document.getElementById('game-section').style.display = 'block';
                     renderTabs(); loadLB();
                 } else { showToast(res.message); resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN'); }
-            } catch(e) { showToast("Connection issue."); resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN'); }
+            } catch(e) { showToast("Error"); resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN'); }
         }
-
         function resetBtn(b, t, l, txt) { document.getElementById(b).disabled = false; document.getElementById(t).innerText = txt; document.getElementById(l).style.display = "none"; }
-
         function renderTabs() {
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
-            const days = Object.keys(GLOBAL_DATA.allDays).sort();
-            const now = new Date().toLocaleDateString('en-CA');
+            const days = Object.keys(GLOBAL_DATA.allDays).sort(); const now = new Date().toLocaleDateString('en-CA');
             days.forEach(dayId => {
                 if (GLOBAL_DATA.allDays[dayId].date <= now) {
-                    const btn = document.createElement('div');
-                    btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
+                    const btn = document.createElement('div'); btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
                     btn.innerText = (GLOBAL_DATA.allDays[dayId].date === now) ? "TODAY" : GLOBAL_DATA.allDays[dayId].title;
-                    btn.onclick = () => selectDay(dayId);
-                    container.appendChild(btn);
+                    btn.onclick = () => selectDay(dayId); container.appendChild(btn);
                 }
             });
-            if(!SELECTED_DAY) {
-                const visible = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
-                if(visible.length > 0) selectDay(visible[visible.length - 1]);
-            }
+            if(!SELECTED_DAY) { const visible = days.filter(id => GLOBAL_DATA.allDays[id].date <= now); if(visible.length > 0) selectDay(visible[visible.length - 1]); }
         }
-
         function selectDay(dayId) {
             SELECTED_DAY = dayId; renderTabs();
             resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS');
-            
             const container = document.getElementById('games-container'); container.innerHTML = "";
-            const dInfo = GLOBAL_DATA.allDays[dayId];
-            const now = new Date().toLocaleDateString('en-CA');
-            const isPast = dInfo.date < now;
-            const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
-            TEMP_ANSWERS = {};
-
-            // ინფო ბარი სპორტისთვის და ქულებისთვის
+            const dInfo = GLOBAL_DATA.allDays[dayId]; const now = new Date().toLocaleDateString('en-CA');
+            const isPast = dInfo.date < now; const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId); TEMP_ANSWERS = {};
             container.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><span style="font-size:11px; color:var(--primary); background:rgba(0,255,204,0.1); padding:5px 12px; border-radius:15px; text-transform:uppercase; border:1px solid rgba(0,255,204,0.2);">${dInfo.sport} • ${dInfo.pointsPerGame} PTS PER WIN</span></div>`;
-
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
                     if (userPred) {
                         const my = userPred.answers[i]; const real = dInfo.results ? dInfo.results[i] : null;
-                        if (real && real !== "") {
-                            if (opt === real) cls += (my === real) ? " res-correct" : " res-actual";
-                            else if (opt === my) cls += " res-wrong";
-                        } else if (opt === my) cls += " selected";
+                        if (real && real !== "") { if (opt === real) cls += (my === real) ? " res-correct" : " res-actual"; else if (opt === my) cls += " res-wrong"; } else if (opt === my) cls += " selected";
                     }
                     opts += `<button class="${cls}" ${isPast || userPred ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
@@ -167,20 +110,16 @@
             });
             document.getElementById('save-btn').style.display = (!isPast && !userPred) ? 'block' : 'none';
         }
-
         function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
-
         async function saveCurrentDay() {
-            const btn = document.getElementById('save-btn');
-            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Select all matches!");
-            btn.disabled = true; document.getElementById('save-text').innerText = "SAVING..."; document.getElementById('save-loader').style.display = "block";
+            const btn = document.getElementById('save-btn'); if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Select all matches!");
+            btn.disabled = true; document.getElementById('save-text').innerText = "WAIT..."; document.getElementById('save-loader').style.display = "block";
             try {
                 const res = await fetch(`${BASE_URL}/save-prediction`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
                 if(res.success) { showToast("Saved!", false); GLOBAL_DATA.userPredictions.push({ dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS} }); selectDay(SELECTED_DAY); }
                 else { showToast(res.message); resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); }
-            } catch(e) { showToast("Error saving."); resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); }
+            } catch(e) { showToast("Error"); resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); }
         }
-
         async function loadLB() {
             try {
                 const data = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
