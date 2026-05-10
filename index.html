@@ -37,7 +37,6 @@
         .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-top: 20px; }
         input { padding: 16px; border-radius: 12px; width: 100%; margin-bottom: 12px; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
         
-        /* ✨ განახლებული ღილაკი Spinner-ით */
         .btn-green { 
             background: var(--primary); color: var(--bg-dark); border: none; padding: 18px; 
             border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; 
@@ -137,16 +136,20 @@
             return prizes[rank] || "-";
         }
 
+        // =========================================================
+        // ✨ სრულად გასწორებული START GAME (შავი ეკრანის გარეშე)
+        // =========================================================
         async function startGame() {
             const loginBtn = document.getElementById('login-btn');
             const btnText = document.getElementById('btn-text');
             const btnLoader = document.getElementById('btn-loader');
+            
             const user = localStorage.getItem('wc_user') || document.getElementById('username').value.trim();
             const pass = localStorage.getItem('wc_pass') || document.getElementById('password').value.trim();
             
-            if(!user || !pass) return showToast("Enter username and password");
+            if(!user || !pass) return;
 
-            // ✨ ღილაკის აქტივაცია
+            // მხოლოდ ღილაკს ვცვლით, ეკრანი არ შავდება
             loginBtn.disabled = true;
             btnText.innerText = "CONNECTING...";
             btnLoader.style.display = "block";
@@ -158,7 +161,8 @@
                 }).then(r => r.json());
                 
                 if(res.success) {
-                    localStorage.setItem('wc_user', user); localStorage.setItem('wc_pass', pass);
+                    localStorage.setItem('wc_user', user); 
+                    localStorage.setItem('wc_pass', pass);
                     GLOBAL_DATA = res;
                     document.getElementById('my-rank').innerText = `#${res.userRank}`;
                     document.getElementById('my-score').innerText = res.userScore;
