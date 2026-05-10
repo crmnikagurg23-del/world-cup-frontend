@@ -18,7 +18,8 @@
         }
 
         header { padding: 10px; border-bottom: 1px solid var(--primary); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
-        .logo { height: 28px; }
+        .logo { height: 28px; cursor: pointer; transition: 0.3s; }
+        .logo:hover { opacity: 0.8; transform: scale(1.05); }
         
         .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
 
@@ -27,7 +28,7 @@
         .stat-item span { font-size: 10px; color: #8899a6; text-transform: uppercase; display: block; }
         .stat-item b { font-size: 18px; color: var(--primary); font-family: 'Rajdhani'; }
 
-        .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
         
         .btn-green { 
@@ -40,6 +41,7 @@
         .leaderboard-container { margin-top: 25px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
+        .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border: 1px solid var(--primary); }
         .lb-username { text-align: left !important; padding-left: 15px !important; }
 
         .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
@@ -55,25 +57,32 @@
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
         
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
-        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; }
+        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; }
         .res-wrong { background: #ff4d4d !important; opacity: 0.7; }
         .res-actual { border: 1px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
 
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; text-align: center; display: none; min-width: 300px; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; text-align: center; display: none; min-width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         @media (max-width: 600px) {
+            .main-content { padding: 10px; }
             .stat-item b { font-size: 15px; }
             .lb-row td { font-size: 12px; padding: 10px 5px; }
             .team-name { font-size: 12px; }
+            .opt-btn { padding: 10px; font-size: 12px; }
             .logo { height: 24px; }
         }
     </style>
 </head>
 <body>
     <div id="toast" class="toast"></div>
-    <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo" onclick="location.reload()"></header>
+    <header>
+        <img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" 
+             alt="Rolletto" 
+             class="logo" 
+             onclick="window.open('https://rolletto.com/en/', '_blank')">
+    </header>
 
     <div class="main-content">
         <div id="my-status" class="my-stats-card">
@@ -158,23 +167,19 @@
                     document.getElementById('game-section').style.display = 'block';
                     renderTabs(); loadLB();
                 } else { 
-                    // ✨ მნიშვნელოვანი: აქ აღარ ვშლით localStorage-ს, თუ უბრალოდ სერვერმა დააგვიანა
                     showToast(res.message); 
                     resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN');
                 }
             } catch(e) { 
-                showToast("Connection error. Try refreshing."); 
+                showToast("Connection issue. Try again."); 
                 resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN');
             }
         }
 
         function resetBtn(b, t, l, txt) { 
-            const btn = document.getElementById(b);
-            if(btn) btn.disabled = false;
-            const text = document.getElementById(t);
-            if(text) text.innerText = txt;
-            const loader = document.getElementById(l);
-            if(loader) loader.style.display = "none";
+            const btn = document.getElementById(b); if(btn) btn.disabled = false;
+            const text = document.getElementById(t); if(text) text.innerText = txt;
+            const loader = document.getElementById(l); if(loader) loader.style.display = "none";
         }
 
         function renderTabs() {
@@ -218,44 +223,30 @@
 
         function pick(btn, idx, val) { 
             btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
-            btn.classList.add('selected'); 
-            TEMP_ANSWERS[idx] = val; 
+            btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; 
         }
 
         async function saveCurrentDay() {
-            const btn = document.getElementById('save-btn'); 
-            const txt = document.getElementById('save-text'); 
-            const ldr = document.getElementById('save-loader');
-            const user = localStorage.getItem('wc_user');
+            const btn = document.getElementById('save-btn'); const txt = document.getElementById('save-text'); const ldr = document.getElementById('save-loader');
             if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Select all matches!");
-            
             btn.disabled = true; txt.innerText = "SAVING..."; ldr.style.display = "block";
             try {
                 const res = await fetch(`${BASE_URL}/save-prediction`, { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({username: user, dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) 
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) 
                 }).then(r => r.json());
-                
                 if(res.success) { 
                     showToast("Saved!", false); 
                     GLOBAL_DATA.userPredictions.push({ dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS} }); 
                     selectDay(SELECTED_DAY); 
-                } else { 
-                    showToast(res.message); 
-                    resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); 
-                }
-            } catch(e) { 
-                showToast("Error saving. Try again!"); 
-                resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); 
-            }
+                } else { showToast(res.message); resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); }
+            } catch(e) { showToast("Error saving."); resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); }
         }
 
         async function loadLB() {
             try {
                 const data = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
-                const container = document.getElementById('lb-data'); 
-                const cUser = (localStorage.getItem('wc_user') || "").toLowerCase();
+                const container = document.getElementById('lb-data'); const cUser = (localStorage.getItem('wc_user') || "").toLowerCase();
                 container.innerHTML = data.topData.map(u => {
                     const isMe = u.u.toLowerCase() === cUser;
                     let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "*".repeat(u.u.length-2) + u.u[u.u.length-1] : u.u[0] + "*");
@@ -264,17 +255,8 @@
             } catch(e) {}
         }
 
-        function logout() { 
-            if(confirm("Are you sure you want to logout?")) {
-                localStorage.clear(); 
-                location.reload(); 
-            }
-        }
-        
-        window.onload = () => { 
-            if(localStorage.getItem('wc_user')) startGame(); 
-            else loadLB(); 
-        };
+        function logout() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } }
+        window.onload = () => { if(localStorage.getItem('wc_user')) startGame(); else loadLB(); };
     </script>
 </body>
 </html>
