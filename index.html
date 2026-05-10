@@ -29,7 +29,6 @@
         .logo { height: 32px; cursor: pointer; }
         .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
 
-        /* User Info & Stats */
         .my-stats-card { background: linear-gradient(135deg, rgba(0,255,204,0.2), rgba(0,0,0,0.4)); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center; gap: 10px; }
         .stat-item span { display: block; font-size: 10px; color: #8899a6; text-transform: uppercase; }
@@ -38,15 +37,14 @@
         .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-top: 20px; }
         input { padding: 16px; border-radius: 12px; width: 100%; margin-bottom: 12px; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
         .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 18px; border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 15px; transition: 0.2s; }
+        .btn-green:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
 
-        /* Leaderboard Style */
         .leaderboard-container { margin-top: 30px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         .lb-row td { padding: 14px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; text-align: center; font-size: 14px; }
         .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border-top: 1px solid var(--primary); border-bottom: 1px solid var(--primary); }
         .lb-username { text-align: left !important; padding-left: 12px !important; }
 
-        /* Game Elements */
         .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); cursor: pointer; border-radius: 10px; font-weight: 700; color: #aab8c2; white-space: nowrap; font-size: 13px; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
@@ -71,7 +69,6 @@
     <div id="loader"><div class="spinner"></div></div>
 
     <div class="main-content">
-        <!-- My Status Panel (ახალი) -->
         <div id="my-status" class="my-stats-card">
             <div class="stats-grid">
                 <div class="stat-item"><span>Your Rank</span><b id="my-rank">-</b></div>
@@ -85,7 +82,7 @@
             <div class="card-auth">
                 <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                 <input type="password" id="password" placeholder="PASSWORD">
-                <button class="btn-green" onclick="startGame()">LOGIN / JOIN</button>
+                <button id="login-btn" class="btn-green" onclick="startGame()">LOGIN / JOIN</button>
             </div>
         </div>
 
@@ -96,7 +93,7 @@
         </div>
 
         <div class="leaderboard-container">
-            <h2 style="color: var(--primary); margin-bottom: 15px; font-size: 18px; border-left: 3px solid var(--primary); padding-left: 12px; font-family:'Rajdhani';">TOP 10 LEADERBOARD</h2>
+            <h2 style="color: var(--primary); margin-bottom: 15px; font-size: 18px; border-left: 3px solid var(--primary); padding-left: 12px; font-family:'Rajdhani';">LEADERBOARD</h2>
             <table class="lb-table">
                 <thead><tr style="font-size:11px; color:#8899a6; text-transform:uppercase;"><th>Rank</th><th style="text-align:left; padding-left:12px;">Player</th><th>Score</th><th>Prize</th></tr></thead>
                 <tbody id="lb-data"></tbody>
@@ -143,7 +140,10 @@
                     document.getElementById('start-section').style.display = 'none'; 
                     document.getElementById('game-section').style.display = 'block';
                     renderTabs(); loadLB();
-                } else { localStorage.clear(); if(document.getElementById('username').value) showToast(res.message); }
+                } else { 
+                    localStorage.clear(); 
+                    if(document.getElementById('username').value) showToast(res.message); 
+                }
             } catch(e) { showToast("Connection error"); }
             document.getElementById('loader').style.display = 'none';
         }
@@ -151,7 +151,7 @@
         function renderTabs() {
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
             const now = new Date().toISOString().split('T')[0];
-            Object.keys(GLOBAL_DATA.allDays).forEach(dayId => {
+            Object.keys(GLOBAL_DATA.allDays).sort().forEach(dayId => {
                 const dayInfo = GLOBAL_DATA.allDays[dayId];
                 const btn = document.createElement('div');
                 btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
@@ -159,7 +159,7 @@
                 btn.onclick = () => selectDay(dayId);
                 container.appendChild(btn);
             });
-            if(!SELECTED_DAY) selectDay(Object.keys(GLOBAL_DATA.allDays)[0]);
+            if(!SELECTED_DAY) selectDay(Object.keys(GLOBAL_DATA.allDays).sort()[0]);
         }
 
         function selectDay(dayId) {
@@ -167,20 +167,25 @@
             const container = document.getElementById('games-container'); container.innerHTML = "";
             const dayInfo = GLOBAL_DATA.allDays[dayId];
             const now = new Date().toISOString().split('T')[0];
+
             if (dayInfo.date > now) {
                 container.innerHTML = `<div style="padding: 30px; text-align: center; background: rgba(0,0,0,0.2); border-radius: 15px;"><h3 style="color: var(--primary); font-size:16px;">COMING SOON</h3><p style="color: #8899a6; margin-top: 5px; font-size:12px;">Starts on ${dayInfo.date}</p></div>`;
                 document.getElementById('save-btn').style.display = 'none'; return;
             }
+
             const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             TEMP_ANSWERS = {};
+            
             dayInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
                     if (userPred) {
-                        const my = userPred.answers[i]; const real = dayInfo.results[i];
-                        if (real) { if (opt === real) cls += (my === real) ? " res-correct" : " res-actual"; else if (opt === my) cls += " res-wrong"; }
-                        else if (opt === my) cls += " selected";
+                        const my = userPred.answers[i]; const real = dayInfo.results ? dayInfo.results[i] : null;
+                        if (real && real !== "") {
+                            if (opt === real) cls += (my === real) ? " res-correct" : " res-actual";
+                            else if (opt === my) cls += " res-wrong";
+                        } else if (opt === my) cls += " selected";
                     }
                     opts += `<button class="${cls}" ${userPred ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
@@ -189,21 +194,42 @@
             document.getElementById('save-btn').style.display = userPred ? 'none' : 'block';
         }
 
-        function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
+        function pick(btn, idx, val) { 
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
+            btn.classList.add('selected'); 
+            TEMP_ANSWERS[idx] = val; 
+        }
 
         async function saveCurrentDay() {
             const user = localStorage.getItem('wc_user');
-            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Select all matches!");
-            document.getElementById('loader').style.display = 'flex';
+            const totalMatches = GLOBAL_DATA.allDays[SELECTED_DAY].matches.length;
+            if(Object.keys(TEMP_ANSWERS).length < totalMatches) return showToast("Select all matches!");
+
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.disabled = true;
+            saveBtn.innerText = "SAVING... PLEASE WAIT";
+
             try {
                 const response = await fetch(`${BASE_URL}/save-prediction`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({username: user, dayId: SELECTED_DAY, answers: TEMP_ANSWERS})
                 }).then(r => r.json());
-                if(response.success) { await startGame(); showToast("Saved!", false); }
-                else showToast(response.message);
-            } catch(e) { showToast("Error saving"); }
-            document.getElementById('loader').style.display = 'none';
+
+                if(response.success) {
+                    showToast("Success! Your prediction is saved.", false);
+                    // 🚀 ლოკალური განახლება: აღარ ვიძახებთ startGame-ს ხელახლა
+                    GLOBAL_DATA.userPredictions.push({ dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS} });
+                    selectDay(SELECTED_DAY);
+                } else {
+                    showToast(response.message);
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = "SUBMIT PREDICTIONS";
+                }
+            } catch(e) {
+                showToast("Error saving. Check your connection.");
+                saveBtn.disabled = false;
+                saveBtn.innerText = "SUBMIT PREDICTIONS";
+            }
         }
 
         async function loadLB() {
