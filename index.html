@@ -36,8 +36,22 @@
 
         .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-top: 20px; }
         input { padding: 16px; border-radius: 12px; width: 100%; margin-bottom: 12px; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
-        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 18px; border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 15px; transition: 0.2s; }
-        .btn-green:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
+        
+        /* ✨ განახლებული ღილაკი Spinner-ით */
+        .btn-green { 
+            background: var(--primary); color: var(--bg-dark); border: none; padding: 18px; 
+            border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; 
+            text-transform: uppercase; font-size: 15px; transition: 0.2s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-green:disabled { background: #555; cursor: not-allowed; opacity: 0.7; color: #fff; }
+
+        .btn-spinner {
+            width: 18px; height: 18px; border: 3px solid rgba(0,0,0,0.2);
+            border-top-color: #000; border-radius: 50%;
+            animation: spin 0.8s linear infinite; display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .leaderboard-container { margin-top: 30px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
@@ -48,6 +62,7 @@
         .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); cursor: pointer; border-radius: 10px; font-weight: 700; color: #aab8c2; white-space: nowrap; font-size: 13px; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
+        
         .game-card { background: var(--glass); padding: 20px; margin: 12px 0; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); }
         .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .team-name { flex: 1; font-weight: 700; font-size: 14px; text-align: center; font-family: 'Rajdhani'; }
@@ -59,16 +74,11 @@
         .res-wrong { background: #ff4d4d !important; color: white !important; opacity: 0.7; }
         .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
         .selected { background: rgba(255,255,255,0.2) !important; border: 1px solid var(--primary) !important; }
-
-        #loader { display: none; position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; justify-content: center; align-items: center; }
-        .spinner { border: 3px solid rgba(0,255,204,0.1); border-left-color: var(--primary); width: 35px; height: 35px; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div id="toast" class="toast"></div>
     <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo" onclick="location.reload()"></header>
-    <div id="loader"><div class="spinner"></div></div>
 
     <div class="main-content">
         <div id="my-status" class="my-stats-card">
@@ -84,14 +94,20 @@
             <div class="card-auth">
                 <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                 <input type="password" id="password" placeholder="PASSWORD">
-                <button id="login-btn" class="btn-green" onclick="startGame()">LOGIN / JOIN</button>
+                <button id="login-btn" class="btn-green" onclick="startGame()">
+                    <span id="btn-text">LOGIN / JOIN</span>
+                    <div id="btn-loader" class="btn-spinner"></div>
+                </button>
             </div>
         </div>
 
         <div id="game-section" style="display:none;">
             <div class="tabs-wrapper" id="day-tabs"></div>
             <div id="games-container"></div>
-            <button id="save-btn" class="btn-green" style="display:none; margin-top:15px;" onclick="saveCurrentDay()">SUBMIT PREDICTIONS</button>
+            <button id="save-btn" class="btn-green" style="display:none; margin-top:15px;" onclick="saveCurrentDay()">
+                <span id="save-text">SUBMIT PREDICTIONS</span>
+                <div id="save-loader" class="btn-spinner"></div>
+            </button>
         </div>
 
         <div class="leaderboard-container">
@@ -122,20 +138,18 @@
         }
 
         async function startGame() {
-            const userField = document.getElementById('username');
-            const passField = document.getElementById('password');
             const loginBtn = document.getElementById('login-btn');
-
-            const user = localStorage.getItem('wc_user') || userField.value.trim();
-            const pass = localStorage.getItem('wc_pass') || passField.value.trim();
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+            const user = localStorage.getItem('wc_user') || document.getElementById('username').value.trim();
+            const pass = localStorage.getItem('wc_pass') || document.getElementById('password').value.trim();
             
-            if(!user || !pass) return showToast("Please enter username and password");
+            if(!user || !pass) return showToast("Enter username and password");
 
-            // ✨ ვიზუალური ეფექტი ლოდინისას
+            // ✨ ღილაკის აქტივაცია
             loginBtn.disabled = true;
-            loginBtn.innerText = "CHECKING... PLEASE WAIT";
-            loginBtn.style.opacity = "0.6";
-            if(!localStorage.getItem('wc_user')) document.getElementById('loader').style.display = 'flex';
+            btnText.innerText = "CONNECTING...";
+            btnLoader.style.display = "block";
 
             try {
                 const res = await fetch(`${BASE_URL}/check-user`, { 
@@ -154,13 +168,21 @@
                     renderTabs(); loadLB();
                 } else { 
                     localStorage.clear(); showToast(res.message); 
-                    loginBtn.disabled = false; loginBtn.innerText = "LOGIN / JOIN"; loginBtn.style.opacity = "1";
+                    resetLoginBtn();
                 }
             } catch(e) { 
-                showToast("Connection error"); 
-                loginBtn.disabled = false; loginBtn.innerText = "LOGIN / JOIN"; loginBtn.style.opacity = "1";
+                showToast("Connection error. Try again!"); 
+                resetLoginBtn();
             }
-            document.getElementById('loader').style.display = 'none';
+        }
+
+        function resetLoginBtn() {
+            const loginBtn = document.getElementById('login-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+            loginBtn.disabled = false;
+            btnText.innerText = "LOGIN / JOIN";
+            btnLoader.style.display = "none";
         }
 
         function renderTabs() {
@@ -214,10 +236,16 @@
         }
 
         async function saveCurrentDay() {
+            const saveBtn = document.getElementById('save-btn');
+            const saveText = document.getElementById('save-text');
+            const saveLoader = document.getElementById('save-loader');
             const user = localStorage.getItem('wc_user');
             if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Select all matches!");
-            const saveBtn = document.getElementById('save-btn');
-            saveBtn.disabled = true; saveBtn.innerText = "SAVING...";
+            
+            saveBtn.disabled = true;
+            saveText.innerText = "SAVING...";
+            saveLoader.style.display = "block";
+
             try {
                 const res = await fetch(`${BASE_URL}/save-prediction`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -227,8 +255,17 @@
                     showToast("Saved successfully!", false);
                     GLOBAL_DATA.userPredictions.push({ dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS} });
                     selectDay(SELECTED_DAY);
-                } else { showToast(res.message); saveBtn.disabled = false; saveBtn.innerText = "SUBMIT PREDICTIONS"; }
-            } catch(e) { showToast("Error connecting"); saveBtn.disabled = false; saveBtn.innerText = "SUBMIT PREDICTIONS"; }
+                } else { showToast(res.message); resetSaveBtn(); }
+            } catch(e) { showToast("Error connecting"); resetSaveBtn(); }
+        }
+
+        function resetSaveBtn() {
+            const saveBtn = document.getElementById('save-btn');
+            const saveText = document.getElementById('save-text');
+            const saveLoader = document.getElementById('save-loader');
+            saveBtn.disabled = false;
+            saveText.innerText = "SUBMIT PREDICTIONS";
+            saveLoader.style.display = "none";
         }
 
         async function loadLB() {
@@ -251,6 +288,7 @@
                 }).join('');
             } catch(e) {}
         }
+
         function logout() { localStorage.clear(); location.reload(); }
         window.onload = () => { if(localStorage.getItem('wc_user')) startGame(); else loadLB(); };
     </script>
