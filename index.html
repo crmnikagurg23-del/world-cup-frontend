@@ -1,70 +1,271 @@
-<style>
-    /* ადმინ პანელის დამატებითი სტილი */
-    .admin-panel { background: rgba(255, 204, 0, 0.1); border: 1px solid #ffcc00; padding: 20px; border-radius: 20px; margin-top: 20px; }
-    .admin-input { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 10px; border-radius: 8px; color: white; width: 100%; margin-bottom: 10px; }
-</style>
-
-<div id="admin-section" class="main-content hidden">
-    <div class="admin-panel">
-        <h2 style="color: #ffcc00; font-family: 'Rajdhani'; margin-bottom: 15px;">ADMIN DASHBOARD</h2>
-        
-        <div style="border-bottom: 1px solid #444; padding-bottom: 15px; margin-bottom: 15px;">
-            <p style="font-size: 12px; margin-bottom: 5px;">ADD NEW GAME DAY</p>
-            <input id="adm-dayid" class="admin-input" placeholder="Day ID (e.g. 1)">
-            <input id="adm-title" class="admin-input" placeholder="Title (e.g. Day 1 - Group Stage)">
-            <input id="adm-date" class="admin-input" type="date">
-            <input id="adm-sport" class="admin-input" placeholder="Sport (e.g. Football / UFC)">
-            <textarea id="adm-matches" class="admin-input" placeholder="Matches (Team A vs Team B | Team C vs Team D)"></textarea>
-            <button class="btn-green" onclick="adminAddGame()">CREATE GAME DAY</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rolletto Predictor | World Cup 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00ffcc; --bg-dark: #061218; --glass: rgba(15, 33, 42, 0.9); --accent-gold: #ffcc00; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-dark); color: #fff; background-image: radial-gradient(circle at 50% 0%, rgba(0, 255, 204, 0.1) 0%, transparent 50%), linear-gradient(rgba(6,18,24,0.8), rgba(6,18,24,0.95)), url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg'); background-size: cover; background-attachment: fixed; background-position: center; }
+        header { padding: 10px; border-bottom: 1px solid var(--primary); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
+        .logo { height: 28px; cursor: pointer; }
+        .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
+        .card-auth, .game-card, .leaderboard-container, .rules-container, .admin-panel { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+        input, textarea, select { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; outline: none; }
+        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 50px; }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; width: 100%; margin-top: 10px; cursor: pointer; }
+        .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
+        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; }
+        .res-wrong { background: #ff4d4d !important; color: white !important; }
+        .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; }
+        .hidden { display: none !important; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; z-index: 2000; display: none; text-align:center; min-width: 280px; }
+        .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo"></header>
+    
+    <div class="main-content">
+        <div id="my-status" class="hidden">
+            <div class="card-auth" style="padding: 15px; margin-bottom: 15px; background: rgba(0,255,204,0.1); border-color: var(--primary);">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; text-align:center;">
+                    <div><span style="font-size:10px; color:#8899a6; text-transform:uppercase;">Rank</span><br><b id="my-rank" style="color:var(--primary); font-family:'Rajdhani'; font-size:20px;">-</b></div>
+                    <div><span style="font-size:10px; color:#8899a6; text-transform:uppercase;">Score</span><br><b id="my-score" style="color:var(--primary); font-family:'Rajdhani'; font-size:20px;">0</b></div>
+                    <div onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d; font-size:10px; text-transform:uppercase;">Exit</span><br><b style="color:#ff4d4d; font-size:14px; font-family:'Rajdhani';">OUT</b></div>
+                </div>
+            </div>
         </div>
 
-        <div>
-            <p style="font-size: 12px; margin-bottom: 5px;">SET RESULTS</p>
-            <input id="res-dayid" class="admin-input" placeholder="Day ID">
-            <input id="res-values" class="admin-input" placeholder="Results (1 | X | 2 | 1)">
-            <button class="btn-green" style="background: #ffcc00;" onclick="adminSetResults()">SAVE RESULTS</button>
+        <div id="admin-panel" class="admin-panel hidden" style="border-color: #ffcc00; background: rgba(255,204,0,0.05);">
+            <h3 style="color: #ffcc00; font-family: 'Rajdhani'; margin-bottom: 15px;">ADMIN PANEL</h3>
+            <div id="admin-controls">
+                <input id="adm-dayid" placeholder="Day ID (e.g. 1)">
+                <input id="adm-title" placeholder="Title (e.g. Day 1 - Group Stage)">
+                <input id="adm-date" type="date">
+                <input id="adm-sport" placeholder="Sport (Football, UFC, NBA)">
+                <textarea id="adm-matches" placeholder="Match A vs Match B | Match C vs Match D"></textarea>
+                <button class="btn-green" onclick="adminAddGame()" style="background:#ffcc00;">CREATE GAME DAY</button>
+                <hr style="margin: 15px 0; opacity: 0.2;">
+                <input id="res-dayid" placeholder="Day ID to set results">
+                <input id="res-values" placeholder="Results (1 | X | 2)">
+                <button class="btn-green" onclick="adminSetResults()" style="background:#ffcc00;">SAVE RESULTS</button>
+            </div>
         </div>
-        <button class="btn-outline" onclick="location.reload()">BACK TO PLAYER VIEW</button>
+
+        <div id="login-section">
+            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">WORLD CUP 2026</h2>
+            <div class="card-auth">
+                <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
+                <input type="password" id="password" placeholder="PASSWORD">
+                <button id="login-btn" class="btn-green" onclick="startGame(false, 'login')">
+                    <span id="btn-text">LOGIN</span>
+                    <div id="btn-loader" class="btn-spinner"></div>
+                </button>
+                <button class="btn-outline" onclick="toggleAuth('signup')">CREATE NEW ACCOUNT</button>
+            </div>
+        </div>
+
+        <div id="signup-section" class="hidden">
+            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">JOIN PREDICTOR</h2>
+            <div class="card-auth">
+                <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
+                <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
+                <p style="font-size: 10px; color: #ffcc00; margin-bottom: 15px; text-align: center;">⚠️ PLEASE REMEMBER YOUR PASSWORD!</p>
+                <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">
+                    <span id="reg-btn-text">SIGN UP / JOIN</span>
+                    <div id="reg-btn-loader" class="btn-spinner"></div>
+                </button>
+                <button class="btn-outline" onclick="toggleAuth('login')">BACK TO LOGIN</button>
+            </div>
+        </div>
+
+        <div id="game-section" class="hidden">
+            <div class="tabs-wrapper" id="day-tabs"></div>
+            <div id="games-container"></div>
+            <button id="save-btn" class="btn-green hidden" onclick="saveCurrentDay()">
+                <span id="save-text">SUBMIT PREDICTIONS</span>
+                <div id="save-loader" class="btn-spinner"></div>
+            </button>
+        </div>
+
+        <div class="leaderboard-container">
+            <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; font-family:'Rajdhani'; text-transform: uppercase;">LEADERBOARD</h3>
+            <table class="lb-table" style="width:100%; border-collapse: separate; border-spacing: 0 5px;">
+                <tbody id="lb-data"></tbody>
+            </table>
+        </div>
+
+        <div class="rules-container">
+            <h3 style="color: var(--primary); font-size: 14px; font-family:'Rajdhani'; text-transform: uppercase;">Official Rules</h3>
+            <div style="font-size: 11px; color: #b0bac1; line-height: 1.6; margin-top: 10px;">
+                • Campaign Period: June 5 - July 20, 2026.<br>
+                • Points: 1 pt (June 10-27), 3 pts (June 28 - July 13), 5 pts (July 14-20).<br>
+                • Multi-accounts will be disqualified.
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    // ... წინა ფუნქციები (startGame, renderTabs და ა.შ.) ...
+    <script>
+        const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
+        let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
 
-    // startGame-ში დაამატე ეს ხაზი, როცა პასუხი მოვა:
-    if(res.isAdmin) {
-        document.getElementById('admin-section').classList.remove('hidden');
-    }
+        function showToast(m, isErr = true) { 
+            const t = document.getElementById('toast'); t.innerText = m; 
+            t.style.background = isErr ? '#ff4d4d' : '#00ffcc'; t.style.color = isErr ? '#fff' : '#061218'; 
+            t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); 
+        }
 
-    async function adminAddGame() {
-        const gameData = {
-            dayId: document.getElementById('adm-dayid').value,
-            title: document.getElementById('adm-title').value,
-            date: document.getElementById('adm-date').value,
-            sport: document.getElementById('adm-sport').value,
-            matches: document.getElementById('adm-matches').value.split('|').map(m => m.trim()),
-            pointsPerGame: 1
-        };
+        function toggleAuth(view) {
+            document.getElementById('login-section').classList.toggle('hidden', view !== 'login');
+            document.getElementById('signup-section').classList.toggle('hidden', view !== 'signup');
+        }
 
-        const res = await fetch(`${BASE_URL}/admin/add-game`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ adminUser: localStorage.getItem('wc_user'), gameData })
-        }).then(r => r.json());
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                if (!document.getElementById('login-section').classList.contains('hidden')) startGame(false, 'login');
+                else if (!document.getElementById('signup-section').classList.contains('hidden')) startGame(false, 'signup');
+            }
+        });
 
-        if(res.success) { alert("Game Day Added!"); location.reload(); }
-    }
+        async function startGame(isAuto = false, type = 'login') {
+            const u = isAuto ? localStorage.getItem('wc_user') : (type === 'login' ? document.getElementById('username').value.trim() : document.getElementById('reg-username').value.trim());
+            const p = isAuto ? localStorage.getItem('wc_pass') : (type === 'login' ? document.getElementById('password').value.trim() : document.getElementById('reg-password').value.trim());
+            if(!u || !p) return;
 
-    async function adminSetResults() {
-        const dayId = document.getElementById('res-dayid').value;
-        const results = document.getElementById('res-values').value.split('|').map(r => r.trim());
+            const endpoint = isAuto ? 'login' : type;
+            try {
+                const res = await fetch(`${BASE_URL}/${endpoint}`, { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({user: u, password: p}) 
+                }).then(r => r.json());
 
-        const res = await fetch(`${BASE_URL}/admin/set-results`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ adminUser: localStorage.getItem('wc_user'), dayId, results })
-        }).then(r => r.json());
+                if(res.success) {
+                    localStorage.setItem('wc_user', u); localStorage.setItem('wc_pass', p);
+                    GLOBAL_DATA = res;
+                    document.getElementById('my-rank').innerText = `#${res.userRank}`;
+                    document.getElementById('my-score').innerText = res.userScore;
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('signup-section').classList.add('hidden');
+                    document.getElementById('game-section').classList.remove('hidden');
+                    document.getElementById('my-status').classList.remove('hidden');
+                    if(res.isAdmin) document.getElementById('admin-panel').classList.remove('hidden');
+                    renderTabs(); loadLB();
+                } else if(!isAuto) showToast(res.message);
+            } catch(e) { if(!isAuto) showToast("Server Error"); }
+        }
 
-        if(res.success) { alert("Results Updated!"); location.reload(); }
-    }
-</script>
+        function renderTabs() {
+            const container = document.getElementById('day-tabs'); container.innerHTML = "";
+            const now = new Date().toISOString().split('T')[0];
+            const days = GLOBAL_DATA.allDays.filter(d => d.date <= now).sort((a,b) => a.dayId - b.dayId);
+            days.forEach(day => {
+                const btn = document.createElement('div');
+                btn.className = 'day-tab' + (SELECTED_DAY === day.dayId ? ' active' : '');
+                btn.innerText = (day.date === now) ? "TODAY" : day.title;
+                btn.onclick = () => selectDay(day.dayId);
+                container.appendChild(btn);
+            });
+            if(!SELECTED_DAY && days.length > 0) selectDay(days[days.length-1].dayId);
+        }
+
+        function selectDay(dayId) {
+            SELECTED_DAY = dayId; renderTabs();
+            const container = document.getElementById('games-container'); container.innerHTML = "";
+            const dInfo = GLOBAL_DATA.allDays.find(d => d.dayId === dayId);
+            const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
+            const isPast = dInfo.date < new Date().toISOString().split('T')[0];
+            TEMP_ANSWERS = {};
+
+            container.innerHTML = `<div style="text-align:center; margin-bottom:10px;"><span style="font-size:10px; color:var(--primary);">${dInfo.sport} • ${dInfo.date}</span></div>`;
+            dInfo.matches.forEach((game, i) => {
+                const teams = game.split(' vs '); let opts = "";
+                const realRes = dInfo.results && dInfo.results[i] ? dInfo.results[i] : null;
+                ['1', 'X', '2'].forEach(opt => {
+                    let cls = "opt-btn";
+                    const myPick = userPred ? userPred.answers[i] : null;
+                    if (realRes) {
+                        if (opt === realRes) { cls += " res-actual"; if (myPick === realRes) cls += " res-correct"; }
+                        else if (opt === myPick) cls += " res-wrong";
+                    } else if (myPick === opt || TEMP_ANSWERS[i] === opt) cls += " selected";
+                    opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
+                });
+                container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
+            });
+            document.getElementById('save-btn').classList.toggle('hidden', userPred || isPast);
+        }
+
+        function pick(btn, idx, val) { 
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; 
+        }
+
+        async function saveCurrentDay() {
+            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays.find(d => d.dayId === SELECTED_DAY).matches.length) return showToast("Pick all matches!");
+            try {
+                const res = await fetch(`${BASE_URL}/save-prediction`, { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) 
+                }).then(r => r.json());
+                if(res.success) { 
+                    showToast("Saved!", false); 
+                    GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); 
+                    selectDay(SELECTED_DAY); 
+                }
+            } catch(e) { showToast("Error"); }
+        }
+
+        async function loadLB() {
+            try {
+                const res = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
+                const container = document.getElementById('lb-data');
+                const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
+                container.innerHTML = res.topData.map(u => {
+                    const isMe = u.u.toLowerCase().trim() === cUser;
+                    let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "***" + u.u[u.u.length - 1] : u.u[0] + "*");
+                    return `<tr class="lb-row ${isMe ? 'my-row-highlight' : ''}"><td>${u.rank}</td><td style="text-align:left; padding-left:15px;">${disp}</td><td style="color:var(--accent-gold); font-weight:700;">${u.p}</td></tr>`;
+                }).join('');
+            } catch(e) {}
+        }
+
+        async function adminAddGame() {
+            const gameData = {
+                dayId: document.getElementById('adm-dayid').value,
+                title: document.getElementById('adm-title').value,
+                date: document.getElementById('adm-date').value,
+                sport: document.getElementById('adm-sport').value,
+                matches: document.getElementById('adm-matches').value.split('|').map(m => m.trim())
+            };
+            const res = await fetch(`${BASE_URL}/admin/add-game`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ adminUser: localStorage.getItem('wc_user'), gameData })
+            }).then(r => r.json());
+            if(res.success) { showToast("Success!", false); location.reload(); }
+        }
+
+        async function adminSetResults() {
+            const res = await fetch(`${BASE_URL}/admin/set-results`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    adminUser: localStorage.getItem('wc_user'), 
+                    dayId: document.getElementById('res-dayid').value, 
+                    results: document.getElementById('res-values').value.split('|').map(r => r.trim()) 
+                })
+            }).then(r => r.json());
+            if(res.success) { showToast("Results Saved!", false); location.reload(); }
+        }
+
+        function logout() { localStorage.clear(); location.reload(); }
+        window.onload = () => { if(localStorage.getItem('wc_user')) startGame(true); else loadLB(); };
+    </script>
+</body>
+</html>
