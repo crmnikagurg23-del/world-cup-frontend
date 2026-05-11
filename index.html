@@ -16,10 +16,14 @@
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; }
         .stat-item span { font-size: 10px; color: #8899a6; text-transform: uppercase; display: block; }
         .stat-item b { font-size: 18px; color: var(--primary); font-family: 'Rajdhani'; }
+        
+        /* Auth Card Styles */
         .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
         input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
-        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; font-size: 15px; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; font-size: 15px; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; font-weight: 700; width: 100%; font-size: 14px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        
+        /* Games & LB Styles */
         .leaderboard-container { margin-top: 25px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
@@ -34,40 +38,55 @@
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
-        
-        /* შეფერადების სტილები */
         .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; border: none !important; }
         .res-wrong { background: #ff4d4d !important; color: white !important; opacity: 0.8; border: none !important; }
         .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
 
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 13px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; line-height: 1.4; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 13px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <div id="toast" class="toast"></div>
     <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo"></header>
+    
     <div class="main-content">
         <div id="my-status" class="my-stats-card"><div class="stats-grid"><div class="stat-item"><span>Rank</span><b id="my-rank">-</b></div><div class="stat-item"><span>Score</span><b id="my-score">0</b></div><div class="stat-item" onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d">EXIT</span><b style="color:#ff4d4d; font-size:12px;">OUT</b></div></div></div>
         
-        <div id="start-section">
+        <div id="login-section">
             <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">WORLD CUP 2026</h2>
             <div class="card-auth">
                 <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                 <input type="password" id="password" placeholder="PASSWORD">
-                <button id="login-btn" class="btn-green" onclick="startGame(false)">
+                <button id="login-btn" class="btn-green" onclick="startGame(false, 'login')">
                     <span id="btn-text">LOGIN</span>
                     <div id="btn-loader" class="btn-spinner"></div>
                 </button>
-                <button class="btn-outline" onclick="window.open('https://rolletto.com/en/registration', '_blank')">SIGN UP ON ROLLETTO</button>
+                <button class="btn-outline" onclick="toggleAuth('signup')">CREATE NEW ACCOUNT</button>
             </div>
         </div>
 
-        <div id="game-section" style="display:none;">
+        <div id="signup-section" class="hidden">
+            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">JOIN PREDICTOR</h2>
+            <div class="card-auth">
+                <p style="font-size: 11px; color: var(--primary); margin-bottom: 10px; text-align: center; text-transform: uppercase;">Use your Rolletto Username to register.</p>
+                <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
+                <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
+                <p style="font-size: 10px; color: #ffcc00; margin-bottom: 15px; text-align: center;">⚠️ PLEASE REMEMBER YOUR PASSWORD!</p>
+                <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">
+                    <span id="reg-btn-text">SIGN UP / JOIN</span>
+                    <div id="reg-btn-loader" class="btn-spinner"></div>
+                </button>
+                <button class="btn-outline" onclick="toggleAuth('login')">BACK TO LOGIN</button>
+            </div>
+        </div>
+
+        <div id="game-section" class="hidden">
             <div class="tabs-wrapper" id="day-tabs"></div>
             <div id="games-container"></div>
-            <button id="save-btn" class="btn-green" style="display:none; margin-top:15px;" onclick="saveCurrentDay()">
+            <button id="save-btn" class="btn-green hidden" onclick="saveCurrentDay()">
                 <span id="save-text">SUBMIT PREDICTIONS</span>
                 <div id="save-loader" class="btn-spinner"></div>
             </button>
@@ -92,28 +111,43 @@
             t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); 
         }
 
-        async function startGame(isAuto = false) {
-            const user = isAuto ? localStorage.getItem('wc_user') : document.getElementById('username').value.trim();
-            const pass = isAuto ? localStorage.getItem('wc_pass') : document.getElementById('password').value.trim();
-            if(!user || !pass) return;
-            if(!isAuto) document.getElementById('btn-loader').style.display = "block";
+        function toggleAuth(view) {
+            document.getElementById('login-section').classList.toggle('hidden', view !== 'login');
+            document.getElementById('signup-section').classList.toggle('hidden', view !== 'signup');
+        }
+
+        async function startGame(isAuto = false, type = 'login') {
+            const u = isAuto ? localStorage.getItem('wc_user') : (type === 'login' ? document.getElementById('username').value.trim() : document.getElementById('reg-username').value.trim());
+            const p = isAuto ? localStorage.getItem('wc_pass') : (type === 'login' ? document.getElementById('password').value.trim() : document.getElementById('reg-password').value.trim());
+
+            if(!u || !p) return;
+            const ldr = type === 'login' ? 'btn-loader' : 'reg-btn-loader';
+            if(!isAuto) document.getElementById(ldr).style.display = "block";
+
             try {
-                const res = await fetch(`${BASE_URL}/check-user`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user, password: pass}) }).then(r => r.json());
+                const res = await fetch(`${BASE_URL}/check-user`, { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({user: u, password: p}) 
+                }).then(r => r.json());
+
                 if(res.success) {
-                    localStorage.setItem('wc_user', user); localStorage.setItem('wc_pass', pass);
+                    localStorage.setItem('wc_user', u); localStorage.setItem('wc_pass', p);
                     GLOBAL_DATA = res;
                     document.getElementById('my-rank').innerText = `#${res.userRank}`;
                     document.getElementById('my-score').innerText = res.userScore;
-                    document.getElementById('start-section').style.display = 'none';
-                    document.getElementById('game-section').style.display = 'block';
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('signup-section').classList.add('hidden');
+                    document.getElementById('game-section').classList.remove('hidden');
                     document.getElementById('my-status').style.display = 'block';
                     renderTabs(); loadLB();
                 } else {
-                    if(res.message.includes("authorized")) showToast("Please use your registered Rolletto username to join.");
-                    else if(!isAuto) showToast(res.message);
+                    if(res.message.includes("not authorized")) showToast("Please use your registered Rolletto username!");
+                    else showToast(res.message);
+                    if(isAuto) logout();
                 }
-            } catch(e) { if(!isAuto) showToast("Error"); }
-            document.getElementById('btn-loader').style.display = "none";
+            } catch(e) { if(!isAuto) showToast("Connection Error"); }
+            document.getElementById(ldr).style.display = "none";
         }
 
         function renderTabs() {
@@ -145,22 +179,18 @@
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
                 const realRes = (realResults[i] && realResults[i].trim() !== "") ? realResults[i].trim() : null;
-
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
                     const myPick = userPred ? userPred.answers[i] : null;
                     if (realRes) {
-                        if (opt === realRes) {
-                            cls += " res-actual"; 
-                            if (myPick === realRes) cls += " res-correct";
-                        } else if (opt === myPick) cls += " res-wrong";
+                        if (opt === realRes) { cls += " res-actual"; if (myPick === realRes) cls += " res-correct"; }
+                        else if (opt === myPick) cls += " res-wrong";
                     } else if (myPick === opt || TEMP_ANSWERS[i] === opt) cls += " selected";
-                    
                     opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
             });
-            document.getElementById('save-btn').style.display = (!userPred && !isPast) ? 'block' : 'none';
+            document.getElementById('save-btn').classList.toggle('hidden', userPred || isPast);
         }
 
         function pick(btn, idx, val) { 
