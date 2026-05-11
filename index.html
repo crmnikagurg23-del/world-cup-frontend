@@ -12,31 +12,27 @@
         header { padding: 10px; border-bottom: 1px solid var(--primary); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
         .logo { height: 28px; cursor: pointer; transition: 0.3s; }
         .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
-        .my-stats-card { background: rgba(0,255,204,0.1); border: 1px solid var(--primary); padding: 12px; border-radius: 15px; margin-bottom: 15px; display: none; }
+        .my-status-card { background: rgba(0,255,204,0.1); border: 1px solid var(--primary); padding: 12px; border-radius: 15px; margin-bottom: 15px; display: none; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; }
         .stat-item span { font-size: 10px; color: #8899a6; text-transform: uppercase; display: block; }
         .stat-item b { font-size: 18px; color: var(--primary); font-family: 'Rajdhani'; }
         
-        /* Auth Card Styles */
+        /* Auth Card */
         .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
         input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
-        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; font-size: 15px; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; }
+        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; font-size: 15px; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; font-weight: 700; width: 100%; font-size: 14px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         
-        /* Rules Section */
-        .rules-container { margin-top: 30px; background: rgba(255, 255, 255, 0.03); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
-        .rules-list { list-style: none; margin-top: 15px; }
-        .rules-list li { font-size: 12px; color: #b0bac1; margin-bottom: 10px; position: relative; padding-left: 20px; line-height: 1.6; }
-        .rules-list li::before { content: '✔'; position: absolute; left: 0; color: var(--primary); font-size: 10px; }
-        .rules-list b { color: #fff; }
+        /* Coloring Logic */
+        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; }
+        .res-wrong { background: #ff4d4d !important; color: white !important; opacity: 0.8; }
+        .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
 
-        /* Leaderboard Styles */
+        /* General UI */
         .leaderboard-container { margin-top: 25px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
         .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border: 1px solid var(--primary); }
-        
-        /* Games Styles */
         .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
@@ -48,7 +44,12 @@
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 13px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
+        .rules-container { margin-top: 30px; background: rgba(255, 255, 255, 0.03); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
+        .rules-list { list-style: none; margin-top: 15px; color: #b0bac1; font-size: 12px; }
+        .rules-list li { margin-bottom: 10px; padding-left: 20px; position: relative; line-height: 1.6; }
+        .rules-list li::before { content: '✔'; position: absolute; left: 0; color: var(--primary); font-size: 10px; }
+
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 13px; z-index: 2000; display: none; text-align:center; min-width: 280px; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .hidden { display: none !important; }
@@ -57,9 +58,8 @@
 <body>
     <div id="toast" class="toast"></div>
     <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo"></header>
-    
     <div class="main-content">
-        <div id="my-status" class="my-stats-card"><div class="stats-grid"><div class="stat-item"><span>Rank</span><b id="my-rank">-</b></div><div class="stat-item"><span>Score</span><b id="my-score">0</b></div><div class="stat-item" onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d">EXIT</span><b style="color:#ff4d4d; font-size:12px;">OUT</b></div></div></div>
+        <div id="my-status" class="my-status-card"><div class="stats-grid"><div class="stat-item"><span>Rank</span><b id="my-rank">-</b></div><div class="stat-item"><span>Score</span><b id="my-score">0</b></div><div class="stat-item" onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d">EXIT</span><b style="color:#ff4d4d; font-size:12px;">OUT</b></div></div></div>
         
         <div id="login-section">
             <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">WORLD CUP 2026</h2>
@@ -80,7 +80,6 @@
                 <p style="font-size: 11px; color: var(--primary); margin-bottom: 10px; text-align: center;">USE YOUR ROLLETTO USERNAME TO JOIN.</p>
                 <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
                 <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
-                <p style="font-size: 10px; color: #ffcc00; margin-bottom: 15px; text-align: center;">⚠️ PLEASE REMEMBER YOUR PASSWORD!</p>
                 <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">
                     <span id="reg-btn-text">SIGN UP / JOIN</span>
                     <div id="reg-btn-loader" class="btn-spinner"></div>
@@ -107,19 +106,18 @@
         </div>
 
         <div class="rules-container">
-            <h3 style="color: var(--primary); font-size: 15px; font-family:'Rajdhani'; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(0,255,204,0.2); padding-bottom: 10px;">Terms & Conditions</h3>
+            <h3 style="color: var(--primary); font-size: 15px; font-family:'Rajdhani'; text-transform: uppercase;">Terms & Conditions</h3>
             <ul class="rules-list">
-                <li><b>Campaign Period:</b> This promotion is active during the World Cup 2026, starting <b>June 5th</b> and ending <b>July 20th</b>.</li>
-                <li><b>Daily Participation:</b> 10 matches will be released every game day. You must predict <b>all 10 matches</b> to submit your entry.</li>
-                <li><b>Scoring System:</b> Points are awarded based on the tournament stage:
-                    <br>▹ June 10 - June 27: <b>1 Point</b> per correct pick.
-                    <br>▹ June 28 - July 13: <b>3 Points</b> per correct pick.
-                    <br>▹ July 14 - July 20: <b>5 Points</b> per correct pick.
+                <li><b>Campaign Period:</b> Active during World Cup 2026, from <b>June 5th</b> to <b>July 20th</b>.</li>
+                <li><b>Daily Participation:</b> 10 matches released daily. You must predict <b>all 10 matches</b>.</li>
+                <li><b>Scoring:</b> 
+                    <br>▹ June 10 - June 27: <b>1 Point</b> per pick.
+                    <br>▹ June 28 - July 13: <b>3 Points</b> per pick.
+                    <br>▹ July 14 - July 20: <b>5 Points</b> per pick.
                 </li>
-                <li><b>Tie-Breaker:</b> If scores are equal, the user who submitted their predictions <b>earliest</b> will take the higher rank.</li>
-                <li><b>Fair Play:</b> Multi-accounting or any form of fraudulent activity is strictly prohibited. Involved users will be <b>disqualified</b> from the leaderboard.</li>
-                <li><b>Verification:</b> Prizes are only eligible for verified Rolletto users. Please ensure your username is correct.</li>
-                <li><b>Rights:</b> Rolletto reserves the right to modify, suspend, or cancel the promotion rules at any time without prior notice.</li>
+                <li><b>Tie-Breaker:</b> Earlier prediction submission takes the higher rank.</li>
+                <li><b>Fair Play:</b> Multi-accounting is prohibited. Fraudulent users will be <b>disqualified</b>.</li>
+                <li>Rolletto reserves the right to modify rules at any time.</li>
             </ul>
         </div>
     </div>
@@ -157,7 +155,11 @@
                     document.getElementById('game-section').classList.remove('hidden');
                     document.getElementById('my-status').style.display = 'block';
                     renderTabs(); loadLB();
-                } else { showToast(res.message); if(isAuto) logout(); }
+                } else {
+                    if(res.message.includes("not authorized")) showToast("Please use your registered Rolletto username!");
+                    else if(!isAuto) showToast(res.message);
+                    if(isAuto) logout();
+                }
             } catch(e) { if(!isAuto) showToast("Connection Error"); }
             document.getElementById(ldr).style.display = "none";
         }
@@ -186,17 +188,29 @@
             const isPast = dInfo.date < now;
             const realResults = dInfo.results || [];
             TEMP_ANSWERS = {};
+
             container.innerHTML = `<div style="text-align:center; margin-bottom:10px;"><span style="font-size:10px; color:var(--primary);">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
+            
             dInfo.matches.forEach((game, i) => {
-                const teams = game.split(' vs '); let opts = "";
+                const teams = game.split(' vs '); 
+                let opts = "";
                 const realRes = (realResults[i] && realResults[i].trim() !== "") ? realResults[i].trim() : null;
+
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
                     const myPick = userPred ? userPred.answers[i] : null;
+
                     if (realRes) {
-                        if (opt === realRes) { cls += " res-actual"; if (myPick === realRes) cls += " res-correct"; }
-                        else if (opt === myPick) cls += " res-wrong";
-                    } else if (myPick === opt || TEMP_ANSWERS[i] === opt) cls += " selected";
+                        if (opt === realRes) {
+                            cls += " res-actual"; 
+                            if (myPick === realRes) cls += " res-correct";
+                        } else if (opt === myPick) {
+                            cls += " res-wrong";
+                        }
+                    } else if (myPick === opt || TEMP_ANSWERS[i] === opt) {
+                        cls += " selected";
+                    }
+                    
                     opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
@@ -214,7 +228,11 @@
             document.getElementById('save-loader').style.display = "block";
             try {
                 const res = await fetch(`${BASE_URL}/save-prediction`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
-                if(res.success) { showToast("Saved!", false); GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); selectDay(SELECTED_DAY); }
+                if(res.success) { 
+                    showToast("Saved!", false); 
+                    GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); 
+                    selectDay(SELECTED_DAY); 
+                }
             } catch(e) { showToast("Error"); }
             document.getElementById('save-loader').style.display = "none";
         }
