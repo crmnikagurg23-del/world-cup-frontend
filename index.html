@@ -10,26 +10,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-dark); color: #fff; background-image: radial-gradient(circle at 50% 0%, rgba(0, 255, 204, 0.1) 0%, transparent 50%), linear-gradient(rgba(6,18,24,0.8), rgba(6,18,24,0.95)), url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg'); background-size: cover; background-attachment: fixed; background-position: center; }
         header { padding: 10px; border-bottom: 1px solid var(--primary); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
-        .logo { height: 28px; cursor: pointer; transition: 0.3s; }
+        .logo { height: 28px; cursor: pointer; }
         .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
-        .my-status-card { background: rgba(0,255,204,0.1); border: 1px solid var(--primary); padding: 12px; border-radius: 15px; margin-bottom: 15px; display: none; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; }
-        .stat-item span { font-size: 10px; color: #8899a6; text-transform: uppercase; display: block; }
-        .stat-item b { font-size: 18px; color: var(--primary); font-family: 'Rajdhani'; }
-        
-        /* Auth Styles */
-        .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
-        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; font-size: 15px; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 50px; }
-        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; font-weight: 700; width: 100%; font-size: 14px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        
-        /* Coloring Logic */
+        .card-auth, .game-card, .leaderboard-container, .rules-container { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+        input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; outline: none; }
+        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 50px; }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; width: 100%; cursor: pointer; margin-top: 10px; }
+        .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; }
-        .res-wrong { background: #ff4d4d !important; color: white !important; opacity: 0.8; }
+        .res-wrong { background: #ff4d4d !important; color: white !important; }
         .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
-
-        /* Leaderboard & Tabs */
-        .leaderboard-container { margin-top: 25px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
         .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border: 1px solid var(--primary); }
@@ -41,14 +32,10 @@
         .team-name { flex: 1; font-weight: 700; font-size: 14px; text-align: center; font-family: 'Rajdhani'; }
         .vs-divider { font-size: 10px; color: var(--primary); padding: 4px 8px; background: rgba(0,255,204,0.1); border-radius: 5px; margin: 0 10px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
-        .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
-        
         .rules-container { margin-top: 30px; background: rgba(255, 255, 255, 0.03); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
-        .rules-list { list-style: none; margin-top: 15px; color: #b0bac1; font-size: 12px; line-height: 1.6; }
-        .rules-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
-        .rules-list li::before { content: '✔'; position: absolute; left: 0; color: var(--primary); font-size: 10px; }
-
+        .rules-list { list-style: none; margin-top: 15px; color: #b0bac1; font-size: 11px; line-height: 1.6; }
+        .rules-list li { margin-bottom: 8px; padding-left: 18px; position: relative; }
+        .rules-list li::before { content: '✔'; position: absolute; left: 0; color: var(--primary); }
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 13px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -58,10 +45,17 @@
 <body>
     <div id="toast" class="toast"></div>
     <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo"></header>
-    
     <div class="main-content">
-        <div id="my-status" class="my-status-card"><div class="stats-grid"><div class="stat-item"><span>Rank</span><b id="my-rank">-</b></div><div class="stat-item"><span>Score</span><b id="my-score">0</b></div><div class="stat-item" onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d">EXIT</span><b style="color:#ff4d4d; font-size:12px;">OUT</b></div></div></div>
-        
+        <div id="my-status" class="hidden">
+            <div class="card-auth" style="padding: 15px; margin-bottom: 15px; background: rgba(0,255,204,0.1); border-color: var(--primary);">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; text-align:center;">
+                    <div><span style="font-size:10px; color:#8899a6; text-transform:uppercase;">Rank</span><br><b id="my-rank" style="color:var(--primary); font-family:'Rajdhani'; font-size:20px;">-</b></div>
+                    <div><span style="font-size:10px; color:#8899a6; text-transform:uppercase;">Score</span><br><b id="my-score" style="color:var(--primary); font-family:'Rajdhani'; font-size:20px;">0</b></div>
+                    <div onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d; font-size:10px; text-transform:uppercase;">Exit</span><br><b style="color:#ff4d4d; font-size:14px; font-family:'Rajdhani';">OUT</b></div>
+                </div>
+            </div>
+        </div>
+
         <div id="login-section">
             <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">WORLD CUP 2026</h2>
             <div class="card-auth">
@@ -71,14 +65,13 @@
                     <span id="btn-text">LOGIN</span>
                     <div id="btn-loader" class="btn-spinner"></div>
                 </button>
-                <button class="btn-outline" onclick="toggleAuth('signup')">CREATE NEW ACCOUNT</button>
+                <button class="btn-outline" onclick="toggleAuth('signup')">CREATE ACCOUNT</button>
             </div>
         </div>
 
         <div id="signup-section" class="hidden">
             <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">JOIN PREDICTOR</h2>
             <div class="card-auth">
-                <p style="font-size: 11px; color: var(--primary); margin-bottom: 10px; text-align: center;">USE YOUR ROLLETTO USERNAME TO JOIN.</p>
                 <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
                 <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
                 <p style="font-size: 10px; color: #ffcc00; margin-bottom: 15px; text-align: center;">⚠️ PLEASE REMEMBER YOUR PASSWORD!</p>
@@ -101,25 +94,15 @@
 
         <div class="leaderboard-container">
             <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; font-family:'Rajdhani'; text-transform: uppercase;">LEADERBOARD</h3>
-            <table class="lb-table">
-                <thead><tr style="font-size:10px; color:#8899a6; text-transform: uppercase;"><th>#</th><th style="text-align:left; padding-left:15px;">Player</th><th>Score</th><th>Prize</th></tr></thead>
-                <tbody id="lb-data"></tbody>
-            </table>
+            <table class="lb-table"><tbody id="lb-data"></tbody></table>
         </div>
 
         <div class="rules-container">
-            <h3 style="color: var(--primary); font-size: 15px; font-family:'Rajdhani'; text-transform: uppercase;">Terms & Conditions</h3>
+            <h3 style="color: var(--primary); font-size: 14px; font-family:'Rajdhani'; text-transform: uppercase;">Promotion Rules</h3>
             <ul class="rules-list">
-                <li><b>Campaign Period:</b> From June 5th to July 20th, 2026.</li>
-                <li><b>Daily Task:</b> You must answer <b>all 10 questions</b> each day to submit.</li>
-                <li><b>Scoring:</b> 
-                    <br>▹ June 10 - June 27: <b>1 Point</b> per correct pick.
-                    <br>▹ June 28 - July 13: <b>3 Points</b> per correct pick.
-                    <br>▹ July 14 - July 20: <b>5 Points</b> per correct pick.
-                </li>
-                <li><b>Tie-Breaker:</b> Earlier prediction submission takes the higher rank.</li>
-                <li><b>Fair Play:</b> Multi-accounting is prohibited. Fraudsters will be disqualified.</li>
-                <li>Rolletto reserves the right to modify rules at any time.</li>
+                <li>Period: June 5 - July 20, 2026. 10 questions daily.</li>
+                <li>Points: 1pt (Jun 10-27), 3pts (Jun 28 - Jul 13), 5pts (Jul 14-20).</li>
+                <li>Earliest submission wins in case of a tie. Multi-accounts = DQ.</li>
             </ul>
         </div>
     </div>
@@ -134,22 +117,16 @@
             t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); 
         }
 
-        function toggleAuth(view) {
-            document.getElementById('login-section').classList.toggle('hidden', view !== 'login');
-            document.getElementById('signup-section').classList.toggle('hidden', view !== 'signup');
-        }
+        function toggleAuth(v) { document.getElementById('login-section').classList.toggle('hidden', v!=='login'); document.getElementById('signup-section').classList.toggle('hidden', v!=='signup'); }
 
-        // Enter Key Listener
-        document.addEventListener('keypress', function (e) {
+        document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                const isLoginVisible = !document.getElementById('login-section').classList.contains('hidden');
-                const isSignupVisible = !document.getElementById('signup-section').classList.contains('hidden');
-                if (isLoginVisible) startGame(false, 'login');
-                else if (isSignupVisible) startGame(false, 'signup');
+                if (!document.getElementById('login-section').classList.contains('hidden')) startGame(false, 'login');
+                else if (!document.getElementById('signup-section').classList.contains('hidden')) startGame(false, 'signup');
             }
         });
 
-        async function startGame(isAuto = false, type = 'login') {
+        async function startGame(isAuto, type) {
             const u = isAuto ? localStorage.getItem('wc_user') : (type === 'login' ? document.getElementById('username').value.trim() : document.getElementById('reg-username').value.trim());
             const p = isAuto ? localStorage.getItem('wc_pass') : (type === 'login' ? document.getElementById('password').value.trim() : document.getElementById('reg-password').value.trim());
             if(!u || !p) return;
@@ -159,11 +136,7 @@
             const textId = type === 'login' ? 'btn-text' : 'reg-btn-text';
             const loaderId = type === 'login' ? 'btn-loader' : 'reg-btn-loader';
 
-            if(!isAuto) {
-                document.getElementById(btnId).disabled = true;
-                document.getElementById(textId).classList.add('hidden');
-                document.getElementById(loaderId).style.display = "block";
-            }
+            if(!isAuto) { document.getElementById(btnId).disabled = true; document.getElementById(textId).classList.add('hidden'); document.getElementById(loaderId).style.display = "block"; }
 
             try {
                 const res = await fetch(`${BASE_URL}/${endpoint}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user: u, password: p}) }).then(r => r.json());
@@ -175,21 +148,11 @@
                     document.getElementById('login-section').classList.add('hidden');
                     document.getElementById('signup-section').classList.add('hidden');
                     document.getElementById('game-section').classList.remove('hidden');
-                    document.getElementById('my-status').style.display = 'block';
+                    document.getElementById('my-status').classList.remove('hidden');
                     renderTabs(); loadLB();
-                } else {
-                    if(res.message.includes("authorized")) showToast("Please use your registered Rolletto username!");
-                    else showToast(res.message);
-                    if(isAuto) logout();
-                }
+                } else if(!isAuto) showToast(res.message);
             } catch(e) { if(!isAuto) showToast("Error"); }
-            finally {
-                if(!isAuto) {
-                    document.getElementById(btnId).disabled = false;
-                    document.getElementById(textId).classList.remove('hidden');
-                    document.getElementById(loaderId).style.display = "none";
-                }
-            }
+            finally { if(!isAuto) { document.getElementById(btnId).disabled = false; document.getElementById(textId).classList.remove('hidden'); document.getElementById(loaderId).style.display = "none"; } }
         }
 
         function renderTabs() {
@@ -215,7 +178,7 @@
             const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             const isPast = dInfo.date < now;
             const realResults = dInfo.results || [];
-            TEMP_ANSWERS = {};
+            
             container.innerHTML = `<div style="text-align:center; margin-bottom:10px;"><span style="font-size:10px; color:var(--primary);">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
@@ -234,13 +197,10 @@
             document.getElementById('save-btn').classList.toggle('hidden', userPred || isPast);
         }
 
-        function pick(btn, idx, val) { 
-            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; 
-        }
+        function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
 
         async function saveCurrentDay() {
-            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all 10 matches!");
+            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
             document.getElementById('save-loader').style.display = "block";
             document.getElementById('save-text').classList.add('hidden');
             try {
