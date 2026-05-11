@@ -24,10 +24,11 @@
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; font-weight: 700; width: 100%; font-size: 14px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         
         /* Rules Section */
-        .rules-container { margin-top: 25px; background: rgba(255, 255, 255, 0.03); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .rules-list { list-style: none; margin-top: 10px; }
-        .rules-list li { font-size: 12px; color: #b0bac1; margin-bottom: 8px; position: relative; padding-left: 15px; line-height: 1.5; }
-        .rules-list li::before { content: '▹'; position: absolute; left: 0; color: var(--primary); }
+        .rules-container { margin-top: 30px; background: rgba(255, 255, 255, 0.03); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
+        .rules-list { list-style: none; margin-top: 15px; }
+        .rules-list li { font-size: 12px; color: #b0bac1; margin-bottom: 10px; position: relative; padding-left: 20px; line-height: 1.6; }
+        .rules-list li::before { content: '✔'; position: absolute; left: 0; color: var(--primary); font-size: 10px; }
+        .rules-list b { color: #fff; }
 
         /* Leaderboard Styles */
         .leaderboard-container { margin-top: 25px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
@@ -35,6 +36,7 @@
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
         .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border: 1px solid var(--primary); }
         
+        /* Games Styles */
         .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
@@ -45,10 +47,7 @@
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
-        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; }
-        .res-wrong { background: #ff4d4d !important; color: white !important; opacity: 0.8; }
-        .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
-
+        
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 13px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -78,7 +77,7 @@
         <div id="signup-section" class="hidden">
             <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">JOIN PREDICTOR</h2>
             <div class="card-auth">
-                <p style="font-size: 11px; color: var(--primary); margin-bottom: 10px; text-align: center; text-transform: uppercase;">Use your Rolletto Username to register.</p>
+                <p style="font-size: 11px; color: var(--primary); margin-bottom: 10px; text-align: center;">USE YOUR ROLLETTO USERNAME TO JOIN.</p>
                 <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
                 <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
                 <p style="font-size: 10px; color: #ffcc00; margin-bottom: 15px; text-align: center;">⚠️ PLEASE REMEMBER YOUR PASSWORD!</p>
@@ -99,25 +98,29 @@
             </button>
         </div>
 
-        <div class="rules-container">
-            <h3 style="color: var(--primary); font-size: 14px; font-family:'Rajdhani'; text-transform: uppercase;">How to Play & Rules</h3>
-            <ul class="rules-list">
-                <li>You must use your official <b>Rolletto Username</b> to participate.</li>
-                <li>Each match has 3 options: <b>1</b> (Home Win), <b>X</b> (Draw), <b>2</b> (Away Win).</li>
-                <li>Predictions for each "Game Day" must be submitted before the first match starts.</li>
-                <li>Once submitted, predictions are locked and cannot be changed.</li>
-                <li>You can only see and predict the <b>current</b> or <b>past</b> game days.</li>
-                <li>Correct predictions earn points based on the "PTS PER WIN" value of that day.</li>
-                <li>Leaderboard is updated automatically after match results are confirmed.</li>
-            </ul>
-        </div>
-
         <div class="leaderboard-container">
             <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; font-family:'Rajdhani'; text-transform: uppercase;">LEADERBOARD</h3>
             <table class="lb-table">
                 <thead><tr style="font-size:10px; color:#8899a6; text-transform: uppercase;"><th>#</th><th style="text-align:left; padding-left:15px;">Player</th><th>Score</th><th>Prize</th></tr></thead>
                 <tbody id="lb-data"></tbody>
             </table>
+        </div>
+
+        <div class="rules-container">
+            <h3 style="color: var(--primary); font-size: 15px; font-family:'Rajdhani'; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(0,255,204,0.2); padding-bottom: 10px;">Terms & Conditions</h3>
+            <ul class="rules-list">
+                <li><b>Campaign Period:</b> This promotion is active during the World Cup 2026, starting <b>June 5th</b> and ending <b>July 20th</b>.</li>
+                <li><b>Daily Participation:</b> 10 matches will be released every game day. You must predict <b>all 10 matches</b> to submit your entry.</li>
+                <li><b>Scoring System:</b> Points are awarded based on the tournament stage:
+                    <br>▹ June 10 - June 27: <b>1 Point</b> per correct pick.
+                    <br>▹ June 28 - July 13: <b>3 Points</b> per correct pick.
+                    <br>▹ July 14 - July 20: <b>5 Points</b> per correct pick.
+                </li>
+                <li><b>Tie-Breaker:</b> If scores are equal, the user who submitted their predictions <b>earliest</b> will take the higher rank.</li>
+                <li><b>Fair Play:</b> Multi-accounting or any form of fraudulent activity is strictly prohibited. Involved users will be <b>disqualified</b> from the leaderboard.</li>
+                <li><b>Verification:</b> Prizes are only eligible for verified Rolletto users. Please ensure your username is correct.</li>
+                <li><b>Rights:</b> Rolletto reserves the right to modify, suspend, or cancel the promotion rules at any time without prior notice.</li>
+            </ul>
         </div>
     </div>
 
@@ -154,11 +157,7 @@
                     document.getElementById('game-section').classList.remove('hidden');
                     document.getElementById('my-status').style.display = 'block';
                     renderTabs(); loadLB();
-                } else {
-                    if(res.message.includes("not authorized")) showToast("Please use your registered Rolletto username!");
-                    else showToast(res.message);
-                    if(isAuto) logout();
-                }
+                } else { showToast(res.message); if(isAuto) logout(); }
             } catch(e) { if(!isAuto) showToast("Connection Error"); }
             document.getElementById(ldr).style.display = "none";
         }
