@@ -19,6 +19,8 @@
         .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
         input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
         .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; font-size: 15px; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; font-weight: 700; width: 100%; font-size: 14px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .leaderboard-container { margin-top: 25px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
         .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border: 1px solid var(--primary); }
@@ -49,9 +51,13 @@
                 <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                 <input type="password" id="password" placeholder="PASSWORD">
                 <button id="login-btn" class="btn-green" onclick="startGame(false)">
-                    <span id="btn-text">LOGIN / JOIN</span>
+                    <span id="btn-text">LOGIN</span>
                     <div id="btn-loader" class="btn-spinner"></div>
                 </button>
+                <div style="text-align: center; margin-top: 15px;">
+                    <p style="font-size: 11px; color: #8899a6; text-transform: uppercase;">Don't have an account?</p>
+                    <button class="btn-outline" onclick="window.open('https://rolletto.com/en/registration', '_blank')">SIGN UP ON ROLLETTO</button>
+                </div>
             </div>
         </div>
 
@@ -113,12 +119,9 @@
                     document.getElementById('my-status').style.display = 'block';
                     renderTabs(); loadLB();
                 } else { 
-                    // CRM მოთხოვნა: თუ იუზერი არ არის სიაში
                     if(res.message.includes("not authorized") || res.message.includes("white-list")) {
                         showToast("Please use your registered Rolletto username to join.");
-                    } else {
-                        showToast(res.message);
-                    }
+                    } else { showToast(res.message); }
                     if(isAuto) logout();
                 }
             } catch(e) { if(!isAuto) showToast("Connection Error"); }
@@ -192,7 +195,6 @@
                     let disp = u.u;
                     if (!isMe && u.u.length > 2) disp = u.u[0] + "***" + u.u[u.u.length - 1];
                     else if (!isMe) disp = u.u[0] + "*";
-
                     return `<tr class="lb-row ${isMe ? 'my-row-highlight' : ''}">
                         <td>${u.rank}</td>
                         <td style="text-align:left; padding-left:15px;">${disp}</td>
