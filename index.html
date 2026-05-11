@@ -3,167 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Cup 2026 | Predictor</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>WC 2026 Predictor</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background: #0b0f1a; color: white; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .accent-blue { color: #3b82f6; }
-        .bg-gradient { background: linear-gradient(135deg, #1e40af 0%, #1e1b4b 100%); }
+        body { font-family: sans-serif; background-color: #f0f2f5; padding: 20px; color: #1c1e21; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1a73e8; }
+        .login-box { text-align: center; margin-top: 50px; }
+        input { padding: 12px; margin: 8px; width: 85%; max-width: 320px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
+        button { padding: 12px 25px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        button:hover { background-color: #218838; }
+        .day-card { border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 25px; border-radius: 8px; background: #fff; }
+        .match-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; }
+        .leaderboard { margin-top: 30px; border-collapse: collapse; width: 100%; border-radius: 8px; overflow: hidden; }
+        .leaderboard th, .leaderboard td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        .leaderboard th { background-color: #f8f9fa; color: #5f6368; font-size: 13px; text-transform: uppercase; }
+        .hidden { display: none; }
+        .user-bar { display: flex; justify-content: space-between; margin-bottom: 30px; padding: 15px; background: #e7f3ff; border-radius: 8px; color: #1a73e8; font-weight: bold; }
+        .status-tag { font-size: 12px; font-weight: normal; color: #28a745; }
     </style>
 </head>
-<body class="min-h-screen pb-12">
+<body>
 
-    <div id="login-screen" class="max-w-md mx-auto mt-32 px-6">
-        <div class="glass p-8 rounded-3xl shadow-2xl text-center">
-            <h1 class="text-3xl font-black mb-2 uppercase tracking-tighter">Predictor <span class="accent-blue">2026</span></h1>
-            <p class="text-slate-400 text-sm mb-8">Enter your credentials to start</p>
-            <div class="space-y-4">
-                <input type="text" id="username" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 border border-slate-700 focus:outline-none focus:border-blue-500 transition-all">
-                <input type="password" id="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 border border-slate-700 focus:outline-none focus:border-blue-500 transition-all">
-                <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold transition-all transform hover:scale-[1.02]">Sign In</button>
-            </div>
-            <p id="login-msg" class="text-red-400 mt-6 text-sm hidden font-medium"></p>
-        </div>
+<div class="container">
+    <div id="login-screen" class="login-box">
+        <h2>Sign In</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <br>
+        <button onclick="login()">Login</button>
+        <p id="login-msg" style="color: #d93025; font-size: 14px;" class="hidden"></p>
     </div>
 
-    <div id="main-content" class="max-w-5xl mx-auto px-4 mt-8 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="md:col-span-2 glass p-8 rounded-3xl flex items-center justify-between bg-gradient">
-                <div>
-                    <h2 id="welcome-user" class="text-2xl font-extrabold">Welcome Back!</h2>
-                    <p class="text-blue-200 opacity-80">Global Rank: <span id="user-rank" class="font-bold text-white">#0</span></p>
-                </div>
-                <div class="text-right">
-                    <p class="text-xs uppercase tracking-widest text-blue-200 opacity-70">Total Points</p>
-                    <p id="user-score" class="text-5xl font-black text-white">0</p>
-                </div>
-            </div>
-            <div class="glass p-8 rounded-3xl flex flex-col justify-center items-center">
-                <span class="text-4xl mb-2">🏆</span>
-                <p class="text-xs font-bold uppercase text-slate-400">Next Match</p>
-                <p class="text-sm font-semibold">Ready for 2026?</p>
-            </div>
+    <div id="main-content" class="hidden">
+        <div class="user-bar">
+            <div>User: <span id="welcome-user"></span></div>
+            <div>Score: <span id="user-score" style="color: #28a745;">0</span></div>
+            <div>Rank: <span id="user-rank">#0</span></div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 space-y-6" id="days-container"></div>
-
-            <div class="space-y-6">
-                <div class="glass p-6 rounded-3xl">
-                    <h3 class="text-lg font-black mb-6 uppercase tracking-wider accent-blue">Top 10 Leaderboard</h3>
-                    <div id="leaderboard" class="space-y-4"></div>
-                </div>
+        <div id="days-container">
             </div>
+
+        <div style="margin-top: 40px;">
+            <h3>Global Leaderboard</h3>
+            <table class="leaderboard">
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>User</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <script>
-        const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
-        let currentUser = null;
+<script>
+    const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
+    let currentUser = null;
 
-        async function login() {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            const msg = document.getElementById('login-msg');
+    async function login() {
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+        const msg = document.getElementById('login-msg');
 
-            try {
-                const res = await fetch(`${BASE_URL}/check-user`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user, password: pass })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    currentUser = user;
-                    showMain(data);
-                } else {
-                    msg.innerText = data.message;
-                    msg.classList.remove('hidden');
-                }
-            } catch (e) { alert("Server connection failed."); }
-        }
-
-        function showMain(data) {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('main-content').classList.remove('hidden');
-            document.getElementById('welcome-user').innerText = `Hello, ${currentUser}!`;
-            document.getElementById('user-score').innerText = data.userScore;
-            document.getElementById('user-rank').innerText = `#${data.userRank}`;
-
-            loadDays(data.allDays, data.userPredictions);
-            loadLeaderboard();
-        }
-
-        function loadDays(days, predictions) {
-            const container = document.getElementById('days-container');
-            container.innerHTML = '';
-
-            Object.keys(days).sort((a,b) => a-b).forEach(dayId => {
-                const day = days[dayId];
-                const hasPredicted = predictions.find(p => p.dayId === dayId);
-                
-                const card = document.createElement('div');
-                card.className = 'glass p-6 rounded-3xl overflow-hidden';
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h4 class="font-black text-xl">${day.title}</h4>
-                            <p class="text-xs text-slate-500 uppercase font-bold tracking-widest">${day.sport} • ${day.date}</p>
-                        </div>
-                        <span class="bg-blue-600/20 text-blue-400 text-[10px] font-black px-3 py-1 rounded-full uppercase">${day.pointsPerGame} PTS / GAME</span>
-                    </div>
-                    <div class="space-y-3" id="matches-${dayId}">
-                        ${day.matches.map((m, i) => `
-                            <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl">
-                                <span class="text-sm font-medium">${m}</span>
-                                <select id="ans-${dayId}-${i}" ${hasPredicted ? 'disabled' : ''} class="bg-slate-800 rounded-xl p-2 text-xs font-bold outline-none border border-slate-700">
-                                    <option value="">PICK</option>
-                                    <option value="1">1</option>
-                                    <option value="X">X</option>
-                                    <option value="2">2</option>
-                                </select>
-                            </div>
-                        `).join('')}
-                    </div>
-                    ${!hasPredicted 
-                        ? `<button onclick="savePredict('${dayId}', ${day.matches.length})" class="w-full mt-6 bg-white text-black p-4 rounded-2xl font-black text-xs uppercase hover:bg-blue-500 hover:text-white transition-all">Submit Prediction</button>`
-                        : `<div class="mt-6 p-4 rounded-2xl bg-green-500/10 text-green-400 text-center text-xs font-black uppercase tracking-widest border border-green-500/20">Prediction Locked ✓</div>`
-                    }
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        async function savePredict(dayId, count) {
-            const answers = {};
-            for(let i=0; i<count; i++) {
-                const val = document.getElementById(`ans-${dayId}-${i}`).value;
-                if(!val) return alert("Please complete all picks!");
-                answers[i] = val;
-            }
-
-            const res = await fetch(`${BASE_URL}/save-prediction`, {
+        try {
+            const res = await fetch(`${BASE_URL}/check-user`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: currentUser, dayId, answers })
+                body: JSON.stringify({ user, password: pass })
             });
             const data = await res.json();
-            if(data.success) location.reload();
+
+            if (data.success) {
+                currentUser = user;
+                showMain(data);
+            } else {
+                msg.innerText = "Error: " + data.message;
+                msg.classList.remove('hidden');
+            }
+        } catch (e) {
+            alert("Connection to server failed.");
+        }
+    }
+
+    function showMain(data) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-content').classList.remove('hidden');
+        document.getElementById('welcome-user').innerText = currentUser;
+        document.getElementById('user-score').innerText = data.userScore;
+        document.getElementById('user-rank').innerText = "#" + data.userRank;
+
+        loadDays(data.allDays, data.userPredictions);
+        loadLeaderboard();
+    }
+
+    function loadDays(days, predictions) {
+        const container = document.getElementById('days-container');
+        container.innerHTML = '<h3>Predict Matches</h3>';
+
+        Object.keys(days).sort((a,b) => a-b).forEach(dayId => {
+            const day = days[dayId];
+            const hasPredicted = predictions.find(p => p.dayId === dayId);
+            
+            const card = document.createElement('div');
+            card.className = 'day-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom: 15px;">
+                    <strong style="color: #1a73e8;">${day.title}</strong>
+                    <span style="font-size: 12px; color: #70757a;">${day.date}</span>
+                </div>
+                ${day.matches.map((m, i) => `
+                    <div class="match-row">
+                        <span style="font-size: 14px;">${m}</span>
+                        <select id="ans-${dayId}-${i}" ${hasPredicted ? 'disabled' : ''}>
+                            <option value="">-</option>
+                            <option value="1">1</option>
+                            <option value="X">X</option>
+                            <option value="2">2</option>
+                        </select>
+                    </div>
+                `).join('')}
+                ${!hasPredicted 
+                    ? `<button onclick="savePredict('${dayId}', ${day.matches.length})" style="width:100%; margin-top:15px;">Submit Prediction</button>`
+                    : `<p style="text-align:center; color: #28a745; font-size: 13px; font-weight: bold; margin-top: 15px;">Locked ✓</p>`
+                }
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    async function savePredict(dayId, count) {
+        const answers = {};
+        for(let i=0; i<count; i++) {
+            const val = document.getElementById(`ans-${dayId}-${i}`).value;
+            if(!val) return alert("Please select all match results!");
+            answers[i] = val;
         }
 
-        async function loadLeaderboard() {
-            const res = await fetch(`${BASE_URL}/leaderboard`);
-            const data = await res.json();
-            const list = document.getElementById('leaderboard');
-            list.innerHTML = data.topData.map(u => `
-                <div class="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <span class="text-sm font-semibold"><span class="text-slate-500 mr-2">${u.rank}.</span> ${u.u}</span>
-                    <span class="font-black text-sm text-blue-400">${u.p} <span class="text-[10px] text-slate-500 ml-1">PTS</span></span>
-                </div>
-            `).join('');
+        const res = await fetch(`${BASE_URL}/save-prediction`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: currentUser, dayId, answers })
+        });
+        const data = await res.json();
+        if(data.success) {
+            alert("Prediction Saved!");
+            location.reload();
         }
-    </script>
+    }
+
+    async function loadLeaderboard() {
+        const res = await fetch(`${BASE_URL}/leaderboard`);
+        const data = await res.json();
+        const tbody = document.getElementById('leaderboard-body');
+        tbody.innerHTML = data.topData.map(u => `
+            <tr>
+                <td>${u.rank}</td>
+                <td>${u.u}</td>
+                <td><strong>${u.p}</strong></td>
+            </tr>
+        `).join('');
+    }
+</script>
+
 </body>
 </html>
