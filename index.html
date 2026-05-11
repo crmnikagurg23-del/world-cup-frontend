@@ -33,7 +33,7 @@
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; display: none; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; display: none; text-align:center; min-width: 250px; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -66,9 +66,9 @@
         </div>
 
         <div class="leaderboard-container">
-            <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; font-family:'Rajdhani';">LEADERBOARD</h3>
+            <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; font-family:'Rajdhani'; text-transform: uppercase;">LEADERBOARD</h3>
             <table class="lb-table">
-                <thead><tr style="font-size:10px; color:#8899a6;"><th>#</th><th style="text-align:left; padding-left:15px;">Player</th><th>Score</th><th>Prize</th></tr></thead>
+                <thead><tr style="font-size:10px; color:#8899a6; text-transform: uppercase;"><th>#</th><th style="text-align:left; padding-left:15px;">Player</th><th>Score</th><th>Prize</th></tr></thead>
                 <tbody id="lb-data"></tbody>
             </table>
         </div>
@@ -105,7 +105,6 @@
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
             const now = new Date().toISOString().split('T')[0];
             const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
-            
             const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
             visibleDays.forEach(dayId => {
                 const btn = document.createElement('div');
@@ -139,10 +138,7 @@
             document.getElementById('save-btn').style.display = (!userPred && !isPast) ? 'block' : 'none';
         }
 
-        function pick(btn, idx, val) { 
-            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; 
-        }
+        function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
 
         async function saveCurrentDay() {
             if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
@@ -155,9 +151,30 @@
         }
 
         async function loadLB() {
-            const data = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
-            const container = document.getElementById('lb-data');
-            container.innerHTML = data.topData.map(u => `<tr class="lb-row"><td>${u.rank}</td><td style="text-align:left; padding-left:15px;">${u.u}</td><td style="color:var(--accent-gold); font-weight:700;">${u.p}</td><td>${{1:"1000€",2:"500€",3:"200€"}[u.rank] || "-"}</td></tr>`).join('');
+            try {
+                const res = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
+                const container = document.getElementById('lb-data');
+                const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
+                
+                container.innerHTML = res.topData.map(u => {
+                    const isMe = u.u.toLowerCase().trim() === cUser;
+                    
+                    // დაფიფქვის ლოგიკა: პირველი ასო + *** + ბოლო ასო
+                    let displayUsername = u.u;
+                    if (!isMe && u.u.length > 2) {
+                        displayUsername = u.u[0] + "***" + u.u[u.u.length - 1];
+                    } else if (!isMe && u.u.length <= 2) {
+                        displayUsername = u.u[0] + "*";
+                    }
+
+                    return `<tr class="lb-row ${isMe ? 'my-row-highlight' : ''}">
+                        <td>${u.rank}</td>
+                        <td style="text-align:left; padding-left:15px;">${displayUsername}</td>
+                        <td style="color:var(--accent-gold); font-weight:700;">${u.p}</td>
+                        <td>${{1:"1000€",2:"500€",3:"200€"}[u.rank] || "-"}</td>
+                    </tr>`;
+                }).join('');
+            } catch(e) { console.error("LB Error", e); }
         }
 
         function logout() { localStorage.clear(); location.reload(); }
