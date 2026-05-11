@@ -11,20 +11,18 @@
         body { background-color: var(--bg-dark); color: #fff; background-image: radial-gradient(circle at 50% 0%, rgba(0, 255, 204, 0.1) 0%, transparent 50%), linear-gradient(rgba(6,18,24,0.8), rgba(6,18,24,0.95)), url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg'); background-size: cover; background-attachment: fixed; background-position: center; }
         header { padding: 10px; border-bottom: 1px solid var(--primary); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
         .logo { height: 28px; cursor: pointer; transition: 0.3s; }
-        .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+        .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
         .my-stats-card { background: rgba(0,255,204,0.1); border: 1px solid var(--primary); padding: 12px; border-radius: 15px; margin-bottom: 15px; display: none; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; }
         .stat-item span { font-size: 10px; color: #8899a6; text-transform: uppercase; display: block; }
         .stat-item b { font-size: 18px; color: var(--primary); font-family: 'Rajdhani'; }
-        .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .card-auth { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
         input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; font-size: 16px; outline: none; }
-        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; cursor: pointer; text-transform: uppercase; }
-        .btn-green:disabled { background: #444; cursor: not-allowed; opacity: 0.6; color: #888; }
+        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; font-size: 15px; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .leaderboard-container { margin-top: 25px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
         .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border: 1px solid var(--primary); }
-        .lb-username { text-align: left !important; padding-left: 15px !important; }
         .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
@@ -35,27 +33,19 @@
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
-        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; }
-        .res-wrong { background: #ff4d4d !important; opacity: 0.7; }
-        .res-actual { border: 1px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; text-align: center; display: none; min-width: 280px; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; font-size: 14px; z-index: 2000; display: none; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div id="toast" class="toast"></div>
-    <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo" onclick="window.open('https://rolletto.com/en/', '_blank')"></header>
+    <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo"></header>
     <div class="main-content">
-        <div id="my-status" class="my-stats-card">
-            <div class="stats-grid">
-                <div class="stat-item"><span>Rank</span><b id="my-rank">-</b></div>
-                <div class="stat-item"><span>Score</span><b id="my-score">0</b></div>
-                <div class="stat-item" onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d">EXIT</span><b style="color:#ff4d4d; font-size:12px;">OUT</b></div>
-            </div>
-        </div>
+        <div id="my-status" class="my-stats-card"><div class="stats-grid"><div class="stat-item"><span>Rank</span><b id="my-rank">-</b></div><div class="stat-item"><span>Score</span><b id="my-score">0</b></div><div class="stat-item" onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d">EXIT</span><b style="color:#ff4d4d; font-size:12px;">OUT</b></div></div></div>
+        
         <div id="start-section">
-            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani'; uppercase;">WORLD CUP 2026</h2>
+            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">WORLD CUP 2026</h2>
             <div class="card-auth">
                 <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                 <input type="password" id="password" placeholder="PASSWORD">
@@ -65,6 +55,7 @@
                 </button>
             </div>
         </div>
+
         <div id="game-section" style="display:none;">
             <div class="tabs-wrapper" id="day-tabs"></div>
             <div id="games-container"></div>
@@ -73,131 +64,103 @@
                 <div id="save-loader" class="btn-spinner"></div>
             </button>
         </div>
+
         <div class="leaderboard-container">
-            <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; border-left: 3px solid var(--primary); padding-left: 10px; font-family:'Rajdhani'; uppercase;">LEADERBOARD</h3>
+            <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; font-family:'Rajdhani';">LEADERBOARD</h3>
             <table class="lb-table">
-                <thead><tr style="font-size:10px; color:#8899a6; text-transform:uppercase;"><th>#</th><th style="text-align:left; padding-left:15px;">Player</th><th>Score</th><th>Prize</th></tr></thead>
+                <thead><tr style="font-size:10px; color:#8899a6;"><th>#</th><th style="text-align:left; padding-left:15px;">Player</th><th>Score</th><th>Prize</th></tr></thead>
                 <tbody id="lb-data"></tbody>
             </table>
         </div>
     </div>
+
     <script>
-        const BASE_URL = 'https://rolletto-backend-1.onrender.com/api'; // აქ ჩავსვი შენი ახალი სერვერის ლინკი
+        const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
         let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
 
-        function showToast(m, isErr = true) { 
-            const t = document.getElementById('toast'); 
-            t.innerText = m; 
-            t.style.background = isErr ? 'rgba(255, 77, 77, 0.95)' : 'rgba(0, 255, 204, 0.95)'; 
-            t.style.display = 'block'; 
-            setTimeout(() => t.style.display = 'none', 3000); 
-        }
+        function showToast(m, isErr = true) { const t = document.getElementById('toast'); t.innerText = m; t.style.background = isErr ? '#ff4d4d' : '#00ffcc'; t.style.color = isErr ? '#fff' : '#061218'; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
 
         async function startGame() {
-            const btn = document.getElementById('login-btn'); const txt = document.getElementById('btn-text'); const ldr = document.getElementById('btn-loader');
             const user = document.getElementById('username').value.trim() || localStorage.getItem('wc_user');
             const pass = document.getElementById('password').value.trim() || localStorage.getItem('wc_pass');
-            if(!user || !pass) return showToast("Enter credentials");
-
-            btn.disabled = true; txt.innerText = "WAIT..."; ldr.style.display = "block";
+            if(!user || !pass) return;
+            document.getElementById('btn-loader').style.display = "block";
             try {
-                const res = await fetch(`${BASE_URL}/check-user`, { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({user, password: pass}) 
-                }).then(r => r.json());
-
+                const res = await fetch(`${BASE_URL}/check-user`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user, password: pass}) }).then(r => r.json());
                 if(res.success) {
                     localStorage.setItem('wc_user', user); localStorage.setItem('wc_pass', pass);
                     GLOBAL_DATA = res;
-                    document.getElementById('my-rank').innerText = `#${res.userRank}`; 
+                    document.getElementById('my-rank').innerText = `#${res.userRank}`;
                     document.getElementById('my-score').innerText = res.userScore;
-                    document.getElementById('my-status').style.display = 'block'; 
-                    document.getElementById('start-section').style.display = 'none'; 
+                    document.getElementById('start-section').style.display = 'none';
                     document.getElementById('game-section').style.display = 'block';
+                    document.getElementById('my-status').style.display = 'block';
                     renderTabs(); loadLB();
-                } else { showToast(res.message); resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN'); }
-            } catch(e) { showToast("Server Error"); resetBtn('login-btn', 'btn-text', 'btn-loader', 'LOGIN / JOIN'); }
+                } else { showToast(res.message); }
+            } catch(e) { showToast("Error"); }
+            document.getElementById('btn-loader').style.display = "none";
         }
-
-        function resetBtn(b, t, l, txt) { document.getElementById(b).disabled = false; document.getElementById(t).innerText = txt; document.getElementById(l).style.display = "none"; }
 
         function renderTabs() {
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
+            const now = new Date().toISOString().split('T')[0];
             const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
-            days.forEach(dayId => {
-                const btn = document.createElement('div'); 
+            
+            const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
+            visibleDays.forEach(dayId => {
+                const btn = document.createElement('div');
                 btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
-                btn.innerText = GLOBAL_DATA.allDays[dayId].title;
-                btn.onclick = () => selectDay(dayId); 
+                btn.innerText = (GLOBAL_DATA.allDays[dayId].date === now) ? "TODAY" : GLOBAL_DATA.allDays[dayId].title;
+                btn.onclick = () => selectDay(dayId);
                 container.appendChild(btn);
             });
-            if(!SELECTED_DAY && days.length > 0) selectDay(days[0]);
+            if(!SELECTED_DAY && visibleDays.length > 0) selectDay(visibleDays[visibleDays.length-1]);
         }
 
         function selectDay(dayId) {
             SELECTED_DAY = dayId; renderTabs();
-            resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS');
             const container = document.getElementById('games-container'); container.innerHTML = "";
             const dInfo = GLOBAL_DATA.allDays[dayId];
+            const now = new Date().toISOString().split('T')[0];
             const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
+            const isPast = dInfo.date < now;
             TEMP_ANSWERS = {};
 
-            container.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><span style="font-size:11px; color:var(--primary); border:1px solid rgba(0,255,204,0.3); padding:4px 10px; border-radius:10px;">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
-            
+            container.innerHTML = `<div style="text-align:center; margin-bottom:10px;"><span style="font-size:10px; color:var(--primary);">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
-                    if (userPred) {
-                        const my = userPred.answers[i];
-                        if (opt === my) cls += " selected";
-                    } else if (TEMP_ANSWERS[i] === opt) cls += " selected";
-                    opts += `<button class="${cls}" ${userPred ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
+                    if (userPred && userPred.answers[i] === opt) cls += " selected";
+                    opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
             });
-            document.getElementById('save-btn').style.display = (!userPred) ? 'block' : 'none';
+            document.getElementById('save-btn').style.display = (!userPred && !isPast) ? 'block' : 'none';
         }
 
         function pick(btn, idx, val) { 
-            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
-            btn.classList.add('selected'); 
-            TEMP_ANSWERS[idx] = val; 
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; 
         }
 
         async function saveCurrentDay() {
-            const btn = document.getElementById('save-btn'); 
             if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
-            btn.disabled = true; document.getElementById('save-text').innerText = "WAIT..."; document.getElementById('save-loader').style.display = "block";
+            document.getElementById('save-loader').style.display = "block";
             try {
-                const res = await fetch(`${BASE_URL}/save-prediction`, { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) 
-                }).then(r => r.json());
-
-                if(res.success) { 
-                    showToast("Saved Successfully!", false); 
-                    GLOBAL_DATA.userPredictions.push({ dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS} }); 
-                    selectDay(SELECTED_DAY); 
-                } else { showToast(res.message); resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); }
-            } catch(e) { showToast("Error Saving"); resetBtn('save-btn', 'save-text', 'save-loader', 'SUBMIT PREDICTIONS'); }
+                const res = await fetch(`${BASE_URL}/save-prediction`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
+                if(res.success) { showToast("Saved!", false); GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); selectDay(SELECTED_DAY); }
+            } catch(e) { showToast("Error"); }
+            document.getElementById('save-loader').style.display = "none";
         }
 
         async function loadLB() {
-            try {
-                const data = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
-                const container = document.getElementById('lb-data'); 
-                const cUser = (localStorage.getItem('wc_user') || "").toLowerCase();
-                container.innerHTML = data.topData.map(u => {
-                    const isMe = u.u.toLowerCase() === cUser;
-                    return `<tr class="lb-row ${isMe ? 'my-row-highlight' : ''}"><td>${u.rank}</td><td class="lb-username">${u.u}</td><td style="color:var(--accent-gold); font-weight:700;">${u.p}</td><td>${{1:"1000€",2:"500€",3:"200€"}[u.rank] || "-"}</td></tr>`;
-                }).join('');
-            } catch(e) {}
+            const data = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
+            const container = document.getElementById('lb-data');
+            container.innerHTML = data.topData.map(u => `<tr class="lb-row"><td>${u.rank}</td><td style="text-align:left; padding-left:15px;">${u.u}</td><td style="color:var(--accent-gold); font-weight:700;">${u.p}</td><td>${{1:"1000€",2:"500€",3:"200€"}[u.rank] || "-"}</td></tr>`).join('');
         }
 
-        function logout() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } }
+        function logout() { localStorage.clear(); location.reload(); }
         window.onload = () => { if(localStorage.getItem('wc_user')) startGame(); else loadLB(); };
     </script>
 </body>
