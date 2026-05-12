@@ -8,23 +8,41 @@
     <style>
         :root { --primary: #00ffcc; --bg-dark: #061218; --glass: rgba(15, 33, 42, 0.9); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-dark); color: #fff; background-image: linear-gradient(rgba(6,18,24,0.8), rgba(6,18,24,0.95)), url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg'); background-size: cover; background-attachment: fixed; }
-        header { padding: 12px; border-bottom: 1px solid var(--primary); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
+        body { background-color: var(--bg-dark); color: #fff; background-image: linear-gradient(rgba(6,18,24,0.8), rgba(6,18,24,0.95)), url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg'); background-size: cover; background-attachment: fixed; background-position: center; }
+        header { padding: 10px; border-bottom: 1px solid var(--primary); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
         .logo { height: 28px; }
         .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
+        
         .card-auth, .game-card, .leaderboard-container, .rules-container { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+        
+        /* Match Layout Fix */
+        .match-display { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px; text-align: center; }
+        .team-name { font-weight: 700; font-size: 16px; font-family: 'Rajdhani'; text-transform: uppercase; letter-spacing: 1px; }
+        .vs-divider { font-size: 10px; color: var(--primary); font-weight: 800; padding: 2px 8px; background: rgba(0,255,204,0.1); border-radius: 4px; }
+        
         input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; outline: none; }
         .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; min-height: 50px; }
-        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; width: 100%; cursor: pointer; margin-top: 10px; font-weight: 700; text-transform: uppercase; }
-        .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; width: 100%; cursor: pointer; margin-top: 10px; text-transform: uppercase; font-weight: 700; }
+        
+        /* Options Grid */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        
+        /* Colors */
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
-        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; }
-        .res-wrong { background: #ff4d4d !important; color: white !important; }
+        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; border: none !important; }
+        .res-wrong { background: #ff4d4d !important; color: white !important; border: none !important; }
         .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
-        .hidden { display: none !important; }
-        .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
+
+        .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; margin-bottom: 10px; }
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
+        
+        .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
+        .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
+        .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border: 1px solid var(--primary); }
+        
+        .hidden { display: none !important; }
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -62,6 +80,7 @@
             <div class="card-auth">
                 <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
                 <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
+                <p style="font-size: 10px; color: #ffcc00; margin-bottom: 15px; text-align: center;">⚠️ PLEASE REMEMBER YOUR PASSWORD!</p>
                 <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">
                     <span id="reg-btn-text">SIGN UP / JOIN</span>
                     <div id="reg-btn-loader" class="btn-spinner"></div>
@@ -81,13 +100,13 @@
 
         <div class="leaderboard-container">
             <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; font-family:'Rajdhani'; text-transform: uppercase;">LEADERBOARD</h3>
-            <table class="lb-table" style="width:100%; border-collapse: separate; border-spacing: 0 6px;"><tbody id="lb-data"></tbody></table>
+            <table class="lb-table"><tbody id="lb-data"></tbody></table>
         </div>
 
         <div class="rules-container">
             <h3 style="color: var(--primary); font-size: 14px; font-family:'Rajdhani'; text-transform: uppercase;">Promotion Rules</h3>
             <div style="font-size: 11px; color: #b0bac1; line-height: 1.6; margin-top: 10px;">
-                • Campaign Period: June 5 - July 20, 2026.<br>
+                • Period: June 5 - July 20, 2026. 10 questions daily.<br>
                 • Points: 1pt (Jun 10-27), 3pts (Jun 28 - Jul 13), 5pts (Jul 14-20).<br>
                 • Tie-breaker: Earliest submission wins. Multi-accounts = DQ.
             </div>
@@ -184,7 +203,14 @@
                     }
                     opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
-                container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
+                container.innerHTML += `<div class="game-card">
+                    <div class="match-display">
+                        <div class="team-name">${teams[0]}</div>
+                        <div class="vs-divider">VS</div>
+                        <div class="team-name">${teams[1]}</div>
+                    </div>
+                    <div class="options-grid">${opts}</div>
+                </div>`;
             });
             document.getElementById('save-btn').classList.toggle('hidden', userPred || isPast);
         }
