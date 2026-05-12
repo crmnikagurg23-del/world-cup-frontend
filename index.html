@@ -21,13 +21,25 @@
         .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; }
         .res-wrong { background: #ff4d4d !important; color: white !important; }
         .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
-        .hidden { display: none !important; }
+        .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
+        .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
+        .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border: 1px solid var(--primary); }
+        .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
+        .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+        .day-tab.active { background: var(--primary); color: var(--bg-dark); }
+        .game-card { background: var(--glass); padding: 15px; margin: 10px 0; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .team-name { flex: 1; font-weight: 700; font-size: 14px; text-align: center; font-family: 'Rajdhani'; }
+        .vs-divider { font-size: 10px; color: var(--primary); padding: 4px 8px; background: rgba(0,255,204,0.1); border-radius: 5px; margin: 0 10px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div id="toast" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600;"></div>
+    <div id="toast" class="toast"></div>
     <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo"></header>
     <div class="main-content">
         <div id="my-status" class="hidden">
@@ -58,6 +70,7 @@
             <div class="card-auth">
                 <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
                 <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
+                <p style="font-size: 10px; color: #ffcc00; margin-bottom: 15px; text-align: center;">⚠️ PLEASE REMEMBER YOUR PASSWORD!</p>
                 <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">
                     <span id="reg-btn-text">SIGN UP / JOIN</span>
                     <div id="reg-btn-loader" class="btn-spinner"></div>
@@ -77,13 +90,13 @@
 
         <div class="leaderboard-container">
             <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 16px; font-family:'Rajdhani'; text-transform: uppercase;">LEADERBOARD</h3>
-            <table class="lb-table" style="width:100%;"><tbody id="lb-data"></tbody></table>
+            <table class="lb-table"><tbody id="lb-data"></tbody></table>
         </div>
 
         <div class="rules-container">
-            <h3 style="color: var(--primary); font-size: 14px; font-family:'Rajdhani'; text-transform: uppercase;">Promotion Rules</h3>
+            <h3 style="color: var(--primary); font-size: 14px; font-family:'Rajdhani'; text-transform: uppercase;">Terms & Conditions</h3>
             <div style="font-size: 11px; color: #b0bac1; line-height: 1.6; margin-top: 10px;">
-                • Period: June 5 - July 20, 2026. 10 questions daily.<br>
+                • Campaign Period: June 5 - July 20, 2026. Predict 10 matches daily.<br>
                 • Points: 1pt (Jun 10-27), 3pts (Jun 28 - Jul 13), 5pts (Jul 14-20).<br>
                 • Tie-breaker: Earliest submission wins. Multi-accounts = DQ.
             </div>
@@ -100,7 +113,10 @@
             t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); 
         }
 
-        function toggleAuth(v) { document.getElementById('login-section').classList.toggle('hidden', v!=='login'); document.getElementById('signup-section').classList.toggle('hidden', v!=='signup'); }
+        function toggleAuth(v) { 
+            document.getElementById('login-section').classList.toggle('hidden', v!=='login'); 
+            document.getElementById('signup-section').classList.toggle('hidden', v!=='signup'); 
+        }
 
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -117,7 +133,11 @@
             const btnId = type === 'login' ? 'login-btn' : 'reg-btn';
             const textId = type === 'login' ? 'btn-text' : 'reg-btn-text';
             const loaderId = type === 'login' ? 'btn-loader' : 'reg-btn-loader';
-            if(!isAuto) { document.getElementById(btnId).disabled = true; document.getElementById(textId).classList.add('hidden'); document.getElementById(loaderId).style.display = "block"; }
+            if(!isAuto) { 
+                document.getElementById(btnId).disabled = true; 
+                document.getElementById(textId).classList.add('hidden'); 
+                document.getElementById(loaderId).style.display = "block"; 
+            }
             try {
                 const res = await fetch(`${BASE_URL}/${endpoint}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user: u, password: p}) }).then(r => r.json());
                 if(res.success) {
@@ -168,7 +188,6 @@
                     let cls = "opt-btn";
                     const myPick = userPred ? userPred.answers[i] : null;
 
-                    // მთავარი ლოგიკა: ფერადდება მხოლოდ მაშინ, თუ realResRaw არ არის ცარიელი
                     if (realResRaw && realResRaw !== "") {
                         if (opt === realResRaw) {
                             cls += " res-actual"; 
@@ -186,7 +205,10 @@
             document.getElementById('save-btn').classList.toggle('hidden', userPred || isPast);
         }
 
-        function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
+        function pick(btn, idx, val) { 
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
+            btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; 
+        }
 
         async function saveCurrentDay() {
             if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
