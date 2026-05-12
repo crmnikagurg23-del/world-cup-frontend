@@ -8,7 +8,19 @@
     <style>
         :root { --primary: #00ffcc; --bg-dark: #061218; --glass: rgba(15, 33, 42, 0.9); --accent-gold: #ffcc00; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-dark); color: #fff; background-image: radial-gradient(circle at 50% 0%, rgba(0, 255, 204, 0.1) 0%, transparent 50%), linear-gradient(rgba(6,18,24,0.8), rgba(6,18,24,0.95)), url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg'); background-size: cover; background-attachment: fixed; background-position: center; }
+        
+        /* განათებული ფონის სტილი */
+        body { 
+            background-color: var(--bg-dark); 
+            color: #fff; 
+            background-image: radial-gradient(circle at 50% 0%, rgba(0, 255, 204, 0.15) 0%, transparent 50%), 
+                              linear-gradient(rgba(6,18,24,0.3), rgba(6,18,24,0.6)), 
+                              url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg'); 
+            background-size: cover; 
+            background-attachment: fixed; 
+            background-position: center; 
+        }
+
         header { padding: 10px; border-bottom: 1px solid var(--primary); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
         .logo { height: 28px; cursor: pointer; }
         .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
