@@ -12,18 +12,21 @@
         header { padding: 10px; border-bottom: 1px solid var(--primary); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
         .logo { height: 28px; }
         .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; }
-        .card-auth, .game-card, .leaderboard-container, .rules-container { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
         
+        .card-auth, .game-card, .leaderboard-container, .rules-container { background: var(--glass); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+        
+        /* MATCH UI FIX */
         .match-row { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 15px; }
-        .team-name { font-weight: 700; font-size: 16px; font-family: 'Rajdhani'; text-transform: uppercase; }
-        .vs-label { font-size: 10px; color: var(--primary); background: rgba(0,255,204,0.1); padding: 2px 8px; border-radius: 4px; margin: 5px 0; }
+        .team-name { font-weight: 700; font-size: 16px; font-family: 'Rajdhani'; text-transform: uppercase; margin: 5px 0; }
+        .vs-label { font-size: 10px; color: var(--primary); background: rgba(0,255,204,0.1); padding: 2px 8px; border-radius: 4px; }
         
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; text-align: center; min-height: 45px; display: flex; justify-content: center; align-items: center; }
         
-        .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
-        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; }
-        .res-wrong { background: #ff4d4d !important; color: white !important; }
+        /* STATE COLORS */
+        .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; color: #fff !important; }
+        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; border: none !important; }
+        .res-wrong { background: #ff4d4d !important; color: white !important; border: none !important; }
         .res-actual { border: 2px solid var(--primary) !important; color: var(--primary) !important; }
         
         input { padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; outline: none; }
