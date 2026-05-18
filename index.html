@@ -40,8 +40,23 @@
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
         .my-row-highlight td { background: rgba(0, 255, 204, 0.15) !important; border: 1px solid var(--primary); }
-        .tabs-wrapper { display: flex; gap: 10px; padding: 10px 0; overflow-x: auto; scrollbar-width: none; }
-        .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+
+        /* Tabs Wrapper with Scroll Smooth */
+        .tabs-wrapper { 
+            display: flex; 
+            gap: 10px; 
+            padding: 10px 5px; 
+            overflow-x: auto !important; 
+            white-space: nowrap; 
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth; /* სმუზი სქროლი კოდიდან გადაადგილებისას */
+        }
+        
+        .tabs-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; display: inline-block; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
         
         .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -50,8 +65,6 @@
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
-        .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-        @keyframes spin { to { transform: rotate(360deg); } }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -74,10 +87,7 @@
             <div class="card-auth">
                 <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                 <input type="password" id="password" placeholder="PASSWORD">
-                <button id="login-btn" class="btn-green" onclick="startGame(false, 'login')">
-                    <span id="btn-text">LOGIN</span>
-                    <div id="btn-loader" class="btn-spinner"></div>
-                </button>
+                <button id="login-btn" class="btn-green" onclick="startGame(false, 'login')">LOGIN</button>
                 <button class="btn-outline" onclick="toggleAuth('signup')">CREATE ACCOUNT</button>
             </div>
         </div>
@@ -87,10 +97,7 @@
             <div class="card-auth">
                 <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
                 <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
-                <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">
-                    <span id="reg-btn-text">SIGN UP / JOIN</span>
-                    <div id="reg-btn-loader" class="btn-spinner"></div>
-                </button>
+                <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">SIGN UP / JOIN</button>
                 <button class="btn-outline" onclick="toggleAuth('login')">BACK TO LOGIN</button>
             </div>
         </div>
@@ -98,10 +105,7 @@
         <div id="game-section" class="hidden">
             <div class="tabs-wrapper" id="day-tabs"></div>
             <div id="games-container"></div>
-            <button id="save-btn" class="btn-green hidden" onclick="saveCurrentDay()">
-                <span id="save-text">SUBMIT PREDICTIONS</span>
-                <div id="save-loader" class="btn-spinner"></div>
-            </button>
+            <button id="save-btn" class="btn-green hidden" onclick="saveCurrentDay()">SUBMIT PREDICTIONS</button>
         </div>
 
         <div class="leaderboard-container">
@@ -148,18 +152,50 @@
             const now = new Date().toISOString().split('T')[0];
             const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
             const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
+            
+            // ვეძებთ დღევანდელი დღის ID-ს
+            let todayDayId = visibleDays.find(id => GLOBAL_DATA.allDays[id].date === now);
+            
+            // თუ პირველად იტვირთება, SELECTED_DAY ავტომატურად გახდეს დღევანდელი დღე (ან ბოლო ხელმისაწვდომი)
+            if (!SELECTED_DAY) {
+                SELECTED_DAY = todayDayId || visibleDays[visibleDays.length - 1];
+            }
+
             visibleDays.forEach(dayId => {
                 const btn = document.createElement('div');
                 btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
                 btn.innerText = (GLOBAL_DATA.allDays[dayId].date === now) ? "TODAY" : GLOBAL_DATA.allDays[dayId].title;
                 btn.onclick = () => selectDay(dayId);
                 container.appendChild(btn);
+
+                // თუ ეს არის აქტიური ტაბი, ავტომატურად გაასრიალოს მენიუ მისკენ
+                if (SELECTED_DAY === dayId) {
+                    setTimeout(() => {
+                        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }, 100);
+                }
             });
-            if(!SELECTED_DAY && visibleDays.length > 0) selectDay(visibleDays[visibleDays.length-1]);
+            
+            if(visibleDays.length > 0) selectDay(SELECTED_DAY);
         }
 
         function selectDay(dayId) {
-            SELECTED_DAY = dayId; renderTabs();
+            if(SELECTED_DAY !== dayId) {
+                SELECTED_DAY = dayId;
+                // აქტიური კლასების გადატანა ტაბებზე ხელახალი რენდერის გარეშე, რომ სქროლი არ გაწყდეს
+                document.querySelectorAll('.day-tab').forEach((tab, index) => {
+                    const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
+                    const now = new Date().toISOString().split('T')[0];
+                    const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
+                    if(visibleDays[index] === dayId) {
+                        tab.classList.add('active');
+                        tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+            }
+            
             const container = document.getElementById('games-container'); container.innerHTML = "";
             const dInfo = GLOBAL_DATA.allDays[dayId];
             const now = new Date().toISOString().split('T')[0];
