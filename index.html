@@ -203,17 +203,25 @@
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
                 
-                // ამოწმებს, რომ Sheets-ში ჩაწერილი მნიშვნელობა იყოს მხოლოდ "1", "X" ან "2"
-                let rawRes = realResults[i] ? realResults[i].trim().toUpperCase() : null;
-                const realResRaw = (rawRes && ["1", "X", "2"].includes(rawRes)) ? rawRes : null;
+                let rawRes = realResults[i] ? realResults[i].trim().toLowerCase() : null;
+                const realResRaw = (rawRes && ["1", "x", "2"].includes(rawRes)) ? rawRes : null;
 
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
                     const myPick = userPred ? userPred.answers[i] : null;
+                    
+                    // შედარებისას ორივე მხარე მიგვყავს პატარა ასოზე
+                    let myPickLower = myPick ? myPick.toString().toLowerCase().trim() : null;
+                    let optLower = opt.toString().toLowerCase().trim();
+
                     if (realResRaw) {
-                        if (opt === realResRaw) { cls += " res-actual"; if (myPick === realResRaw) cls += " res-correct"; }
-                        else if (opt === myPick) cls += " res-wrong";
-                    } else if (myPick === opt || TEMP_ANSWERS[i] === opt) cls += " selected";
+                        if (optLower === realResRaw) { 
+                            cls += " res-actual"; 
+                            if (myPickLower === realResRaw) cls += " res-correct"; 
+                        }
+                        else if (optLower === myPickLower) cls += " res-wrong";
+                    } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
+                    
                     opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
