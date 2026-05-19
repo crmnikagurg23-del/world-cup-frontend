@@ -31,26 +31,20 @@
         
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
         
-        /* 🔵 მონიშნული (Selected) */
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
-        /* ✅ სწორად გაცემული პასუხი (იუზერმა გამოიცნო) - მთლიანად მწვანე */
         .res-correct { 
             background: #00ffcc !important; 
             color: #061218 !important; 
             font-weight: 800 !important; 
             border: none !important; 
         }
-        
-        /* ❌ არასწორი პასუხი - წითელი */
         .res-wrong { 
             background: #ff4d4d !important; 
             color: #ffffff !important; 
             font-weight: 800 !important;
             border: none !important; 
         }
-        
-        /* 🎯 უბრალოდ სწორი პასუხი (იუზერმა ვერ გამოიცნო) - მწვანე ჩარჩო */
         .res-actual { 
             border: 2px solid #00ffcc !important; 
             background: transparent !important; 
@@ -77,9 +71,27 @@
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; display: inline-block; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
         
+        /* 🛠️ მატჩის ვიზუალის ფიქსი დროშებისთვის */
         .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .team-name { flex: 1; font-weight: 700; font-size: 14px; text-align: center; font-family: 'Rajdhani'; text-transform: uppercase; }
-        .vs-divider { font-size: 10px; color: var(--primary); padding: 4px 8px; background: rgba(0,255,204,0.1); border-radius: 5px; margin: 0 10px; }
+        
+        .team-container { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 6px; 
+        }
+        
+        .flag-img { 
+            width: 32px; 
+            height: 22px; 
+            object-fit: cover; 
+            border-radius: 4px; 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .team-name { font-weight: 700; font-size: 14px; text-align: center; font-family: 'Rajdhani'; text-transform: uppercase; }
+        .vs-divider { font-size: 10px; color: var(--primary); padding: 4px 8px; background: rgba(0,255,204,0.1); border-radius: 5px; margin: 0 10px; align-self: center; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
@@ -101,7 +113,7 @@
         </div>
 
         <div id="login-section">
-            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani'; uppercase">WORLD CUP 2026</h2>
+            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">WORLD CUP 2026</h2>
             <div class="card-auth">
                 <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                 <input type="password" id="password" placeholder="PASSWORD">
@@ -111,7 +123,7 @@
         </div>
 
         <div id="signup-section" class="hidden">
-            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani'; uppercase">JOIN PREDICTOR</h2>
+            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">JOIN PREDICTOR</h2>
             <div class="card-auth">
                 <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
                 <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
@@ -135,6 +147,25 @@
     <script>
         const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
         let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
+
+        // 🛠️ ქვეყნების კოდების ბაზა დროშების ავტომატური გენერაციისთვის
+        const flagCodes = {
+            "georgia": "ge", "spain": "es", "germany": "de", "scotland": "gb-sct",
+            "argentina": "ar", "brazil": "br", "france": "fr", "england": "gb-eng",
+            "italy": "it", "portugal": "pt", "mexico": "mx", "usa": "us", 
+            "canada": "ca", "morocco": "ma", "croatia": "hr", "belgium": "be",
+            "netherlands": "nl", "uruguay": "uy", "colombia": "co", "japan": "jp"
+        };
+
+        function getFlagHtml(teamName) {
+            let key = teamName.trim().toLowerCase();
+            let code = flagCodes[key];
+            if (code) {
+                return `<img src="https://flagcdn.com/w40/${code}.png" class="flag-img" alt="${teamName}">`;
+            }
+            // თუ ქვეყანა ბაზაში არ არის, დააბრუნებს ცარიელ ადგილს, რომ კოდი არ გაიტეხოს
+            return `<div style="width:32px; height:22px; background:rgba(255,255,255,0.05); border-radius:4px;"></div>`;
+        }
 
         function getLocalDateString() {
             const d = new Date();
@@ -212,7 +243,6 @@
             
             let realResultsArray = [];
             if (dInfo.results) {
-                // წმენდს შედეგებს ბრჭყალებისა და ჰაერებისგან
                 let cleanStr = dInfo.results.toString().replace(/["'\s]/g, ''); 
                 if (cleanStr.includes('|')) realResultsArray = cleanStr.split('|');
                 else if (cleanStr.includes(',')) realResultsArray = cleanStr.split(',');
@@ -234,19 +264,34 @@
 
                     if (realResRaw) {
                         if (optLower === realResRaw) { 
-                            // სწორი პასუხი
-                            if (myPickLower === realResRaw) cls += " res-correct"; // იუზერმა გამოიცნო -> მთლიანად მწვანე
-                            else cls += " res-actual"; // იუზერმა ვერ გამოიცნო -> მწვანე ჩარჩო
+                            if (myPickLower === realResRaw) cls += " res-correct"; 
+                            else cls += " res-actual"; 
                         }
-                        else if (optLower === myPickLower) {
-                            // იუზერის არასწორი არჩევანი -> წითელი
-                            cls += " res-wrong"; 
-                        }
+                        else if (optLower === myPickLower) cls += " res-wrong"; 
                     } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
                     
                     opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
-                container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-name">${teams[0]}</div><div class="vs-divider">VS</div><div class="team-name">${teams[1]}</div></div><div class="options-grid">${opts}</div></div>`;
+
+                // 🛠️ აქ გენერირდება მატჩის ბლოკი დროშებით
+                let leftFlag = getFlagHtml(teams[0]);
+                let rightFlag = getFlagHtml(teams[1]);
+
+                container.innerHTML += `
+                    <div class="game-card">
+                        <div class="match-display">
+                            <div class="team-container">
+                                ${leftFlag}
+                                <div class="team-name">${teams[0]}</div>
+                            </div>
+                            <div class="vs-divider">VS</div>
+                            <div class="team-container">
+                                ${rightFlag}
+                                <div class="team-name">${teams[1]}</div>
+                            </div>
+                        </div>
+                        <div class="options-grid">${opts}</div>
+                    </div>`;
             });
             document.getElementById('save-btn').classList.toggle('hidden', userPred || isPast);
         }
