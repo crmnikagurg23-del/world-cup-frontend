@@ -32,6 +32,7 @@
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
+        /* ფერების სტილები */
         .res-correct { 
             background: #00ffcc !important; 
             color: #061218 !important; 
@@ -130,13 +131,9 @@
         const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
         let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
 
-        // 🛠️ ლოკალური თარიღის აღება YYYY-MM-DD ფორმატში (ტაიმზონის აცდენის ფიქსი)
         function getLocalDateString() {
             const d = new Date();
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
 
         function showToast(m, isErr = true) { 
@@ -151,9 +148,8 @@
             const u = isAuto ? localStorage.getItem('wc_user') : (type === 'login' ? document.getElementById('username').value.trim() : document.getElementById('reg-username').value.trim());
             const p = isAuto ? localStorage.getItem('wc_pass') : (type === 'login' ? document.getElementById('password').value.trim() : document.getElementById('reg-password').value.trim());
             if(!u || !p) return;
-            const endpoint = isAuto ? 'login' : type;
             try {
-                const res = await fetch(`${BASE_URL}/${endpoint}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user: u, password: p}) }).then(r => r.json());
+                const res = await fetch(`${BASE_URL}/${isAuto ? 'login' : type}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user: u, password: p}) }).then(r => r.json());
                 if(res.success) {
                     localStorage.setItem('wc_user', u); localStorage.setItem('wc_pass', p);
                     GLOBAL_DATA = res;
@@ -170,7 +166,7 @@
 
         function renderTabs() {
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
-            const now = getLocalDateString(); // განახლებული ლოკალური დრო
+            const now = getLocalDateString();
             const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
             const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
             
@@ -213,9 +209,15 @@
             const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             const isPast = dInfo.date < now;
             
+            // 🛠️ სუპერ ფიქსი: კოდი ასუფთავებს ნებისმიერ სიმბოლოს (ბრჭყალებს, მძიმეებს, ხაზებს)
             let realResultsArray = [];
             if (dInfo.results) {
-                realResultsArray = dInfo.results.toString().split('|').map(res => res.trim().toLowerCase());
+                let cleanStr = dInfo.results.toString().replace(/["'\s]/g, ''); // აშორებს ბრჭყალებს და ჰაერებს
+                if (cleanStr.includes('|')) realResultsArray = cleanStr.split('|');
+                else if (cleanStr.includes(',')) realResultsArray = cleanStr.split(',');
+                else realResultsArray = [cleanStr];
+                
+                realResultsArray = realResultsArray.map(res => res.trim().toLowerCase());
             }
             
             container.innerHTML = `<div style="text-align:center; margin-bottom:10px;"><span style="font-size:10px; color:var(--primary);">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
