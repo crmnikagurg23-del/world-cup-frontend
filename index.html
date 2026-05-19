@@ -32,16 +32,15 @@
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
-        /* 🛠️ სრულიად შესწორებული ფერები და კონტრასტი */
         .res-correct { 
             background: #00ffcc !important; 
-            color: #061218 !important; /* მუქი ფონი, რომ ტექსტი იდეალურად გამოჩნდეს */
+            color: #061218 !important; 
             font-weight: 800 !important; 
             border: none !important; 
         }
         .res-wrong { 
             background: #ff4d4d !important; 
-            color: #ffffff !important; /* თეთრი ტექსტი წითელ ფონზე */
+            color: #ffffff !important; 
             font-weight: 800 !important;
             border: none !important; 
         }
@@ -131,6 +130,15 @@
         const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
         let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
 
+        // 🛠️ ლოკალური თარიღის აღება YYYY-MM-DD ფორმატში (ტაიმზონის აცდენის ფიქსი)
+        function getLocalDateString() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         function showToast(m, isErr = true) { 
             const t = document.getElementById('toast'); t.innerText = m; 
             t.style.background = isErr ? '#ff4d4d' : '#00ffcc'; t.style.color = isErr ? '#fff' : '#061218'; 
@@ -162,7 +170,7 @@
 
         function renderTabs() {
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
-            const now = new Date().toISOString().split('T')[0];
+            const now = getLocalDateString(); // განახლებული ლოკალური დრო
             const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
             const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
             
@@ -188,7 +196,7 @@
                 SELECTED_DAY = dayId;
                 document.querySelectorAll('.day-tab').forEach((tab, index) => {
                     const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
-                    const now = new Date().toISOString().split('T')[0];
+                    const now = getLocalDateString();
                     const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
                     if(visibleDays[index] === dayId) {
                         tab.classList.add('active');
@@ -201,7 +209,7 @@
             
             const container = document.getElementById('games-container'); container.innerHTML = "";
             const dInfo = GLOBAL_DATA.allDays[dayId];
-            const now = new Date().toISOString().split('T')[0];
+            const now = getLocalDateString();
             const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             const isPast = dInfo.date < now;
             
@@ -215,7 +223,6 @@
                 const teams = game.split(' vs '); let opts = "";
                 
                 let targetRes = realResultsArray[i] || null;
-                // 🛠️ აქ გასწორდა: ვალიდაცია ახლა დიდ X-საც სწორად ატარებს მასივში
                 const realResRaw = (targetRes && ["1", "x", "2"].includes(targetRes)) ? targetRes : null;
 
                 ['1', 'X', '2'].forEach(opt => {
