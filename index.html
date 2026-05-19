@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rolletto Predictor | World Cup 2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght class="opt-btn";:600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00ffcc; --bg-dark: #061218; --glass: rgba(15, 33, 42, 0.9); --accent-gold: #ffcc00; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -70,64 +70,69 @@
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; display: inline-block; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
         
-        /* 🛠️ მკაცრად ცენტრირებული Grid განლაგება */
+        /* 🛠️ ახალი დახვეწილი და გაშლილი დიზაინი (ტოტალიზატორის სტილი) */
         .match-display { 
-            display: grid; 
-            grid-template-columns: 1fr 50px 1fr; /* ფიქსირებული 50px ცენტრისთვის */
-            align-items: center; 
-            margin-bottom: 20px; 
+            display: flex;
+            justify-content: space-between; /* შლის გუნდებს კიდეებისკენ */
+            align-items: center;
+            margin-bottom: 22px;
             width: 100%;
+            padding: 0 10px; /* აძლევს სუნთქვის საშუალებას გვერდებიდან */
         }
         
         .team-home { 
             display: flex; 
             align-items: center; 
-            justify-content: flex-end; /* სახელი და დროშა მიდის ცენტრისკენ, მარჯვნივ */
-            gap: 8px; 
-            overflow: hidden;
+            gap: 10px; 
+            flex: 1;
+            justify-content: flex-start; /* მარცხენა გუნდი იწყება მარცხნიდან */
         }
         
         .team-away { 
             display: flex; 
             align-items: center; 
-            justify-content: flex-start; /* სახელი და დროშა მიდის ცენტრისკენ, მარცხნივ */
-            gap: 8px; 
-            overflow: hidden;
+            gap: 10px; 
+            flex: 1;
+            justify-content: flex-end; /* მარჯვენა გუნდი მიდის ბოლომდე მარჯვნივ */
         }
         
         .flag-img { 
-            width: 26px; 
-            height: 18px; 
+            width: 28px; 
+            height: 19px; 
             object-fit: cover; 
-            border-radius: 3px; 
+            border-radius: 4px; 
             border: 1px solid rgba(255, 255, 255, 0.15);
             flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         .team-name { 
             font-weight: 700; 
-            font-size: 13px; 
+            font-size: 14px; 
             font-family: 'Rajdhani'; 
             text-transform: uppercase; 
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            max-width: 150px;
         }
         
         .vs-container {
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 0 15px; /* აშორებს დროშებს ცენტრისგან */
+            flex-shrink: 0;
         }
 
         .vs-divider { 
-            font-size: 10px; 
+            font-size: 11px; 
             color: var(--primary); 
-            padding: 3px 7px; 
+            padding: 4px 10px; 
             background: rgba(0,255,204,0.1); 
-            border: 1px solid rgba(0,255,204,0.15);
-            border-radius: 5px; 
+            border: 1px solid rgba(0,255,204,0.2);
+            border-radius: 6px; 
             font-weight: 700;
             font-family: 'Rajdhani';
         }
@@ -322,15 +327,15 @@
                     <div class="game-card">
                         <div class="match-display">
                             <div class="team-home">
-                                <div class="team-name">${teams[0]}</div>
                                 ${leftFlag}
+                                <div class="team-name">${teams[0]}</div>
                             </div>
                             <div class="vs-container">
                                 <div class="vs-divider">VS</div>
                             </div>
                             <div class="team-away">
-                                ${rightFlag}
                                 <div class="team-name">${teams[1]}</div>
+                                ${rightFlag}
                             </div>
                         </div>
                         <div class="options-grid">${opts}</div>
