@@ -32,7 +32,7 @@
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
-        /* ფერების სტილები */
+        /* 🛠️ განახლებული შეფერადების სტილები */
         .res-correct { 
             background: #00ffcc !important; 
             color: #061218 !important; 
@@ -209,10 +209,9 @@
             const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             const isPast = dInfo.date < now;
             
-            // 🛠️ სუპერ ფიქსი: კოდი ასუფთავებს ნებისმიერ სიმბოლოს (ბრჭყალებს, მძიმეებს, ხაზებს)
             let realResultsArray = [];
             if (dInfo.results) {
-                let cleanStr = dInfo.results.toString().replace(/["'\s]/g, ''); // აშორებს ბრჭყალებს და ჰაერებს
+                let cleanStr = dInfo.results.toString().replace(/["'\s]/g, ''); 
                 if (cleanStr.includes('|')) realResultsArray = cleanStr.split('|');
                 else if (cleanStr.includes(',')) realResultsArray = cleanStr.split(',');
                 else realResultsArray = [cleanStr];
@@ -236,10 +235,11 @@
 
                     if (realResRaw) {
                         if (optLower === realResRaw) { 
-                            cls += " res-actual"; 
-                            if (myPickLower === realResRaw) cls += " res-correct"; 
+                            cls += " res-correct"; // 🛠️ აქ გასწორდა: თუ პასუხი სწორია, მთლიანად ამწვანებს ფონს
                         }
-                        else if (optLower === myPickLower) cls += " res-wrong";
+                        else if (optLower === myPickLower) {
+                            cls += " res-wrong"; // 🛠️ აქ გასწორდა: თუ იუზერის არჩევანი არასწორია, აწითლებს ფონს
+                        }
                     } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
                     
                     opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
