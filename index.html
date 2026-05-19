@@ -29,26 +29,33 @@
         .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 50px; }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; width: 100%; cursor: pointer; margin-top: 10px; }
         
-        .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        
+        /* 🔵 მონიშნული (Selected) */
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
-        /* 🛠️ განახლებული შეფერადების სტილები */
+        /* ✅ სწორად გაცემული პასუხი (იუზერმა გამოიცნო) - მთლიანად მწვანე */
         .res-correct { 
             background: #00ffcc !important; 
             color: #061218 !important; 
             font-weight: 800 !important; 
             border: none !important; 
         }
+        
+        /* ❌ არასწორი პასუხი - წითელი */
         .res-wrong { 
             background: #ff4d4d !important; 
             color: #ffffff !important; 
             font-weight: 800 !important;
             border: none !important; 
         }
+        
+        /* 🎯 უბრალოდ სწორი პასუხი (იუზერმა ვერ გამოიცნო) - მწვანე ჩარჩო */
         .res-actual { 
             border: 2px solid #00ffcc !important; 
             background: transparent !important; 
             color: #00ffcc !important; 
+            font-weight: 700 !important;
         }
 
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
@@ -65,9 +72,7 @@
             scroll-behavior: smooth;
         }
         
-        .tabs-wrapper::-webkit-scrollbar {
-            display: none;
-        }
+        .tabs-wrapper::-webkit-scrollbar { display: none; }
 
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; display: inline-block; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
@@ -96,7 +101,7 @@
         </div>
 
         <div id="login-section">
-            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">WORLD CUP 2026</h2>
+            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani'; uppercase">WORLD CUP 2026</h2>
             <div class="card-auth">
                 <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                 <input type="password" id="password" placeholder="PASSWORD">
@@ -106,7 +111,7 @@
         </div>
 
         <div id="signup-section" class="hidden">
-            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani';">JOIN PREDICTOR</h2>
+            <h2 style="margin: 20px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani'; uppercase">JOIN PREDICTOR</h2>
             <div class="card-auth">
                 <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
                 <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
@@ -194,12 +199,8 @@
                     const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
                     const now = getLocalDateString();
                     const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
-                    if(visibleDays[index] === dayId) {
-                        tab.classList.add('active');
-                        tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                    } else {
-                        tab.classList.remove('active');
-                    }
+                    if(visibleDays[index] === dayId) tab.classList.add('active');
+                    else tab.classList.remove('active');
                 });
             }
             
@@ -211,34 +212,35 @@
             
             let realResultsArray = [];
             if (dInfo.results) {
+                // წმენდს შედეგებს ბრჭყალებისა და ჰაერებისგან
                 let cleanStr = dInfo.results.toString().replace(/["'\s]/g, ''); 
                 if (cleanStr.includes('|')) realResultsArray = cleanStr.split('|');
                 else if (cleanStr.includes(',')) realResultsArray = cleanStr.split(',');
                 else realResultsArray = [cleanStr];
-                
                 realResultsArray = realResultsArray.map(res => res.trim().toLowerCase());
             }
             
             container.innerHTML = `<div style="text-align:center; margin-bottom:10px;"><span style="font-size:10px; color:var(--primary);">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
-                
                 let targetRes = realResultsArray[i] || null;
                 const realResRaw = (targetRes && ["1", "x", "2"].includes(targetRes)) ? targetRes : null;
 
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
                     const myPick = userPred ? userPred.answers[i] : null;
-                    
                     let myPickLower = myPick ? myPick.toString().toLowerCase().trim() : null;
                     let optLower = opt.toString().toLowerCase().trim();
 
                     if (realResRaw) {
                         if (optLower === realResRaw) { 
-                            cls += " res-correct"; // 🛠️ აქ გასწორდა: თუ პასუხი სწორია, მთლიანად ამწვანებს ფონს
+                            // სწორი პასუხი
+                            if (myPickLower === realResRaw) cls += " res-correct"; // იუზერმა გამოიცნო -> მთლიანად მწვანე
+                            else cls += " res-actual"; // იუზერმა ვერ გამოიცნო -> მწვანე ჩარჩო
                         }
                         else if (optLower === myPickLower) {
-                            cls += " res-wrong"; // 🛠️ აქ გასწორდა: თუ იუზერის არჩევანი არასწორია, აწითლებს ფონს
+                            // იუზერის არასწორი არჩევანი -> წითელი
+                            cls += " res-wrong"; 
                         }
                     } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
                     
