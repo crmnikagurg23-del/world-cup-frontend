@@ -146,28 +146,29 @@
         const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
         let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
 
-        // 🛠️ გაფართოებული ბაზა - ყველა პოპულარული ქვეყანა და მათი კოდები
-        const flagCodes = {
-            "georgia": "ge", "spain": "es", "germany": "de", "scotland": "gb-sct",
-            "argentina": "ar", "brazil": "br", "france": "fr", "england": "gb-eng",
-            "italy": "it", "portugal": "pt", "mexico": "mx", "usa": "us", 
-            "canada": "ca", "morocco": "ma", "croatia": "hr", "belgium": "be",
-            "netherlands": "nl", "uruguay": "uy", "colombia": "co", "japan": "jp",
-            "paraguay": "py", "bosnia and herzegovina": "ba", "bosnia": "ba",
-            "switzerland": "ch", "denmark": "dk", "senegal": "sn", "tunisia": "tn",
-            "poland": "pl", "south korea": "kr", "australia": "au", "ukraine": "ua",
-            "sweden": "se", "wales": "gb-wls", "ecuador": "ec", "peru": "pe",
-            "chile": "cl", "ghana": "gh", "cameroon": "cm", "serbia": "rs",
-            "switzerland": "ch", "austria": "at", "turkey": "tr", "czechia": "cz"
-        };
+        // 🛠️ სუპერ ავტომატური ფუნქცია: იღებს დროშას პირდაპირ საერთაშორისო ბაზიდან ქვეყნის სახელით
+        function getFlagHtml(teamName, imgId) {
+            let name = teamName.trim().toLowerCase();
+            
+            // სპეციფიკური ფიქსები დიდი ბრიტანეთის ქვეყნებისთვის
+            if (name === "england") name = "united kingdom";
+            if (name === "scotland") name = "united kingdom";
+            if (name === "wales") name = "united kingdom";
+            if (name === "usa") name = "united states";
 
-        function getFlagHtml(teamName) {
-            let key = teamName.trim().toLowerCase();
-            let code = flagCodes[key];
-            if (code) {
-                return `<img src="https://flagcdn.com/w40/${code}.png" class="flag-img" alt="${teamName}">`;
-            }
-            return `<div style="width:32px; height:22px; background:rgba(255,255,255,0.05); border-radius:4px; border:1px solid rgba(255,255,255,0.1)"></div>`;
+            // აგზავნის მოთხოვნას საერთაშორისო API-ზე
+            fetch(`https://restcountries.com/v3.1/name/${name}?fullText=false`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data[0] && data[0].flags && data[0].flags.png) {
+                        const imgEl = document.getElementById(imgId);
+                        if (imgEl) imgEl.src = data[0].flags.png;
+                    }
+                })
+                .catch(e => console.log("Flag error for:", teamName));
+
+            // სანამ API-დან სურათი ჩამოვა, დროებით აჩვენებს ლამაზ ლოადერ ბლოკს
+            return `<img id="${imgId}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" class="flag-img" style="background:rgba(255,255,255,0.05);" alt="${teamName}">`;
         }
 
         function getLocalDateString() {
@@ -276,8 +277,12 @@
                     opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
 
-                let leftFlag = getFlagHtml(teams[0]);
-                let rightFlag = getFlagHtml(teams[1]);
+                // უნიკალური ID თითოეული სურათისთვის
+                let leftImgId = `flag-L-${dayId}-${i}`;
+                let rightImgId = `flag-R-${dayId}-${i}`;
+
+                let leftFlag = getFlagHtml(teams[0], leftImgId);
+                let rightFlag = getFlagHtml(teams[1], rightImgId);
 
                 container.innerHTML += `
                     <div class="game-card">
