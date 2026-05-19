@@ -32,23 +32,23 @@
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
-        /* 🛠️ ფიქსი ტექსტის ფერებზე, რომ ციფრები ყოველთვის გამოჩნდეს */
+        /* 🛠️ სრულიად შესწორებული ფერები და კონტრასტი */
         .res-correct { 
-            background: var(--primary) !important; 
-            color: #000000 !important; /* მკაცრად შავი ტექსტი მწვანე ფონზე */
-            font-weight: 800; 
+            background: #00ffcc !important; 
+            color: #061218 !important; /* მუქი ფონი, რომ ტექსტი იდეალურად გამოჩნდეს */
+            font-weight: 800 !important; 
             border: none !important; 
         }
         .res-wrong { 
             background: #ff4d4d !important; 
-            color: #ffffff !important; /* მკაცრად თეთრი ტექსტი წითელ ფონზე */
-            font-weight: 800;
+            color: #ffffff !important; /* თეთრი ტექსტი წითელ ფონზე */
+            font-weight: 800 !important;
             border: none !important; 
         }
         .res-actual { 
-            border: 2px solid var(--primary) !important; 
-            background: transparent; 
-            color: var(--primary) !important; 
+            border: 2px solid #00ffcc !important; 
+            background: transparent !important; 
+            color: #00ffcc !important; 
         }
 
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
@@ -215,6 +215,7 @@
                 const teams = game.split(' vs '); let opts = "";
                 
                 let targetRes = realResultsArray[i] || null;
+                // 🛠️ აქ გასწორდა: ვალიდაცია ახლა დიდ X-საც სწორად ატარებს მასივში
                 const realResRaw = (targetRes && ["1", "x", "2"].includes(targetRes)) ? targetRes : null;
 
                 ['1', 'X', '2'].forEach(opt => {
