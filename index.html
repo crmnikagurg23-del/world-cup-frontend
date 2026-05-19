@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rolletto Predictor | World Cup 2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght class="opt-btn";:600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00ffcc; --bg-dark: #061218; --glass: rgba(15, 33, 42, 0.9); --accent-gold: #ffcc00; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -70,70 +70,64 @@
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; display: inline-block; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
         
-        /* 🛠️ სრულიად განახლებული, სიმეტრიული მატჩის ველის CSS */
+        /* 🛠️ მკაცრად ცენტრირებული Grid განლაგება */
         .match-display { 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
+            display: grid; 
+            grid-template-columns: 1fr 50px 1fr; /* ფიქსირებული 50px ცენტრისთვის */
+            align-items: center; 
+            margin-bottom: 20px; 
             width: 100%;
         }
         
         .team-home { 
-            flex: 1;
             display: flex; 
             align-items: center; 
-            justify-content: flex-end; 
-            gap: 12px; 
-            padding-right: 5px;
+            justify-content: flex-end; /* სახელი და დროშა მიდის ცენტრისკენ, მარჯვნივ */
+            gap: 8px; 
+            overflow: hidden;
         }
         
         .team-away { 
-            flex: 1;
             display: flex; 
             align-items: center; 
-            justify-content: flex-start; 
-            gap: 12px; 
-            padding-left: 5px;
+            justify-content: flex-start; /* სახელი და დროშა მიდის ცენტრისკენ, მარცხნივ */
+            gap: 8px; 
+            overflow: hidden;
         }
         
         .flag-img { 
-            width: 30px; 
-            height: 20px; 
+            width: 26px; 
+            height: 18px; 
             object-fit: cover; 
-            border-radius: 4px; 
+            border-radius: 3px; 
             border: 1px solid rgba(255, 255, 255, 0.15);
             flex-shrink: 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .team-name { 
             font-weight: 700; 
-            font-size: 14px; 
+            font-size: 13px; 
             font-family: 'Rajdhani'; 
             text-transform: uppercase; 
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 140px; /* იცავს გრძელ სახელებს საიტის გაწელვისგან */
         }
         
         .vs-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 60px; /* აძლევს უძრავ, ფიქსირებულ ადგილს ცენტრს */
-            flex-shrink: 0;
         }
 
         .vs-divider { 
-            font-size: 11px; 
+            font-size: 10px; 
             color: var(--primary); 
-            padding: 4px 10px; 
+            padding: 3px 7px; 
             background: rgba(0,255,204,0.1); 
-            border: 1px solid rgba(0,255,204,0.2);
-            border-radius: 6px; 
+            border: 1px solid rgba(0,255,204,0.15);
+            border-radius: 5px; 
             font-weight: 700;
             font-family: 'Rajdhani';
         }
