@@ -30,7 +30,6 @@
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; width: 100%; cursor: pointer; margin-top: 10px; }
         
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
         .res-correct { 
@@ -71,7 +70,6 @@
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; display: inline-block; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
         
-        /* 🛠️ მატჩის ვიზუალის ფიქსი დროშებისთვის */
         .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         
         .team-container { 
@@ -148,13 +146,19 @@
         const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
         let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
 
-        // 🛠️ ქვეყნების კოდების ბაზა დროშების ავტომატური გენერაციისთვის
+        // 🛠️ გაფართოებული ბაზა - ყველა პოპულარული ქვეყანა და მათი კოდები
         const flagCodes = {
             "georgia": "ge", "spain": "es", "germany": "de", "scotland": "gb-sct",
             "argentina": "ar", "brazil": "br", "france": "fr", "england": "gb-eng",
             "italy": "it", "portugal": "pt", "mexico": "mx", "usa": "us", 
             "canada": "ca", "morocco": "ma", "croatia": "hr", "belgium": "be",
-            "netherlands": "nl", "uruguay": "uy", "colombia": "co", "japan": "jp"
+            "netherlands": "nl", "uruguay": "uy", "colombia": "co", "japan": "jp",
+            "paraguay": "py", "bosnia and herzegovina": "ba", "bosnia": "ba",
+            "switzerland": "ch", "denmark": "dk", "senegal": "sn", "tunisia": "tn",
+            "poland": "pl", "south korea": "kr", "australia": "au", "ukraine": "ua",
+            "sweden": "se", "wales": "gb-wls", "ecuador": "ec", "peru": "pe",
+            "chile": "cl", "ghana": "gh", "cameroon": "cm", "serbia": "rs",
+            "switzerland": "ch", "austria": "at", "turkey": "tr", "czechia": "cz"
         };
 
         function getFlagHtml(teamName) {
@@ -163,8 +167,7 @@
             if (code) {
                 return `<img src="https://flagcdn.com/w40/${code}.png" class="flag-img" alt="${teamName}">`;
             }
-            // თუ ქვეყანა ბაზაში არ არის, დააბრუნებს ცარიელ ადგილს, რომ კოდი არ გაიტეხოს
-            return `<div style="width:32px; height:22px; background:rgba(255,255,255,0.05); border-radius:4px;"></div>`;
+            return `<div style="width:32px; height:22px; background:rgba(255,255,255,0.05); border-radius:4px; border:1px solid rgba(255,255,255,0.1)"></div>`;
         }
 
         function getLocalDateString() {
@@ -273,7 +276,6 @@
                     opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
                 });
 
-                // 🛠️ აქ გენერირდება მატჩის ბლოკი დროშებით
                 let leftFlag = getFlagHtml(teams[0]);
                 let rightFlag = getFlagHtml(teams[1]);
 
