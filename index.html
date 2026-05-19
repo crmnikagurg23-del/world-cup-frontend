@@ -32,10 +32,24 @@
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
-        /* Result Colors */
-        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; font-weight: 800; border: none !important; }
-        .res-wrong { background: #ff4d4d !important; color: white !important; border: none !important; }
-        .res-actual { border: 2px solid var(--primary) !important; background: transparent; color: var(--primary) !important; }
+        /* 🛠️ ფიქსი ტექსტის ფერებზე, რომ ციფრები ყოველთვის გამოჩნდეს */
+        .res-correct { 
+            background: var(--primary) !important; 
+            color: #000000 !important; /* მკაცრად შავი ტექსტი მწვანე ფონზე */
+            font-weight: 800; 
+            border: none !important; 
+        }
+        .res-wrong { 
+            background: #ff4d4d !important; 
+            color: #ffffff !important; /* მკაცრად თეთრი ტექსტი წითელ ფონზე */
+            font-weight: 800;
+            border: none !important; 
+        }
+        .res-actual { 
+            border: 2px solid var(--primary) !important; 
+            background: transparent; 
+            color: var(--primary) !important; 
+        }
 
         .lb-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
         .lb-row td { padding: 12px 8px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 13px; text-align: center; }
@@ -153,10 +167,7 @@
             const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
             
             let todayDayId = visibleDays.find(id => GLOBAL_DATA.allDays[id].date === now);
-            
-            if (!SELECTED_DAY) {
-                SELECTED_DAY = todayDayId || visibleDays[visibleDays.length - 1];
-            }
+            if (!SELECTED_DAY) SELECTED_DAY = todayDayId || visibleDays[visibleDays.length - 1];
 
             visibleDays.forEach(dayId => {
                 const btn = document.createElement('div');
@@ -166,12 +177,9 @@
                 container.appendChild(btn);
 
                 if (SELECTED_DAY === dayId) {
-                    setTimeout(() => {
-                        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                    }, 100);
+                    setTimeout(() => { btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 100);
                 }
             });
-            
             if(visibleDays.length > 0) selectDay(SELECTED_DAY);
         }
 
@@ -196,21 +204,23 @@
             const now = new Date().toISOString().split('T')[0];
             const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             const isPast = dInfo.date < now;
-            const realResults = dInfo.results || [];
-            TEMP_ANSWERS = {};
+            
+            let realResultsArray = [];
+            if (dInfo.results) {
+                realResultsArray = dInfo.results.toString().split('|').map(res => res.trim().toLowerCase());
+            }
             
             container.innerHTML = `<div style="text-align:center; margin-bottom:10px;"><span style="font-size:10px; color:var(--primary);">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
                 
-                let rawRes = realResults[i] ? realResults[i].trim().toLowerCase() : null;
-                const realResRaw = (rawRes && ["1", "x", "2"].includes(rawRes)) ? rawRes : null;
+                let targetRes = realResultsArray[i] || null;
+                const realResRaw = (targetRes && ["1", "x", "2"].includes(targetRes)) ? targetRes : null;
 
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
                     const myPick = userPred ? userPred.answers[i] : null;
                     
-                    // შედარებისას ორივე მხარე მიგვყავს პატარა ასოზე
                     let myPickLower = myPick ? myPick.toString().toLowerCase().trim() : null;
                     let optLower = opt.toString().toLowerCase().trim();
 
