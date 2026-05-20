@@ -35,8 +35,7 @@
         header { padding: 14px; border-bottom: 1px solid rgba(0, 255, 204, 0.08); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; backdrop-filter: blur(12px); }
         .logo { height: 26px; cursor: pointer; filter: drop-shadow(0 0 5px var(--primary-glow)); }
 
-        /* 📏 დამატებულია padding-bottom, რომ ახალმა პანელმა კოდი არ დაფაროს */
-        .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; padding-bottom: 160px; }
+        .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; padding-bottom: 90px; }
         
         .page-view { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -51,24 +50,21 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        /* 🔒 🛠️ სრულიად ახალი, პრემიუმ Floating Guest პანელი */
-        .guest-float-bar {
-            position: fixed;
-            bottom: 68px; /* პირდაპირ ნავიგაციის ზოლზე ჯდება */
-            left: 0;
-            right: 0;
-            background: rgba(6, 20, 28, 0.95);
-            border-top: 1px solid rgba(0, 255, 204, 0.3);
-            padding: 16px 24px;
+        /* 🔒 🛠️ განახლებული: დახვეწილი ზედა საჯარო პანელი (Top Guest Bar) */
+        .guest-top-bar {
+            background: rgba(6, 20, 28, 0.85);
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            padding: 14px 18px;
+            border-radius: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 -10px 25px rgba(0, 0, 204, 0.15);
-            z-index: 1400;
-            backdrop-filter: blur(15px);
-            animation: slideUp 0.4s ease-out;
+            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.05);
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            animation: fadeInTop 0.4s ease-out;
         }
-        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeInTop { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         .guest-text-block { display: flex; flex-direction: column; gap: 2px; }
         .guest-title { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.2px; }
@@ -77,18 +73,16 @@
         .guest-login-btn {
             background: var(--primary);
             color: var(--bg-dark);
-            padding: 8px 18px;
+            padding: 8px 16px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 255, 204, 0.2);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 255, 204, 0.15);
         }
-        .guest-login-btn:active { transform: scale(0.95); }
 
         /* 📜 Terms & Rules */
         .rules-title { color: var(--primary); font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid rgba(0, 255, 204, 0.1); padding-bottom: 8px; }
@@ -171,12 +165,12 @@
             </div>
         </div>
 
-        <div id="guest-float-bar" class="guest-float-bar hidden" onclick="switchPage('auth')">
+        <div id="guest-float-bar" class="guest-top-bar hidden">
             <div class="guest-text-block">
                 <div class="guest-title">Viewing as a Guest</div>
-                <div class="guest-subtitle">Sign in to lock your predictions & win prizes</div>
+                <div class="guest-subtitle">Sign in to play & win prizes</div>
             </div>
-            <button class="guest-login-btn">Login</button>
+            <button class="guest-login-btn" onclick="switchPage('auth')">Login</button>
         </div>
 
         <div id="auth-page" class="page-view hidden">
@@ -269,7 +263,6 @@
             document.getElementById('nav-lb').classList.toggle('active', page === 'lb');
             document.getElementById('nav-rules').classList.toggle('active', page === 'rules');
             
-            // ვმართავთ Floating ბარის გამოჩენას გვერდების მიხედვით
             const isLoggedIn = localStorage.getItem('wc_user') ? true : false;
             if (!isLoggedIn) {
                 document.getElementById('guest-float-bar').classList.toggle('hidden', page === 'auth');
@@ -366,6 +359,7 @@
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div></div><div class="options-grid">${opts}</div></div>`;
             });
+            
             document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast);
         }
 
