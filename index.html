@@ -30,6 +30,7 @@
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 13px; border-radius: 12px; width: 100%; cursor: pointer; margin-top: 10px; }
         
         .opt-btn { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .opt-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .selected { background: rgba(0, 255, 204, 0.2) !important; border: 1px solid var(--primary) !important; }
         
         .res-correct { 
@@ -51,81 +52,18 @@
             font-weight: 700 !important;
         }
 
-        /* 🛠️ ახალი დახვეწილი ლიდერბორდის დიზაინი (Cards Layout) */
-        .lb-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
-        }
+        .lb-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .lb-card { display: grid; grid-template-columns: 45px 1fr auto auto; align-items: center; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 12px 16px; border-radius: 12px; transition: all 0.2s ease; gap: 10px; }
+        .lb-card:hover { background: rgba(255, 255, 255, 0.04); border-color: rgba(0, 255, 204, 0.2); }
+        .lb-card.my-highlight { background: rgba(0, 255, 204, 0.08) !important; border: 1px solid var(--primary) !important; box-shadow: 0 0 10px rgba(0, 255, 204, 0.1); }
 
-        .lb-card {
-            display: grid;
-            grid-template-columns: 45px 1fr auto auto;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 12px 16px;
-            border-radius: 12px;
-            transition: all 0.2s ease;
-            gap: 10px;
-        }
-
-        .lb-card:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(0, 255, 204, 0.2);
-        }
-
-        /* ჩემი პროფილის ჰაილაითი ლიდერბორდში */
-        .lb-card.my-highlight {
-            background: rgba(0, 255, 204, 0.08) !important;
-            border: 1px solid var(--primary) !important;
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.1);
-        }
-
-        .lb-rank {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: #a0aec0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .lb-rank-1 { color: #ffd700; font-size: 18px; } /* ოქრო */
-        .lb-rank-2 { color: #c0c0c0; font-size: 18px; } /* ვერცხლი */
-        .lb-rank-3 { color: #cd7f32; font-size: 18px; } /* ბრინჯაო */
-
-        .lb-user {
-            font-size: 14px;
-            font-weight: 600;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .lb-score {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-            padding: 2px 10px;
-            background: rgba(0, 255, 204, 0.08);
-            border-radius: 6px;
-            margin-right: 15px;
-            min-width: 45px;
-            text-align: center;
-        }
-
-        .lb-prize {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--accent-gold);
-            text-align: right;
-            white-space: nowrap;
-        }
+        .lb-rank { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: #a0aec0; display: flex; align-items: center; justify-content: center; }
+        .lb-rank-1 { color: #ffd700; font-size: 18px; }
+        .lb-rank-2 { color: #c0c0c0; font-size: 18px; }
+        .lb-rank-3 { color: #cd7f32; font-size: 18px; }
+        .lb-user { font-size: 14px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lb-score { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--primary); padding: 2px 10px; background: rgba(0, 255, 204, 0.08); border-radius: 6px; margin-right: 15px; min-width: 45px; text-align: center; }
+        .lb-prize { font-size: 13px; font-weight: 700; color: var(--accent-gold); text-align: right; white-space: nowrap; }
 
         .tabs-wrapper { 
             display: flex; 
@@ -136,7 +74,6 @@
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
         }
-        
         .tabs-wrapper::-webkit-scrollbar { display: none; }
 
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; display: inline-block; }
@@ -151,21 +88,8 @@
             padding: 0 10px; 
         }
         
-        .team-home { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            flex: 1;
-            justify-content: flex-start; 
-        }
-        
-        .team-away { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            flex: 1;
-            justify-content: flex-end; 
-        }
+        .team-home { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-start; }
+        .team-away { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
         
         .flag-img { 
             width: 28px; 
@@ -189,102 +113,12 @@
             max-width: 150px;
         }
         
-        .vs-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0 15px; 
-            flex-shrink: 0;
-        }
-
-        .vs-divider { 
-            font-size: 11px; 
-            color: var(--primary); 
-            padding: 4px 10px; 
-            background: rgba(0,255,204,0.1); 
-            border: 1px solid rgba(0,255,204,0.2);
-            border-radius: 6px; 
-            font-weight: 700;
-            font-family: 'Rajdhani';
-        }
-        
+        .vs-container { display: flex; justify-content: center; align-items: center; padding: 0 15px; flex-shrink: 0; }
+        .vs-divider { font-size: 11px; color: var(--primary); padding: 4px 10px; background: rgba(0,255,204,0.1); border: 1px solid rgba(0,255,204,0.2); border-radius: 6px; font-weight: 700; font-family: 'Rajdhani'; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
         .hidden { display: none !important; }
-        
-        .status-title {
-            font-size: 11px !important;
-            color: #a0aec0 !important; 
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-            display: inline-block;
-        }
-        
-        .status-value {
-            color: #00ffcc !important; 
-            font-family: 'Rajdhani', sans-serif !important;
-            font-size: 24px !important;
-            font-weight: 700 !important;
-            line-height: 1 !important;
-        }
-        
-        .exit-title {
-            color: #e53e3e !important; 
-            font-size: 11px !important;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-            display: inline-block;
-        }
-        
-        .exit-value {
-            color: #ff4d4d !important; 
-            font-size: 16px !important;
-            font-family: 'Rajdhani', sans-serif !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.5px;
-        }
-
-        @media (max-width: 768px) {
-            #my-status .card-auth {
-                padding: 15px !important;
-                margin-bottom: 15px !important;
-                background: rgba(6, 18, 24, 0.9) !important;
-                border: 1px solid #00ffcc !important;
-            }
-            .status-title {
-                font-size: 10px !important;
-                color: #a0aec0 !important; 
-                display: block !important;
-                text-align: center;
-                opacity: 1 !important;
-            }
-            .status-value {
-                font-size: 22px !important;
-                text-align: center;
-                display: block !important;
-            }
-            .exit-title {
-                font-size: 10px !important;
-                color: #e53e3e !important;
-                display: block !important;
-                text-align: center;
-                opacity: 1 !important;
-            }
-            .exit-value {
-                font-size: 14px !important;
-                text-align: center;
-                display: block !important;
-            }
-            .status-separator {
-                border-left: 1px solid rgba(255,255,255,0.1) !important;
-                border-right: 1px solid rgba(255,255,255,0.1) !important;
-            }
-        }
     </style>
 </head>
 <body>
@@ -436,7 +270,9 @@
             const container = document.getElementById('games-container'); container.innerHTML = "";
             const dInfo = GLOBAL_DATA.allDays[dayId];
             const now = getLocalDateString();
-            const userPred = GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
+            
+            // 🛠️ ფიქსი: ვამოწმებთ, ნამდვილად აქვს თუ არა შენახული პროგნოზი
+            const userPred = GLOBAL_DATA.userPredictions && GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             const isPast = dInfo.date < now;
             
             let realResultsArray = [];
@@ -468,7 +304,10 @@
                         else if (optLower === myPickLower) cls += " res-wrong"; 
                     } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
                     
-                    opts += `<button class="${cls}" ${(userPred || isPast) ? 'disabled' : `onclick="pick(this, ${i}, '${opt}')"`}>${opt}</button>`;
+                    // 🛠️ ფიქსი: ღილაკი დაიბლოკება მხოლოდ იმ შემთხვევაში, თუ დღე წარსულია ან პროგნოზი უკვე გაგზავნილია
+                    let isBtnDisabled = isPast || (userPred ? true : false);
+                    
+                    opts += `<button class="${cls}" ${isBtnDisabled ? 'disabled' : ''} onclick="pick(this, ${i}, '${opt}')">${opt}</button>`;
                 });
 
                 let leftImgId = `flag-L-${dayId}-${i}`;
@@ -495,18 +334,31 @@
                         <div class="options-grid">${opts}</div>
                     </div>`;
             });
+            
+            // 🛠️ ფიქსი: მწვანე ღილაკი გამოჩნდება მხოლოდ მაშინ, თუ იუზერს ჯერ არ აქვს ნაწინასწარმეტყველები
             document.getElementById('save-btn').classList.toggle('hidden', userPred || isPast);
+        }
+
+        function pick(btn, idx, val) { 
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
+            btn.classList.add('selected'); 
+            TEMP_ANSWERS[idx] = val; 
         }
 
         async function saveCurrentDay() {
             if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
             try {
                 const res = await fetch(`${BASE_URL}/save-prediction`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
-                if(res.success) { showToast("Saved!", false); GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); selectDay(SELECTED_DAY); }
+                if(res.success) { 
+                    showToast("Saved!", false); 
+                    if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = [];
+                    GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); 
+                    TEMP_ANSWERS = {}; // ვასუფთავებთ დროებით მასივს
+                    selectDay(SELECTED_DAY); 
+                }
             } catch(e) { showToast("Error"); }
         }
 
-        // 🛠️ სრულიად განახლებული, ულამაზესი ლიდერბორდის ფუნქცია იკონებით
         async function loadLB() {
             try {
                 const res = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
@@ -524,10 +376,8 @@
                     let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "***" + u.u[u.u.length - 1] : u.u[0] + "*");
                     let displayPrize = u.prize && u.prize !== "undefined" ? u.prize : (frontPrizes[u.rank] || "-");
                     
-                    // შემოკლება "freebet"-ის "FB"-ით ვიზუალის სისუფთავისთვის
                     displayPrize = displayPrize.replace("freebet", "FB");
 
-                    // თასების იკონების ლოგიკა ტოპ 3-ისთვის
                     let rankDisplay = u.rank;
                     if (u.rank === 1) rankDisplay = `<span class="lb-rank-1">🥇</span>`;
                     else if (u.rank === 2) rankDisplay = `<span class="lb-rank-2">🥈</span>`;
