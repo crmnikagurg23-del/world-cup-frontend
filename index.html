@@ -70,14 +70,13 @@
         .day-tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; display: inline-block; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); }
         
-        /* 🛠️ ახალი დახვეწილი და გაშლილი დიზაინი (ტოტალიზატორის სტილი) */
         .match-display { 
             display: flex;
-            justify-content: space-between; /* შლის გუნდებს კიდეებისკენ */
+            justify-content: space-between; 
             align-items: center;
             margin-bottom: 22px;
             width: 100%;
-            padding: 0 10px; /* აძლევს სუნთქვის საშუალებას გვერდებიდან */
+            padding: 0 10px; 
         }
         
         .team-home { 
@@ -85,7 +84,7 @@
             align-items: center; 
             gap: 10px; 
             flex: 1;
-            justify-content: flex-start; /* მარცხენა გუნდი იწყება მარცხნიდან */
+            justify-content: flex-start; 
         }
         
         .team-away { 
@@ -93,7 +92,7 @@
             align-items: center; 
             gap: 10px; 
             flex: 1;
-            justify-content: flex-end; /* მარჯვენა გუნდი მიდის ბოლომდე მარჯვნივ */
+            justify-content: flex-end; 
         }
         
         .flag-img { 
@@ -122,7 +121,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 0 15px; /* აშორებს დროშებს ცენტრისგან */
+            padding: 0 15px; 
             flex-shrink: 0;
         }
 
@@ -147,12 +146,26 @@
     <div id="toast" class="toast"></div>
     <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo"></header>
     <div class="main-content">
+        
         <div id="my-status" class="hidden">
-            <div class="card-auth" style="padding: 15px; margin-bottom: 15px; background: rgba(0,255,204,0.1); border-color: var(--primary);">
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; text-align:center;">
-                    <div><span style="font-size:10px; color:#8899a6; text-transform:uppercase;">Rank</span><br><b id="my-rank" style="color:var(--primary); font-family:'Rajdhani'; font-size:20px;">-</b></div>
-                    <div><span style="font-size:10px; color:#8899a6; text-transform:uppercase;">Score</span><br><b id="my-score" style="color:var(--primary); font-family:'Rajdhani'; font-size:20px;">0</b></div>
-                    <div onclick="logout()" style="cursor:pointer;"><span style="color:#ff4d4d; font-size:10px; text-transform:uppercase;">Exit</span><br><b style="color:#ff4d4d; font-size:14px; font-family:'Rajdhani';">OUT</b></div>
+            <div style="padding: 18px; margin-bottom: 20px; background: #061218 !important; border: 2px solid #00ffcc !important; border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 255, 204, 0.15);">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; text-align:center; align-items:center; width:100%;">
+                    
+                    <div style="display: block !important; text-align: center !important;">
+                        <span style="font-size:12px !important; color:#a0aec0 !important; text-transform:uppercase !important; font-weight:700 !important; letter-spacing:0.5px !important; display:block !important; margin-bottom:4px !important;">RANK</span>
+                        <b id="my-rank" style="color:#00ffcc !important; font-family:'Rajdhani', sans-serif !important; font-size:24px !important; font-weight:700 !important; display:block !important; line-height:1 !important;">-</b>
+                    </div>
+                    
+                    <div style="display: block !important; text-align: center !important; border-left: 1px solid rgba(255,255,255,0.15) !important; border-right: 1px solid rgba(255,255,255,0.15) !important;">
+                        <span style="font-size:12px !important; color:#a0aec0 !important; text-transform:uppercase !important; font-weight:700 !important; letter-spacing:0.5px !important; display:block !important; margin-bottom:4px !important;">SCORE</span>
+                        <b id="my-score" style="color:#00ffcc !important; font-family:'Rajdhani', sans-serif !important; font-size:24px !important; font-weight:700 !important; display:block !important; line-height:1 !important;">0</b>
+                    </div>
+                    
+                    <div onclick="logout()" style="cursor:pointer; display: block !important; text-align: center !important;">
+                        <span style="font-size:12px !important; color:#ff4d4d !important; text-transform:uppercase !important; font-weight:700 !important; letter-spacing:0.5px !important; display:block !important; margin-bottom:4px !important;">EXIT</span>
+                        <b style="color:#ff4d4d !important; font-family:'Rajdhani', sans-serif !important; font-size:16px !important; font-weight:700 !important; display:block !important; line-height:1 !important; letter-spacing:0.5px !important;">OUT</b>
+                    </div>
+                    
                 </div>
             </div>
         </div>
