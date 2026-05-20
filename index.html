@@ -6,61 +6,52 @@
     <title>Rolletto Predictor | World Cup 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        /* 🎨 Design System */
         :root { 
             --primary: #00ffcc; 
-            --primary-glow: rgba(0, 255, 204, 0.3);
+            --primary-glow: rgba(0, 255, 204, 0.25);
             --bg-dark: #020a0e; 
-            --card-bg: rgba(6, 18, 24, 0.7);
-            --glass: rgba(10, 25, 33, 0.85); 
+            --card-bg: rgba(6, 18, 24, 0.75);
+            --glass: rgba(10, 25, 33, 0.9); 
             --text-main: #ffffff;
             --text-muted: #8899a6;
             --accent-gold: #ffcc00; 
             --red: #ff4d4d;
         }
 
-        /* 🌍 Global Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body { 
             background-color: var(--bg-dark); 
             color: var(--text-main); 
             background-image: 
-                radial-gradient(circle at 50% -20%, rgba(0, 255, 204, 0.15) 0%, transparent 60%),
-                linear-gradient(180deg, rgba(2, 10, 14, 0.8) 0%, rgba(2, 10, 14, 0.95) 100%),
+                radial-gradient(circle at 50% -20%, rgba(0, 255, 204, 0.12) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(2, 10, 14, 0.85) 0%, rgba(2, 10, 14, 0.98) 100%),
                 url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg'); 
             background-size: cover; 
             background-attachment: fixed; 
             background-position: center; 
         }
 
-        /* 🔝 Header & Logo */
-        header { 
-            padding: 12px; 
-            border-bottom: 1px solid rgba(0, 255, 204, 0.1); 
-            background: var(--glass); 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-            display: flex; 
-            justify-content: center; 
-            backdrop-filter: blur(10px);
-        }
+        header { padding: 14px; border-bottom: 1px solid rgba(0, 255, 204, 0.08); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; backdrop-filter: blur(12px); }
         .logo { height: 26px; cursor: pointer; filter: drop-shadow(0 0 5px var(--primary-glow)); }
 
-        /* 📏 Main Layout */
-        .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; padding-bottom: 50px; }
+        .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; padding-bottom: 90px; }
+        
+        .page-view { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
         .game-card, .leaderboard-container, .card-auth { 
             background: var(--card-bg); 
             padding: 22px; 
-            border-radius: 16px; 
-            border: 1px solid rgba(255,255,255,0.03); 
+            border-radius: 18px; 
+            border: 1px solid rgba(255,255,255,0.02); 
             margin-bottom: 15px; 
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        /* 🏆 Leaderboard Styles */
-        .lb-list { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        /* 🏆 Leaderboard Premium Cards */
+        .lb-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
         .lb-card { 
             display: grid; 
             grid-template-columns: 40px 1fr auto auto; 
@@ -68,38 +59,36 @@
             background: rgba(255, 255, 255, 0.01); 
             border: 1px solid rgba(255, 255, 255, 0.03); 
             padding: 14px 18px; 
-            border-radius: 12px; 
+            border-radius: 14px; 
             gap: 12px; 
             transition: all 0.2s;
         }
         .lb-card:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba(0, 255, 204, 0.1); }
         .lb-card.my-highlight { 
-            background: rgba(0, 255, 204, 0.08) !important; 
-            border: 1px solid rgba(0, 255, 204, 0.4) !important; 
-            box-shadow: 0 0 15px var(--primary-glow);
+            background: rgba(0, 255, 204, 0.07) !important; 
+            border: 1px solid rgba(0, 255, 204, 0.3) !important; 
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.15);
         }
 
         .lb-rank { font-family: 'Rajdhani', sans-serif; font-weight: 700; color: var(--text-muted); text-align: center; font-size: 15px; }
-        .lb-rank-1 { color: #ffd700; font-size: 18px; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+        .lb-rank-1 { color: #ffd700; font-size: 18px; text-shadow: 0 0 5px rgba(255, 215, 0, 0.4); }
         .lb-rank-2 { color: #c0c0c0; font-size: 18px; }
         .lb-rank-3 { color: #cd7f32; font-size: 18px; }
-        
         .lb-user { font-size: 14px; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; }
-        
-        .lb-score { 
-            font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--primary); 
-            padding: 3px 12px; background: rgba(0, 255, 204, 0.08); border-radius: 8px; min-width: 50px; text-align: center;
-        }
+        .lb-score { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--primary); padding: 3px 12px; background: rgba(0, 255, 204, 0.06); border-radius: 8px; min-width: 50px; text-align: center; }
         .lb-prize { font-size: 13px; font-weight: 700; color: var(--accent-gold); text-align: right; }
 
-        /* 📅 Day Tabs */
+        /* 📅 Day Tabs & Filters */
         .tabs-wrapper { display: flex; gap: 10px; padding: 10px 5px; overflow-x: auto; scroll-behavior: smooth; margin-bottom: 5px; }
         .tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { padding: 10px 18px; background: rgba(255,255,255,0.03); border-radius: 12px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; color: var(--text-muted); border: 1px solid transparent; transition: all 0.2s; }
         .day-tab.active { background: var(--primary); color: var(--bg-dark); box-shadow: 0 0 10px var(--primary-glow); }
-        .day-tab:hover:not(.active) { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: #fff; }
+        
+        .filter-container { display: flex; gap: 8px; margin-bottom: 15px; padding: 0 5px; }
+        .filter-btn { flex: 1; padding: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
+        .filter-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(0, 255, 204, 0.04); }
 
-        /* ⚽ Match Card Styles */
+        /* ⚽ Matches Layout */
         .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; padding: 0 8px; }
         .team-home { flex: 1; display: flex; align-items: center; gap: 12px; justify-content: flex-start; }
         .team-away { flex: 1; display: flex; align-items: center; gap: 12px; justify-content: flex-end; text-align: right; }
@@ -108,150 +97,131 @@
         .vs-container { display: flex; justify-content: center; align-items: center; padding: 0 15px; flex-shrink: 0; }
         .vs-divider { font-size: 11px; color: var(--primary); padding: 4px 12px; background: rgba(0,255,204,0.08); border: 1px solid rgba(0,255,204,0.1); border-radius: 6px; font-weight: 700; font-family: 'Rajdhani', sans-serif; }
 
-        /* 🔘 Prediction Buttons */
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-        .opt-btn { padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: #fff; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
-        .opt-btn:hover:not(:disabled):not(.selected) { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
-        .opt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .opt-btn { padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: #fff; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .opt-btn.selected { background: rgba(0, 255, 204, 0.12) !important; border: 1px solid var(--primary) !important; color: var(--primary) !important; box-shadow: 0 0 15px rgba(0, 255, 204, 0.15); font-weight: 800; }
+        .opt-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         
-        .opt-btn.selected { 
-            background: rgba(0, 255, 204, 0.12) !important; 
-            border: 1px solid var(--primary) !important; 
-            color: var(--primary) !important;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
-            font-weight: 800;
-        }
-
-        /* ✅❌ Result Colors */
         .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; border: none !important; font-weight: 800 !important; box-shadow: 0 0 10px var(--primary-glow); }
         .res-wrong { background: var(--red) !important; color: #fff !important; border: none !important; font-weight: 800 !important; opacity: 1 !important;}
         .res-actual { border: 2px solid var(--primary) !important; background: transparent !important; color: var(--primary) !important; font-weight: 700 !important; opacity: 1 !important;}
 
-        /* ⌨️ Inputs & Buttons */
-        input { padding: 16px; border-radius: 12px; width: 100%; margin-bottom: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; outline: none; font-size: 14px; transition: border-color 0.2s; }
+        input { padding: 16px; border-radius: 12px; width: 100%; margin-bottom: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); color: #fff; outline: none; font-size: 14px; }
         input:focus { border-color: var(--primary); }
-        ::placeholder { color: var(--text-muted); opacity: 0.8; }
-
-        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,255,204,0.15); }
-        .btn-green:hover:not(:disabled) { box-shadow: 0 6px 15px rgba(0,255,204,0.25); transform: translateY(-1px); }
-        .btn-green:active { transform: translateY(1px); }
-        .btn-green:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
-        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 14px; border-radius: 14px; width: 100%; cursor: pointer; margin-top: 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; transition: background 0.2s; }
-        .btn-outline:hover { background: rgba(0, 255, 204, 0.05); }
-
-        /* 🔔 Toast & Misc */
-        .toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); padding: 16px 28px; border-radius: 12px; z-index: 2000; display: none; text-align:center; min-width: 300px; font-weight: 700; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
-        .hidden { display: none !important; }
         
-        /* Inline Status Panel Fixes */
-        .status-panel-title { font-size: 12px !important; color: #a0aec0 !important; text-transform: uppercase !important; font-weight: 700 !important; letter-spacing: 1px !important; margin-bottom: 5px !important; display: block !important; }
-        .status-panel-value { color: #00ffcc !important; font-family: 'Rajdhani', sans-serif !important; font-size: 26px !important; font-weight: 700 !important; display: block !important; line-height: 1 !important; }
-        .status-panel-exit { font-size: 12px !important; color: #ff4d4d !important; text-transform: uppercase !important; font-weight: 700 !important; letter-spacing: 1px !important; margin-bottom: 5px !important; display: block !important; }
-        .status-panel-out { color: #ff4d4d !important; font-family: 'Rajdhani', sans-serif !important; font-size: 18px !important; font-weight: 700 !important; display: block !important; letter-spacing: 1px !important; }
+        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,255,204,0.15); }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 14px; border-radius: 14px; width: 100%; cursor: pointer; margin-top: 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
 
-        @media (max-width: 768px) {
-            .main-content { padding: 12px; }
-            .game-card, .leaderboard-container, .card-auth { padding: 18px; }
-            .team-name { font-size: 13px; max-width: 110px; }
-            .lb-card { padding: 12px; font-size: 13px; grid-template-columns: 35px 1fr auto auto; }
-            .lb-score { font-size: 14px; padding: 2px 8px; margin-right: 8px; }
+        /* 📱 Bottom App Bar */
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            height: 68px; background: var(--glass); 
+            border-top: 1px solid rgba(255,255,255,0.04);
+            display: grid; grid-template-columns: 1fr 1fr; 
+            z-index: 1500; backdrop-filter: blur(15px);
         }
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; gap: 4px; color: var(--text-muted); 
+            font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; 
+        }
+        .nav-item span { font-size: 18px; }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 8px var(--primary-glow); }
+
+        .toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); padding: 16px 28px; border-radius: 12px; z-index: 2000; display: none; text-align:center; min-width: 300px; font-weight: 700; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
+        .hidden { display: none !important; }
+
+        .status-panel-title { font-size: 11px !important; color: #a0aec0 !important; text-transform: uppercase !important; font-weight: 700 !important; letter-spacing: 0.8px !important; margin-bottom: 4px !important; display: block !important; }
+        .status-panel-value { color: #00ffcc !important; font-family: 'Rajdhani', sans-serif !important; font-size: 24px !important; font-weight: 700 !important; display: block !important; line-height: 1 !important; }
+        .status-panel-exit { font-size: 11px !important; color: #ff4d4d !important; text-transform: uppercase !important; font-weight: 700 !important; letter-spacing: 0.8px !important; margin-bottom: 4px !important; display: block !important; }
+        .status-panel-out { color: #ff4d4d !important; font-family: 'Rajdhani', sans-serif !important; font-size: 16px !important; font-weight: 700 !important; display: block !important; }
     </style>
 </head>
 <body>
     <div id="toast" class="toast"></div>
     <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo"></header>
+    
     <div class="main-content">
-        
         <div id="my-status" class="hidden">
-            <div style="padding: 20px; margin-bottom: 20px; background: rgba(10, 25, 33, 0.9); border: 2px solid #00ffcc; border-radius: 20px; box-shadow: 0 0 15px rgba(0, 255, 204, 0.15); backdrop-filter: blur(10px);">
+            <div style="padding: 18px; margin-bottom: 15px; background: rgba(10, 25, 33, 0.9); border: 1px solid rgba(0, 255, 204, 0.25); border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 255, 204, 0.08);">
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; text-align:center; align-items:center; width:100%;">
-                    
-                    <div>
-                        <span class="status-panel-title">RANK</span>
-                        <b id="my-rank" class="status-panel-value">-</b>
-                    </div>
-                    
-                    <div style="border-left: 1px solid rgba(255,255,255,0.1) !important; border-right: 1px solid rgba(255,255,255,0.1) !important;">
-                        <span class="status-panel-title">SCORE</span>
-                        <b id="my-score" class="status-panel-value">0</b>
-                    </div>
-                    
-                    <div onclick="logout()" style="cursor:pointer;">
-                        <span class="status-panel-exit">EXIT</span>
-                        <b class="status-panel-out">OUT</b>
-                    </div>
-                    
+                    <div><span class="status-panel-title">RANK</span><b id="my-rank" class="status-panel-value">-</b></div>
+                    <div style="border-left: 1px solid rgba(255,255,255,0.08) !important; border-right: 1px solid rgba(255,255,255,0.08) !important;"><span class="status-panel-title">SCORE</span><b id="my-score" class="status-panel-value">0</b></div>
+                    <div onclick="logout()" style="cursor:pointer;"><span class="status-panel-exit">EXIT</span><b class="status-panel-out">OUT</b></div>
                 </div>
             </div>
         </div>
 
-        <div id="login-section">
-            <h2 style="margin: 25px 0; color: var(--primary); font-size: 28px; text-align:center; font-family:'Rajdhani'; font-weight:700; text-shadow: 0 0 10px rgba(0, 255, 204, 0.2);">WORLD CUP 2026</h2>
-            <div class="card-auth">
-                <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
-                <input type="password" id="password" placeholder="PASSWORD">
-                <button id="login-btn" class="btn-green" onclick="startGame(false, 'login')">LOGIN</button>
-                <button class="btn-outline" onclick="toggleAuth('signup')">CREATE ACCOUNT</button>
+        <div id="auth-pages">
+            <div id="login-section">
+                <h2 style="margin: 25px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani'; font-weight:700; text-shadow: 0 0 10px rgba(0, 255, 204, 0.15);">WORLD CUP 2026</h2>
+                <div class="card-auth">
+                    <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
+                    <input type="password" id="password" placeholder="PASSWORD">
+                    <button id="login-btn" class="btn-green" onclick="startGame(false, 'login')">LOGIN</button>
+                    <button class="btn-outline" onclick="toggleAuth('signup')">CREATE ACCOUNT</button>
+                </div>
+            </div>
+            <div id="signup-section" class="hidden">
+                <h2 style="margin: 25px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani'; font-weight:700;">JOIN PREDICTOR</h2>
+                <div class="card-auth">
+                    <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
+                    <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
+                    <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">SIGN UP / JOIN</button>
+                    <button class="btn-outline" onclick="toggleAuth('login')">BACK TO LOGIN</button>
+                </div>
             </div>
         </div>
 
-        <div id="signup-section" class="hidden">
-            <h2 style="margin: 25px 0; color: var(--primary); font-size: 28px; text-align:center; font-family:'Rajdhani'; font-weight:700;">JOIN PREDICTOR</h2>
-            <div class="card-auth">
-                <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
-                <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
-                <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">SIGN UP / JOIN</button>
-                <button class="btn-outline" onclick="toggleAuth('login')">BACK TO LOGIN</button>
-            </div>
-        </div>
-
-        <div id="game-section" class="hidden">
+        <div id="matches-page" class="page-view hidden">
             <div class="tabs-wrapper" id="day-tabs"></div>
+            <div class="filter-container">
+                <button class="filter-btn active" id="f-all" onclick="filterMatches('all')">All</button>
+                <button class="filter-btn" id="f-open" onclick="filterMatches('open')">To Play</button>
+                <button class="filter-btn" id="f-done" onclick="filterMatches('done')">Completed</button>
+            </div>
             <div id="games-container"></div>
             <button id="save-btn" class="btn-green hidden" onclick="saveCurrentDay()">SUBMIT PREDICTIONS</button>
         </div>
 
-        <div class="leaderboard-container">
-            <h3 style="color: var(--primary); margin-bottom: 5px; font-size: 16px; font-family:'Rajdhani'; text-transform: uppercase; letter-spacing: 1px;">LEADERBOARD</h3>
-            <div class="lb-list" id="lb-data-list"></div>
+        <div id="leaderboard-page" class="page-view hidden">
+            <div class="leaderboard-container">
+                <div class="lb-list" id="lb-data-list"></div>
+            </div>
         </div>
+    </div>
+
+    <div id="app-nav" class="bottom-nav hidden">
+        <div class="nav-item active" id="nav-matches" onclick="switchPage('matches')"><span>⚽</span>MATCHES</div>
+        <div class="nav-item" id="nav-lb" onclick="switchPage('lb')"><span>🏆</span>RANKINGS</div>
     </div>
 
     <script>
         const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
-        let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {};
+        let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {}; let CURRENT_FILTER = 'all';
 
         function getFlagHtml(teamName, imgId) {
             let name = teamName.trim().toLowerCase();
             if (name === "england" || name === "scotland" || name === "wales") name = "united kingdom";
             if (name === "usa") name = "united states";
-
             fetch(`https://restcountries.com/v3.1/name/${name}?fullText=false`)
                 .then(r => r.json())
-                .then(data => {
-                    if (data && data[0] && data[0].flags && data[0].flags.png) {
-                        const imgEl = document.getElementById(imgId);
-                        if (imgEl) imgEl.src = data[0].flags.png;
-                    }
-                })
-                .catch(e => console.log("Flag error for:", teamName));
-
+                .then(data => { if (data && data[0] && data[0].flags && data[0].flags.png) { const imgEl = document.getElementById(imgId); if (imgEl) imgEl.src = data[0].flags.png; } })
+                .catch(e => console.log("Flag error"));
             return `<img id="${imgId}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" class="flag-img" style="background:rgba(255,255,255,0.05);" alt="${teamName}">`;
         }
 
-        function getLocalDateString() {
-            const d = new Date();
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        }
-
-        function showToast(m, isErr = true) { 
-            const t = document.getElementById('toast'); t.innerText = m; 
-            t.style.background = isErr ? 'rgba(255, 77, 77, 0.9)' : 'rgba(0, 255, 204, 0.9)'; t.style.color = isErr ? '#fff' : '#061218'; 
-            t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); 
-        }
-
+        function getLocalDateString() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+        function showToast(m, isErr = true) { const t = document.getElementById('toast'); t.innerText = m; t.style.background = isErr ? 'rgba(255, 77, 77, 0.95)' : 'rgba(0, 255, 204, 0.95)'; t.style.color = isErr ? '#fff' : '#061218'; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); }
         function toggleAuth(v) { document.getElementById('login-section').classList.toggle('hidden', v!=='login'); document.getElementById('signup-section').classList.toggle('hidden', v!=='signup'); }
+
+        function switchPage(page) {
+            document.getElementById('matches-page').classList.toggle('hidden', page !== 'matches');
+            document.getElementById('leaderboard-page').classList.toggle('hidden', page !== 'lb');
+            document.getElementById('nav-matches').classList.toggle('active', page === 'matches');
+            document.getElementById('nav-lb').classList.toggle('active', page === 'lb');
+            if(page === 'lb') loadLB();
+        }
 
         async function startGame(isAuto, type) {
             const u = isAuto ? localStorage.getItem('wc_user') : (type === 'login' ? document.getElementById('username').value.trim() : document.getElementById('reg-username').value.trim());
@@ -264,11 +234,10 @@
                     GLOBAL_DATA = res;
                     document.getElementById('my-rank').innerText = res.userRank ? `#${res.userRank}` : "-";
                     document.getElementById('my-score').innerText = res.userScore !== undefined ? res.userScore : "0";
-                    document.getElementById('login-section').classList.add('hidden');
-                    document.getElementById('signup-section').classList.add('hidden');
-                    document.getElementById('game-section').classList.remove('hidden');
+                    document.getElementById('auth-pages').classList.add('hidden');
                     document.getElementById('my-status').classList.remove('hidden');
-                    renderTabs(); loadLB();
+                    document.getElementById('app-nav').classList.remove('hidden');
+                    renderTabs(); switchPage('matches');
                 } else if(!isAuto) showToast(res.message);
             } catch(e) { if(!isAuto) showToast("Server error"); }
         }
@@ -278,7 +247,6 @@
             const now = getLocalDateString();
             const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
             const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
-            
             let todayDayId = visibleDays.find(id => GLOBAL_DATA.allDays[id].date === now);
             if (!SELECTED_DAY) SELECTED_DAY = todayDayId || visibleDays[visibleDays.length - 1];
 
@@ -286,44 +254,39 @@
                 const btn = document.createElement('div');
                 btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
                 btn.innerText = (GLOBAL_DATA.allDays[dayId].date === now) ? "TODAY" : GLOBAL_DATA.allDays[dayId].title;
-                btn.onclick = () => selectDay(dayId);
+                btn.onclick = () => { SELECTED_DAY = dayId; renderTabs(); };
                 container.appendChild(btn);
-
-                if (SELECTED_DAY === dayId) {
-                    setTimeout(() => { btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 100);
-                }
+                if (SELECTED_DAY === dayId) setTimeout(() => { btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 100);
             });
             if(visibleDays.length > 0) selectDay(SELECTED_DAY);
         }
 
+        function filterMatches(type) {
+            CURRENT_FILTER = type;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`f-${type}`).classList.add('active');
+            selectDay(SELECTED_DAY);
+        }
+
         function selectDay(dayId) {
-            if(SELECTED_DAY !== dayId) {
-                SELECTED_DAY = dayId;
-                document.querySelectorAll('.day-tab').forEach((tab, index) => {
-                    const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
-                    const now = getLocalDateString();
-                    const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
-                    if(visibleDays[index] === dayId) tab.classList.add('active');
-                    else tab.classList.remove('active');
-                });
-            }
-            
             const container = document.getElementById('games-container'); container.innerHTML = "";
             const dInfo = GLOBAL_DATA.allDays[dayId];
             const now = getLocalDateString();
             const userPred = GLOBAL_DATA.userPredictions && GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             const isPast = dInfo.date < now;
             
+            if(CURRENT_FILTER === 'open' && (userPred || isPast)) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No pending matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
+            if(CURRENT_FILTER === 'done' && !userPred && !isPast) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No completed matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
+
             let realResultsArray = [];
             if (dInfo.results) {
                 let cleanStr = dInfo.results.toString().replace(/["'\s]/g, ''); 
-                if (cleanStr.includes('|')) realResultsArray = cleanStr.split('|');
-                else if (cleanStr.includes(',')) realResultsArray = cleanStr.split(',');
-                else realResultsArray = [cleanStr];
+                realResultsArray = cleanStr.includes('|') ? cleanStr.split('|') : (cleanStr.includes(',') ? cleanStr.split(',') : [cleanStr]);
                 realResultsArray = realResultsArray.map(res => res.trim().toLowerCase());
             }
             
-            container.innerHTML = `<div style="text-align:center; margin-bottom:15px; margin-top:5px;"><span style="font-size:11px; font-weight:700; color:var(--primary); font-family:'Rajdhani'; letter-spacing:1px; background:rgba(0,255,204,0.05); padding: 4px 10px; border-radius:6px;">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
+            container.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><span style="font-size:11px; font-weight:700; color:var(--primary); font-family:'Rajdhani'; letter-spacing:1px; background:rgba(0,255,204,0.04); padding: 4px 12px; border-radius:6px;">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
+            
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
                 let targetRes = realResultsArray[i] || null;
@@ -336,105 +299,72 @@
                     let optLower = opt.toString().toLowerCase().trim();
 
                     if (realResRaw) {
-                        if (optLower === realResRaw) { 
-                            if (myPickLower === realResRaw) cls += " res-correct"; 
-                            else cls += " res-actual"; 
-                        }
-                        else if (optLower === myPickLower) cls += " res-wrong"; 
+                        if (optLower === realResRaw) cls += (myPickLower === realResRaw) ? " res-correct" : " res-actual";
+                        else if (optLower === myPickLower) cls += " res-wrong";
                     } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
                     
                     let isBtnDisabled = isPast || (userPred ? true : false);
-                    
                     opts += `<button class="${cls}" ${isBtnDisabled ? 'disabled' : ''} onclick="pick(this, ${i}, '${opt}')">${opt}</button>`;
                 });
-
-                let leftImgId = `flag-L-${dayId}-${i}`;
-                let rightImgId = `flag-R-${dayId}-${i}`;
-
-                let leftFlag = getFlagHtml(teams[0], leftImgId);
-                let rightFlag = getFlagHtml(teams[1], rightImgId);
 
                 container.innerHTML += `
                     <div class="game-card">
                         <div class="match-display">
-                            <div class="team-home">
-                                ${leftFlag}
-                                <div class="team-name">${teams[0]}</div>
-                            </div>
-                            <div class="vs-container">
-                                <div class="vs-divider">VS</div>
-                            </div>
-                            <div class="team-away">
-                                <div class="team-name">${teams[1]}</div>
-                                ${rightFlag}
-                            </div>
+                            <div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div>
+                            <div class="vs-container"><div class="vs-divider">VS</div></div>
+                            <div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div>
                         </div>
                         <div class="options-grid">${opts}</div>
                     </div>`;
             });
-            
             document.getElementById('save-btn').classList.toggle('hidden', userPred || isPast);
         }
 
-        function pick(btn, idx, val) { 
-            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
-            btn.classList.add('selected'); 
-            TEMP_ANSWERS[idx] = val; 
-        }
+        function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
 
         async function saveCurrentDay() {
             if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
             try {
                 const res = await fetch(`${BASE_URL}/save-prediction`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
-                if(res.success) { 
-                    showToast("Saved!", false); 
-                    if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = [];
-                    GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); 
-                    TEMP_ANSWERS = {}; 
-                    selectDay(SELECTED_DAY); 
-                }
+                if(res.success) { showToast("Predictions Submitted!", false); if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = []; GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); TEMP_ANSWERS = {}; selectDay(SELECTED_DAY); }
             } catch(e) { showToast("Error"); }
         }
 
-        // 🛠️ Enhanced Modern Leaderboard Function
         async function loadLB() {
             try {
                 const res = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
-                const container = document.getElementById('lb-data-list');
-                const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
-                
-                const frontPrizes = {
-                    1: "3000 $", 2: "2000 $", 3: "1000 $",
-                    4: "800 FB", 5: "600 FB", 6: "500 FB",
-                    7: "300 FB", 8: "250 FB", 9: "200 FB", 10: "100 FB"
-                };
-
-                container.innerHTML = res.topData.map(u => {
-                    const isMe = u.u.toLowerCase().trim() === cUser;
-                    let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "***" + u.u[u.u.length - 1] : u.u[0] + "*");
-                    
-                    let displayPrize = u.prize && u.prize !== "undefined" ? u.prize : (frontPrizes[u.rank] || "-");
-                    displayPrize = displayPrize.replace("freebet", "FB");
-
-                    // ⭐ Trophy Icons for Top 3
-                    let rankDisplay = u.rank;
-                    if (u.rank === 1) rankDisplay = `<span class="lb-rank-1">🥇</span>`;
-                    else if (u.rank === 2) rankDisplay = `<span class="lb-rank-2">🥈</span>`;
-                    else if (u.rank === 3) rankDisplay = `<span class="lb-rank-3">🥉</span>`;
-
-                    return `
-                        <div class="lb-card ${isMe ? 'my-highlight' : ''}">
-                            <div class="lb-rank">${rankDisplay}</div>
-                            <div class="lb-user">${disp}</div>
-                            <div class="lb-score">${u.p} PTS</div>
-                            <div class="lb-prize">${displayPrize}</div>
-                        </div>`;
-                }).join('');
+                renderLeaderboardList(res.topData);
             } catch(e) {}
         }
 
+        function renderLeaderboardList(data) {
+            const container = document.getElementById('lb-data-list');
+            const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
+            const frontPrizes = { 1: "3000 $", 2: "2000 $", 3: "1000 $", 4: "800 FB", 5: "600 FB", 6: "500 FB", 7: "300 FB", 8: "250 FB", 9: "200 FB", 10: "100 FB" };
+
+            container.innerHTML = data.map(u => {
+                const isMe = u.u.toLowerCase().trim() === cUser;
+                let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "***" + u.u[u.u.length - 1] : u.u[0] + "*");
+                let displayPrize = u.prize && u.prize !== "undefined" ? u.prize : (frontPrizes[u.rank] || "-");
+                displayPrize = displayPrize.replace("freebet", "FB");
+
+                let rankDisplay = u.rank;
+                if (u.rank === 1) rankDisplay = `<span class="lb-rank-1">🥇</span>`;
+                else if (u.rank === 2) rankDisplay = `<span class="lb-rank-2">🥈</span>`;
+                else if (u.rank === 3) rankDisplay = `<span class="lb-rank-3">🥉</span>`;
+
+                return `
+                    <div class="lb-card ${isMe ? 'my-highlight' : ''}">
+                        <div class="lb-rank">${rankDisplay}</div>
+                        <div class="lb-user">${disp}</div>
+                        <div class="lb-score">${u.p} PTS</div>
+                        <div class="lb-prize">${displayPrize}</div>
+                    </div>`;
+            }).join('');
+        }
+
         function logout() { localStorage.clear(); location.reload(); }
-        window.onload = () => { if(localStorage.getItem('wc_user')) startGame(true); else loadLB(); };
+        window.onload = () => { if(localStorage.getItem('wc_user')) startGame(true); else switchPage('matches'); };
     </script>
 </body>
 </html>
