@@ -140,6 +140,79 @@
         
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 15px 25px; border-radius: 10px; z-index: 2000; display: none; text-align:center; min-width: 280px; font-weight: 600; }
         .hidden { display: none !important; }
+        
+        .status-title {
+            font-size: 11px !important;
+            color: #a0aec0 !important; 
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            display: inline-block;
+        }
+        
+        .status-value {
+            color: #00ffcc !important; 
+            font-family: 'Rajdhani', sans-serif !important;
+            font-size: 24px !important;
+            font-weight: 700 !important;
+            line-height: 1 !important;
+        }
+        
+        .exit-title {
+            color: #e53e3e !important; 
+            font-size: 11px !important;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            display: inline-block;
+        }
+        
+        .exit-value {
+            color: #ff4d4d !important; 
+            font-size: 16px !important;
+            font-family: 'Rajdhani', sans-serif !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            #my-status .card-auth {
+                padding: 15px !important;
+                margin-bottom: 15px !important;
+                background: rgba(6, 18, 24, 0.9) !important;
+                border: 1px solid #00ffcc !important;
+            }
+            .status-title {
+                font-size: 10px !important;
+                color: #a0aec0 !important; 
+                display: block !important;
+                text-align: center;
+                opacity: 1 !important;
+            }
+            .status-value {
+                font-size: 22px !important;
+                text-align: center;
+                display: block !important;
+            }
+            .exit-title {
+                font-size: 10px !important;
+                color: #e53e3e !important;
+                display: block !important;
+                text-align: center;
+                opacity: 1 !important;
+            }
+            .exit-value {
+                font-size: 14px !important;
+                text-align: center;
+                display: block !important;
+            }
+            .status-separator {
+                border-left: 1px solid rgba(255,255,255,0.1) !important;
+                border-right: 1px solid rgba(255,255,255,0.1) !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -148,24 +221,20 @@
     <div class="main-content">
         
         <div id="my-status" class="hidden">
-            <div style="padding: 18px; margin-bottom: 20px; background: #061218 !important; border: 2px solid #00ffcc !important; border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 255, 204, 0.15);">
+            <div class="card-auth" style="padding: 20px; margin-bottom: 20px; background: rgba(6, 18, 24, 0.85); border: 1px solid var(--primary); box-shadow: 0 4px 15px rgba(0, 255, 204, 0.1);">
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; text-align:center; align-items:center; width:100%;">
-                    
-                    <div style="display: block !important; text-align: center !important;">
+                    <div>
                         <span style="font-size:12px !important; color:#a0aec0 !important; text-transform:uppercase !important; font-weight:700 !important; letter-spacing:0.5px !important; display:block !important; margin-bottom:4px !important;">RANK</span>
                         <b id="my-rank" style="color:#00ffcc !important; font-family:'Rajdhani', sans-serif !important; font-size:24px !important; font-weight:700 !important; display:block !important; line-height:1 !important;">-</b>
                     </div>
-                    
                     <div style="display: block !important; text-align: center !important; border-left: 1px solid rgba(255,255,255,0.15) !important; border-right: 1px solid rgba(255,255,255,0.15) !important;">
                         <span style="font-size:12px !important; color:#a0aec0 !important; text-transform:uppercase !important; font-weight:700 !important; letter-spacing:0.5px !important; display:block !important; margin-bottom:4px !important;">SCORE</span>
                         <b id="my-score" style="color:#00ffcc !important; font-family:'Rajdhani', sans-serif !important; font-size:24px !important; font-weight:700 !important; display:block !important; line-height:1 !important;">0</b>
                     </div>
-                    
                     <div onclick="logout()" style="cursor:pointer; display: block !important; text-align: center !important;">
                         <span style="font-size:12px !important; color:#ff4d4d !important; text-transform:uppercase !important; font-weight:700 !important; letter-spacing:0.5px !important; display:block !important; margin-bottom:4px !important;">EXIT</span>
                         <b style="color:#ff4d4d !important; font-family:'Rajdhani', sans-serif !important; font-size:16px !important; font-weight:700 !important; display:block !important; line-height:1 !important; letter-spacing:0.5px !important;">OUT</b>
                     </div>
-                    
                 </div>
             </div>
         </div>
@@ -367,6 +436,7 @@
             } catch(e) { showToast("Error"); }
         }
 
+        // 🛠️ განახლებული ფუნქცია, რომელიც პრიზებს პირდაპირ ბექენდიდან კითხულობს
         async function loadLB() {
             try {
                 const res = await fetch(`${BASE_URL}/leaderboard`).then(r => r.json());
@@ -375,7 +445,8 @@
                 container.innerHTML = res.topData.map(u => {
                     const isMe = u.u.toLowerCase().trim() === cUser;
                     let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "***" + u.u[u.u.length - 1] : u.u[0] + "*");
-                    return `<tr class="lb-row ${isMe ? 'my-row-highlight' : ''}"><td>${u.rank}</td><td style="text-align:left; padding-left:15px;">${disp}</td><td style="color:var(--accent-gold); font-weight:700;">${u.p}</td><td>${{1:"1000€",2:"500€",3:"200€"}[u.rank] || "-"}</td></tr>`;
+                    
+                    return `<tr class="lb-row ${isMe ? 'my-row-highlight' : ''}"><td>${u.rank}</td><td style="text-align:left; padding-left:15px;">${disp}</td><td style="color:var(--accent-gold); font-weight:700;">${u.p}</td><td>${u.prize}</td></tr>`;
                 }).join('');
             } catch(e) {}
         }
