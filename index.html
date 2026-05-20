@@ -159,9 +159,9 @@
             </div>
         </div>
 
-        <div id="auth-pages">
+        <div id="guest-auth-banner">
             <div id="login-section">
-                <h2 style="margin: 25px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani'; font-weight:700; text-shadow: 0 0 10px rgba(0, 255, 204, 0.15);">WORLD CUP 2026</h2>
+                <h2 style="margin: 15px 0 20px 0; color: var(--primary); font-size: 24px; text-align:center; font-family:'Rajdhani'; font-weight:700; text-shadow: 0 0 10px rgba(0, 255, 204, 0.15);">LOGIN TO SUBMIT PREDICTIONS</h2>
                 <div class="card-auth">
                     <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
                     <input type="password" id="password" placeholder="PASSWORD">
@@ -170,7 +170,7 @@
                 </div>
             </div>
             <div id="signup-section" class="hidden">
-                <h2 style="margin: 25px 0; color: var(--primary); font-size: 26px; text-align:center; font-family:'Rajdhani'; font-weight:700;">JOIN PREDICTOR</h2>
+                <h2 style="margin: 15px 0 20px 0; color: var(--primary); font-size: 24px; text-align:center; font-family:'Rajdhani'; font-weight:700;">CREATE ACCOUNT TO JOIN</h2>
                 <div class="card-auth">
                     <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
                     <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
@@ -180,7 +180,7 @@
             </div>
         </div>
 
-        <div id="matches-page" class="page-view hidden">
+        <div id="matches-page" class="page-view">
             <div class="tabs-wrapper" id="day-tabs"></div>
             <div class="filter-container">
                 <button class="filter-btn active" id="f-all" onclick="filterMatches('all')">All</button>
@@ -200,52 +200,20 @@
         <div id="rules-page" class="page-view hidden">
             <div class="rules-container">
                 <h3 class="rules-title">Terms & Conditions</h3>
-                
-                <div class="rules-item">
-                    <div class="rules-num">1.</div>
-                    <div class="rules-text">Participation in this tournament is exclusively open to registered and verified Rolletto users who are included in the designated Whitelist.</div>
-                </div>
-
-                <div class="rules-item">
-                    <div class="rules-num">2.</div>
-                    <div class="rules-text">Each user is allowed to submit exactly one set of predictions per matchday. Once predictions are submitted, they cannot be modified, updated, or edited under any circumstances.</div>
-                </div>
-
-                <div class="rules-item">
-                    <div class="rules-num">3.</div>
-                    <div class="rules-text">Prediction submissions close automatically at the beginning of each calendar matchday (00:00 server time). Late entries will not be accepted by the system.</div>
-                </div>
-
-                <div class="rules-item">
-                    <div class="rules-num">4.</div>
-                    <div class="rules-text">Points calculation is based strictly on the official match results at the end of regular full-time play (90 minutes, excluding extra time and penalty shootouts).</div>
-                </div>
-
-                <div class="rules-item">
-                    <div class="rules-num">5.</div>
-                    <div class="rules-text">Every correctly predicted match outcome awards the user a fixed point value (PTS) specified in that respective day's calendar header.</div>
-                </div>
-
-                <div class="rules-item">
-                    <div class="rules-num">6.</div>
-                    <div class="rules-text">In the event of a tie in the leaderboard ranking, priority will be given to the user who submitted their most recent predictions earliest (verified via database timestamps).</div>
-                </div>
-
-                <div class="rules-item">
-                    <div class="rules-num">7.</div>
-                    <div class="rules-text">Upon campaign conclusion, the prize pool (Top 10 leaderboard placements) will be distributed according to the official prize structure. Cash awards and freebets will be credited directly to the user's personal Rolletto account within 48 hours.</div>
-                </div>
-
-                <div class="rules-item">
-                    <div class="rules-num">8.</div>
-                    <div class="rules-text">Any form of fraudulent activity, multi-accounting, system manipulation, or abuse of rules will result in immediate disqualification from the campaign and permanent account restriction.</div>
-                </div>
+                <div class="rules-item"><div class="rules-num">1.</div><div class="rules-text">Participation in this tournament is exclusively open to registered and verified Rolletto users who are included in the designated Whitelist.</div></div>
+                <div class="rules-item"><div class="rules-num">2.</div><div class="rules-text">Each user is allowed to submit exactly one set of predictions per matchday. Once predictions are submitted, they cannot be modified, updated, or edited under any circumstances.</div></div>
+                <div class="rules-item"><div class="rules-num">3.</div><div class="rules-text">Prediction submissions close automatically at the beginning of each calendar matchday (00:00 server time). Late entries will not be accepted by the system.</div></div>
+                <div class="rules-item"><div class="rules-num">4.</div><div class="rules-text">Points calculation is based strictly on the official match results at the end of regular full-time play (90 minutes, excluding extra time and penalty shootouts).</div></div>
+                <div class="rules-item"><div class="rules-num">5.</div><div class="rules-text">Every correctly predicted match outcome awards the user a fixed point value (PTS) specified in that respective day's calendar header.</div></div>
+                <div class="rules-item"><div class="rules-num">6.</div><div class="rules-text">In the event of a tie in the leaderboard ranking, priority will be given to the user who submitted their most recent predictions earliest (verified via database timestamps).</div></div>
+                <div class="rules-item"><div class="rules-num">7.</div><div class="rules-text">Upon campaign conclusion, the prize pool (Top 10 leaderboard placements) will be distributed according to the official prize structure. Cash awards and freebets will be credited directly to the user's personal Rolletto account within 48 hours.</div></div>
+                <div class="rules-item"><div class="rules-num">8.</div><div class="rules-text">Any form of fraudulent activity, multi-accounting, system manipulation, or abuse of rules will result in immediate disqualification from the campaign and permanent account restriction.</div></div>
             </div>
         </div>
 
     </div>
 
-    <div id="app-nav" class="bottom-nav hidden">
+    <div id="app-nav" class="bottom-nav">
         <div class="nav-item active" id="nav-matches" onclick="switchPage('matches')"><span>⚽</span>MATCHES</div>
         <div class="nav-item" id="nav-lb" onclick="switchPage('lb')"><span>🏆</span>RANKINGS</div>
         <div class="nav-item" id="nav-rules" onclick="switchPage('rules')"><span>📜</span>TERMS</div>
@@ -253,20 +221,17 @@
 
     <script>
         const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
-        let GLOBAL_DATA = {}; let SELECTED_DAY = ""; let TEMP_ANSWERS = {}; let CURRENT_FILTER = 'all';
+        let GLOBAL_DATA = { allDays: {}, userPredictions: [] }; 
+        let SELECTED_DAY = ""; let TEMP_ANSWERS = {}; let CURRENT_FILTER = 'all';
 
         function getFlagHtml(teamName, imgId) {
             let name = teamName.trim().toLowerCase();
             if (name === "england" || name === "scotland" || name === "wales") name = "united kingdom";
             if (name === "usa") name = "united states";
-            
             fetch(`https://restcountries.com/v3.1/name/${name}?fullText=false`)
                 .then(r => r.json())
                 .then(data => { if (data && data[0] && data[0].flags && data[0].flags.png) { const imgEl = document.getElementById(imgId); if (imgEl) imgEl.src = data[0].flags.png; } })
-                .catch(e => {
-                    const imgEl = document.getElementById(imgId);
-                    if (imgEl) imgEl.src = "https://rolletto1.cc/content/125,24fb1440f33968.webp";
-                });
+                .catch(e => { const imgEl = document.getElementById(imgId); if (imgEl) imgEl.src = "https://rolletto1.cc/content/125,24fb1440f33968.webp"; });
             return `<img id="${imgId}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" class="flag-img" style="background:rgba(255,255,255,0.05);" alt="${teamName}">`;
         }
 
@@ -279,12 +244,27 @@
             document.getElementById('matches-page').classList.toggle('hidden', page !== 'matches');
             document.getElementById('leaderboard-page').classList.toggle('hidden', page !== 'lb');
             document.getElementById('rules-page').classList.toggle('hidden', page !== 'rules');
-            
             document.getElementById('nav-matches').classList.toggle('active', page === 'matches');
             document.getElementById('nav-lb').classList.toggle('active', page === 'lb');
             document.getElementById('nav-rules').classList.toggle('active', page === 'rules');
-            
             if(page === 'lb') loadLB();
+        }
+
+        // 🛠️ ახალი ფუნქცია ანონიმური იუზერებისთვის მატჩების ჩასატვირთად
+        async function fetchInitialData() {
+            try {
+                // ბექენდზე სპეციალურად შევდივართ სატესტო ან ცარიელი მონაცემებით კალენდრის წამოსაღებად
+                const res = await fetch(getCleanUrl('leaderboard')).then(r => r.json());
+                renderLeaderboardList(res.topData);
+                
+                // ვცდილობთ კალენდრის წამოღებას ირიბად, თუ ბექენდს აქვს ღია მოთხოვნა, ან ველოდებით LOGIN-ს
+                // საჯარო კალენდრის სინქრონიზაციისთვის ავტომატურად ვუშვებთ ცარიელ ავტორიზაციას
+                const initialRes = await fetch(`${BASE_URL}/login`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user: "", password: ""}) }).then(r => r.json()).catch(e => ({}));
+                if(initialRes.allDays) {
+                    GLOBAL_DATA.allDays = initialRes.allDays;
+                    renderTabs();
+                }
+            } catch(e) {}
         }
 
         async function startGame(isAuto, type) {
@@ -292,13 +272,8 @@
             const p = isAuto ? localStorage.getItem('wc_pass') : (type === 'login' ? document.getElementById('password').value.trim() : document.getElementById('reg-password').value.trim());
             if(!u || !p) return;
 
-            // 🛠️ ანიმაციური სტატუსის ჩართვა ღილაკებზე კლიკისას
-            const loginBtn = document.getElementById('login-btn');
-            const regBtn = document.getElementById('reg-btn');
-            if(!isAuto) {
-                if(type === 'login') { loginBtn.innerText = "LOGGING IN..."; loginBtn.disabled = true; }
-                else { regBtn.innerText = "SIGNING UP..."; regBtn.disabled = true; }
-            }
+            const loginBtn = document.getElementById('login-btn'); const regBtn = document.getElementById('reg-btn');
+            if(!isAuto) { if(type === 'login') { loginBtn.innerText = "LOGGING IN..."; loginBtn.disabled = true; } else { regBtn.innerText = "SIGNING UP..."; regBtn.disabled = true; } }
 
             try {
                 const res = await fetch(getCleanUrl(isAuto ? 'login' : type), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user: u, password: p}) }).then(r => r.json());
@@ -307,21 +282,16 @@
                     GLOBAL_DATA = res;
                     document.getElementById('my-rank').innerText = res.userRank ? `#${res.userRank}` : "-";
                     document.getElementById('my-score').innerText = res.userScore !== undefined ? res.userScore : "0";
-                    document.getElementById('auth-pages').classList.add('hidden');
+                    document.getElementById('guest-auth-banner').classList.add('hidden');
                     document.getElementById('my-status').classList.remove('hidden');
-                    document.getElementById('app-nav').classList.remove('hidden');
-                    renderTabs(); switchPage('matches');
+                    renderTabs(); selectDay(SELECTED_DAY);
                 } else if(!isAuto) showToast(res.message);
-            } catch(e) { 
-                if(!isAuto) showToast("Connection error. Please try again."); 
-            } finally {
-                // 🛠️ სერვერიდან პასუხის მერე ღილაკების საწყის ფორმაში დაბრუნება
-                if(loginBtn) { loginBtn.innerText = "LOGIN"; loginBtn.disabled = false; }
-                if(regBtn) { regBtn.innerText = "SIGN UP / JOIN"; regBtn.disabled = false; }
-            }
+            } catch(e) { if(!isAuto) showToast("Connection error. Please try again."); }
+            finally { if(loginBtn) { loginBtn.innerText = "LOGIN"; loginBtn.disabled = false; } if(regBtn) { regBtn.innerText = "SIGN UP / JOIN"; regBtn.disabled = false; } }
         }
 
         function renderTabs() {
+            if(!GLOBAL_DATA.allDays || Object.keys(GLOBAL_DATA.allDays).length === 0) return;
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
             const now = getLocalDateString();
             const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
@@ -340,19 +310,16 @@
             if(visibleDays.length > 0) selectDay(SELECTED_DAY);
         }
 
-        function filterMatches(type) {
-            CURRENT_FILTER = type;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`f-${type}`).classList.add('active');
-            selectDay(SELECTED_DAY);
-        }
+        function filterMatches(type) { CURRENT_FILTER = type; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); document.getElementById(`f-${type}`).classList.add('active'); selectDay(SELECTED_DAY); }
 
         function selectDay(dayId) {
             const container = document.getElementById('games-container'); container.innerHTML = "";
+            if(!GLOBAL_DATA.allDays || !GLOBAL_DATA.allDays[dayId]) return;
             const dInfo = GLOBAL_DATA.allDays[dayId];
             const now = getLocalDateString();
             const userPred = GLOBAL_DATA.userPredictions && GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             const isPast = dInfo.date < now;
+            const isLoggedIn = localStorage.getItem('wc_user') ? true : false;
             
             if(CURRENT_FILTER === 'open' && (userPred || isPast)) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No pending matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
             if(CURRENT_FILTER === 'done' && !userPred && !isPast) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No completed matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
@@ -382,7 +349,8 @@
                         else if (optLower === myPickLower) cls += " res-wrong";
                     } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
                     
-                    let isBtnDisabled = isPast || (userPred ? true : false);
+                    // 🛠️ ფიქსი: თუ იუზერი დალოგინებული არაა (!isLoggedIn), ღილაკები იძულებით იბლოკება (disabled)
+                    let isBtnDisabled = !isLoggedIn || isPast || (userPred ? true : false);
                     opts += `<button class="${cls}" ${isBtnDisabled ? 'disabled' : ''} onclick="pick(this, ${i}, '${opt}')">${opt}</button>`;
                 });
 
@@ -396,35 +364,27 @@
                         <div class="options-grid">${opts}</div>
                     </div>`;
             });
-            document.getElementById('save-btn').classList.toggle('hidden', userPred || isPast);
+            
+            // 🛠️ ფიქსი: SUBMIT ღილაკი გამოჩნდება მხოლოდ ავტორიზებული მომხმარებლებისთვის
+            document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast);
         }
 
         function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
 
         async function saveCurrentDay() {
             if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
-            const saveBtn = document.getElementById('save-btn');
-            saveBtn.innerText = "SUBMITTING...";
-            saveBtn.disabled = true;
+            const saveBtn = document.getElementById('save-btn'); saveBtn.innerText = "SUBMITTING..."; saveBtn.disabled = true;
             try {
                 const res = await fetch(getCleanUrl('save-prediction'), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
                 if(res.success) { showToast("Predictions Submitted!", false); if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = []; GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); TEMP_ANSWERS = {}; selectDay(SELECTED_DAY); }
             } catch(e) { showToast("An error occurred while saving."); }
-            finally {
-                saveBtn.innerText = "SUBMIT PREDICTIONS";
-                saveBtn.disabled = false;
-            }
+            finally { saveBtn.innerText = "SUBMIT PREDICTIONS"; saveBtn.disabled = false; }
         }
 
-        async function loadLB() {
-            try {
-                const res = await fetch(getCleanUrl('leaderboard')).then(r => r.json());
-                renderLeaderboardList(res.topData);
-            } catch(e) { showToast("Failed to load rankings."); }
-        }
+        async function loadLB() { try { const res = await fetch(getCleanUrl('leaderboard')).then(r => r.json()); renderLeaderboardList(res.topData); } catch(e) { showToast("Failed to load rankings."); } }
 
         function renderLeaderboardList(data) {
-            const container = document.getElementById('lb-data-list');
+            const container = document.getElementById('lb-data-list'); if(!container) return;
             const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
             const frontPrizes = { 1: "3000 $", 2: "2000 $", 3: "1000 $", 4: "800 FB", 5: "600 FB", 6: "500 FB", 7: "300 FB", 8: "250 FB", 9: "200 FB", 10: "100 FB" };
 
@@ -439,18 +399,21 @@
                 else if (u.rank === 2) rankDisplay = `<span class="lb-rank-2">🥈</span>`;
                 else if (u.rank === 3) rankDisplay = `<span class="lb-rank-3">🥉</span>`;
 
-                return `
-                    <div class="lb-card ${isMe ? 'my-highlight' : ''}">
-                        <div class="lb-rank">${rankDisplay}</div>
-                        <div class="lb-user">${disp}</div>
-                        <div class="lb-score">${u.p} PTS</div>
-                        <div class="lb-prize">${displayPrize}</div>
-                    </div>`;
+                return `<div class="lb-card ${isMe ? 'my-highlight' : ''}"><div class="lb-rank">${rankDisplay}</div><div class="lb-user">${disp}</div><div class="lb-score">${u.p} PTS</div><div class="lb-prize">${displayPrize}</div></div>`;
             }).join('');
         }
 
         function logout() { localStorage.clear(); location.reload(); }
-        window.onload = () => { if(localStorage.getItem('wc_user')) startGame(true); else switchPage('matches'); };
+        
+        // 🛠️ სინქრონიზებული ჩატვირთვის პროცესი
+        window.onload = async () => { 
+            if(localStorage.getItem('wc_user')) {
+                await startGame(true); 
+            } else {
+                // თუ იუზერი სტუმარია, მაინც ვტვირთავთ საჯარო მონაცემებს
+                await fetchInitialData();
+            }
+        };
     </script>
 </body>
 </html>
