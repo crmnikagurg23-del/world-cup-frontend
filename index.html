@@ -116,9 +116,10 @@
         input:focus { border-color: var(--primary); }
         
         .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,255,204,0.15); }
+        .btn-green:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 14px; border-radius: 14px; width: 100%; cursor: pointer; margin-top: 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
 
-        /* 📱 Bottom App Bar (3 Columns) */
+        /* 📱 Bottom App Bar */
         .bottom-nav { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             height: 68px; background: var(--glass); 
@@ -290,6 +291,15 @@
             const u = isAuto ? localStorage.getItem('wc_user') : (type === 'login' ? document.getElementById('username').value.trim() : document.getElementById('reg-username').value.trim());
             const p = isAuto ? localStorage.getItem('wc_pass') : (type === 'login' ? document.getElementById('password').value.trim() : document.getElementById('reg-password').value.trim());
             if(!u || !p) return;
+
+            // 🛠️ ანიმაციური სტატუსის ჩართვა ღილაკებზე კლიკისას
+            const loginBtn = document.getElementById('login-btn');
+            const regBtn = document.getElementById('reg-btn');
+            if(!isAuto) {
+                if(type === 'login') { loginBtn.innerText = "LOGGING IN..."; loginBtn.disabled = true; }
+                else { regBtn.innerText = "SIGNING UP..."; regBtn.disabled = true; }
+            }
+
             try {
                 const res = await fetch(getCleanUrl(isAuto ? 'login' : type), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user: u, password: p}) }).then(r => r.json());
                 if(res.success) {
@@ -302,7 +312,13 @@
                     document.getElementById('app-nav').classList.remove('hidden');
                     renderTabs(); switchPage('matches');
                 } else if(!isAuto) showToast(res.message);
-            } catch(e) { if(!isAuto) showToast("Connection error. Please try again."); }
+            } catch(e) { 
+                if(!isAuto) showToast("Connection error. Please try again."); 
+            } finally {
+                // 🛠️ სერვერიდან პასუხის მერე ღილაკების საწყის ფორმაში დაბრუნება
+                if(loginBtn) { loginBtn.innerText = "LOGIN"; loginBtn.disabled = false; }
+                if(regBtn) { regBtn.innerText = "SIGN UP / JOIN"; regBtn.disabled = false; }
+            }
         }
 
         function renderTabs() {
@@ -387,10 +403,17 @@
 
         async function saveCurrentDay() {
             if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.innerText = "SUBMITTING...";
+            saveBtn.disabled = true;
             try {
                 const res = await fetch(getCleanUrl('save-prediction'), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
                 if(res.success) { showToast("Predictions Submitted!", false); if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = []; GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); TEMP_ANSWERS = {}; selectDay(SELECTED_DAY); }
             } catch(e) { showToast("An error occurred while saving."); }
+            finally {
+                saveBtn.innerText = "SUBMIT PREDICTIONS";
+                saveBtn.disabled = false;
+            }
         }
 
         async function loadLB() {
