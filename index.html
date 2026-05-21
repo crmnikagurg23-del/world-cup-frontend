@@ -1,151 +1,399 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const axios = require('axios');
-const cors = require('cors');
-
-const app = express();
-app.use(express.json());
-app.use(cors());
-
-const MONGO_URI = "mongodb+srv://nika_final:win2026win@cluster0.lqh75wa.mongodb.net/worldcup?retryWrites=true&w=majority&appName=Cluster0"; 
-const SHEET_ID = "1rVe2OxD7wX6UR2h8xp1AmBEQ6Lx1J6S2J1qOizZK96s";
-const USERS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Sheet1`;
-const GAMES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Games`;
-
-mongoose.connect(MONGO_URI).then(() => console.log("✅ DB Connected"));
-
-const userSchema = new mongoose.Schema({
-    username: { type: String, unique: true, lowercase: true, trim: true },
-    password: { type: String },
-    totalScore: { type: Number, default: 0 },
-    predictions: [{ dayId: String, answers: Object, timestamp: { type: Date, default: Date.now } }]
-});
-const User = mongoose.model('User', userSchema);
-
-app.get('/api/ping', (req, res) => {
-    res.send("⚡ Pong! Server is awake.");
-});
-
-app.get('/api/public-days', async (req, res) => {
-    try {
-        const gRes = await axios.get(GAMES_URL);
-        const rows = gRes.data.split('\n').slice(1);
-        const allDays = {};
-        rows.forEach(r => {
-            const c = r.split(',').map(v => v.replace(/"/g, '').trim());
-            if(c[0]) allDays[c[0]] = { title: c[1], date: c[2], matches: c[3]?.split('|') || [], results: c[4] || null, pointsPerGame: parseInt(c[6]) || 1 };
-        });
-        res.json({ success: true, allDays });
-    } catch (e) { res.status(500).json({ success: false }); }
-});
-
-app.post('/api/signup', async (req, res) => {
-    try {
-        const { user, password } = req.body;
-        const uName = user.toLowerCase().trim();
-        const existing = await User.findOne({ username: uName });
-        if (existing) return res.json({ success: false, message: "Account already exists!" });
-        const sheetRes = await axios.get(USERS_URL);
-        const allowed = sheetRes.data.split('\n').map(r => r.split(',')[0].replace(/"/g, '').trim().toLowerCase());
-        if (!allowed.includes(uName)) return res.json({ success: false, message: "User not found in whitelist!" });
-        const newUser = new User({ username: uName, password });
-        await newUser.save();
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ success: false }); }
-});
-
-app.post('/api/login', async (req, res) => {
-    try {
-        const { user, password } = req.body;
-        const uName = user.toLowerCase().trim();
-        const u = await User.findOne({ username: uName });
-        if (!u || u.password !== password) return res.json({ success: false, message: "Invalid credentials!" });
-        const gRes = await axios.get(GAMES_URL);
-        const rows = gRes.data.split('\n').slice(1);
-        const allDays = {};
-        rows.forEach(r => {
-            const c = r.split(',').map(v => v.replace(/"/g, '').trim());
-            if(c[0]) allDays[c[0]] = { title: c[1], date: c[2], matches: c[3]?.split('|') || [], results: c[4] || null, pointsPerGame: parseInt(c[6]) || 1 };
-        });
-        const allUsers = await User.find().sort({ totalScore: -1, "predictions.timestamp": 1 });
-        const rankIndex = allUsers.findIndex(curr => curr.username === uName);
-        res.json({ 
-            success: true, 
-            userScore: u.totalScore || 0, 
-            userRank: rankIndex === -1 ? "-" : rankIndex + 1, 
-            userPredictions: u.predictions || [], 
-            allDays 
-        });
-    } catch (e) { res.status(500).json({ success: false }); }
-});
-
-app.post('/api/save-prediction', async (req, res) => {
-    const { username, dayId, answers } = req.body;
-    const u = await User.findOne({ username: username.toLowerCase().trim() });
-    if(u && !u.predictions.find(p => p.dayId === dayId)) {
-        u.predictions.push({ dayId, answers, timestamp: new Date() });
-        await u.save();
-        res.json({ success: true });
-    } else res.json({ success: false });
-});
-
-// 🛠️ განახლებული: გამოაქვს ტოპ 20 იუზერი ახალი საპრიზო ფონდით
-app.get('/api/leaderboard', async (req, res) => {
-    const top = await User.find().sort({ totalScore: -1, "predictions.timestamp": 1 }).limit(20);
-    const prizes = {
-        1: "1500 $", 2: "1000 $", 3: "800 $",
-        4: "500 freebet", 5: "400 freebet", 6: "300 freebet",
-        7: "250 freebet", 8: "200 freebet", 9: "150 freebet", 10: "100 freebet",
-        11: "50 freebet", 12: "50 freebet", 13: "50 freebet",
-        14: "300 freebet", 15: "30 freebet", 16: "25 freebet",
-        17: "25 freebet", 18: "20 freebet", 19: "20 freebet", 20: "20 freebet"
-    };
-    res.json({ topData: top.map((u, i) => ({ rank: i + 1, u: u.username, p: u.totalScore || 0, prize: prizes[i + 1] || "-" })) });
-});
-
-app.get('/api/admin/calculate-scores', async (req, res) => {
-    try {
-        const gRes = await axios.get(GAMES_URL);
-        const rows = gRes.data.split('\n').slice(1);
-        const resultsMap = {};
-        rows.forEach(r => {
-            const c = r.split(',').map(v => v.replace(/"/g, '').trim());
-            if(c[0] && c[4] && c[4].trim() !== "") {
-                resultsMap[c[0]] = { results: c[4].split('|').map(res => res.trim().toLowerCase()), points: parseInt(c[6]) || 1 };
-            }
-        });
-        const users = await User.find();
-        for (let user of users) {
-            let score = 0;
-            user.predictions.forEach(pred => {
-                const dayRes = resultsMap[pred.dayId];
-                if (dayRes) {
-                    dayRes.results.forEach((res, i) => {
-                        if (res && ["1", "x", "2"].includes(res) && pred.answers[i]) {
-                            const userAns = pred.answers[i].toString().toLowerCase().trim();
-                            if (userAns === res) score += dayRes.points;
-                        }
-                    });
-                }
-            });
-            user.totalScore = score;
-            await user.save();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rolletto Predictor | World Cup 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #00ffcc; 
+            --primary-glow: rgba(0, 255, 204, 0.25);
+            --bg-dark: #020a0e; 
+            --card-bg: rgba(6, 18, 24, 0.75);
+            --glass: rgba(10, 25, 33, 0.92); 
+            --text-main: #ffffff;
+            --text-muted: #8899a6;
+            --accent-gold: #ffcc00; 
+            --red: #ff4d4d;
         }
-        res.send("✅ Scores updated successfully!");
-    } catch (e) { res.status(500).send("❌ Calculation error"); }
-});
 
-app.get('/api/admin/reset-all', async (req, res) => {
-    try {
-        await User.deleteMany({});
-        res.send("🔥 SUCCESS: All users and leaderboard data have been completely deleted!");
-    } catch (e) { res.status(500).send("❌ Reset error"); }
-});
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            background-image: 
+                radial-gradient(circle at 50% -20%, rgba(0, 255, 204, 0.12) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(2, 10, 14, 0.85) 0%, rgba(2, 10, 14, 0.98) 100%),
+                url('https://theminaretonline.org/wp-content/uploads/2021/11/world-cup.jpeg'); 
+            background-size: cover; 
+            background-attachment: fixed; 
+            background-position: center; 
+        }
 
-setInterval(() => {
-    axios.get('https://rolletto-backend-1.onrender.com/api/ping')
-        .then(() => console.log("🎯 Auto-Ping: Server kept awake successfully!"))
-        .catch((e) => console.log("Auto-Ping failed."));
-}, 600000);
+        header { padding: 14px; border-bottom: 1px solid rgba(0, 255, 204, 0.08); background: var(--glass); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; backdrop-filter: blur(12px); }
+        .logo { height: 26px; cursor: pointer; filter: drop-shadow(0 0 5px var(--primary-glow)); }
 
-app.listen(process.env.PORT || 10000);
+        .main-content { padding: 15px; max-width: 600px; margin: 0 auto; min-height: 100vh; padding-bottom: 90px; }
+        
+        .page-view { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .game-card, .leaderboard-container, .card-auth, .rules-container { 
+            background: var(--card-bg); 
+            padding: 22px; 
+            border-radius: 18px; 
+            border: 1px solid rgba(255,255,255,0.02); 
+            margin-bottom: 15px; 
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        /* 🔒 🛠️ განახლებული: დახვეწილი ზედა საჯარო პანელი (Top Guest Bar) */
+        .guest-top-bar {
+            background: rgba(6, 20, 28, 0.85);
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            padding: 14px 18px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.05);
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            animation: fadeInTop 0.4s ease-out;
+        }
+        @keyframes fadeInTop { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .guest-text-block { display: flex; flex-direction: column; gap: 2px; }
+        .guest-title { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.2px; }
+        .guest-subtitle { font-size: 11px; font-weight: 500; color: var(--text-muted); }
+        
+        .guest-login-btn {
+            background: var(--primary);
+            color: var(--bg-dark);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 255, 204, 0.15);
+        }
+
+        /* 📜 Terms & Rules */
+        .rules-title { color: var(--primary); font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid rgba(0, 255, 204, 0.1); padding-bottom: 8px; }
+        .rules-text { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
+        .rules-item { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+        .rules-num { color: var(--primary); font-weight: 700; font-family: 'Rajdhani'; font-size: 15px; }
+
+        /* 🏆 Leaderboard */
+        .lb-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .lb-card { display: grid; grid-template-columns: 40px 1fr auto auto; align-items: center; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); padding: 14px 18px; border-radius: 14px; gap: 12px; transition: all 0.2s; }
+        .lb-card.my-highlight { background: rgba(0, 255, 204, 0.07) !important; border: 1px solid rgba(0, 255, 204, 0.3) !important; box-shadow: 0 0 15px rgba(0, 255, 204, 0.15); }
+
+        .lb-rank { font-family: 'Rajdhani', sans-serif; font-weight: 700; color: var(--text-muted); text-align: center; font-size: 15px; }
+        .lb-rank-1 { color: #ffd700; font-size: 18px; text-shadow: 0 0 5px rgba(255, 215, 0, 0.4); }
+        .lb-rank-2 { color: #c0c0c0; font-size: 18px; }
+        .lb-rank-3 { color: #cd7f32; font-size: 18px; }
+        .lb-user { font-size: 14px; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; }
+        .lb-score { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--primary); padding: 3px 12px; background: rgba(0, 255, 204, 0.06); border-radius: 8px; min-width: 50px; text-align: center; }
+        .lb-prize { font-size: 13px; font-weight: 700; color: var(--accent-gold); text-align: right; }
+
+        /* 📅 Day Tabs */
+        .tabs-wrapper { display: flex; gap: 10px; padding: 10px 5px; overflow-x: auto; scroll-behavior: smooth; margin-bottom: 5px; }
+        .tabs-wrapper::-webkit-scrollbar { display: none; }
+        .day-tab { padding: 10px 18px; background: rgba(255,255,255,0.03); border-radius: 12px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; color: var(--text-muted); border: 1px solid transparent; transition: all 0.2s; }
+        .day-tab.active { background: var(--primary); color: var(--bg-dark); box-shadow: 0 0 10px var(--primary-glow); }
+        
+        .filter-container { display: flex; gap: 8px; margin-bottom: 15px; padding: 0 5px; }
+        .filter-btn { flex: 1; padding: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
+        .filter-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(0, 255, 204, 0.04); }
+
+        /* ⚽ Matches */
+        .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; padding: 0 8px; }
+        .team-home { flex: 1; display: flex; align-items: center; gap: 12px; justify-content: flex-start; }
+        .team-away { flex: 1; display: flex; align-items: center; gap: 12px; justify-content: flex-end; text-align: right; }
+        .flag-img { width: 30px; height: 21px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 3px 6px rgba(0,0,0,0.5); flex-shrink: 0; }
+        .team-name { font-weight: 700; font-size: 14px; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+        .vs-divider { font-size: 11px; color: var(--primary); padding: 4px 12px; background: rgba(0,255,204,0.08); border: 1px solid rgba(0,255,204,0.1); border-radius: 6px; font-weight: 700; font-family: 'Rajdhani'; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .opt-btn { padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: #fff; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .opt-btn.selected { background: rgba(0, 255, 204, 0.12) !important; border: 1px solid var(--primary) !important; color: var(--primary) !important; box-shadow: 0 0 15px rgba(0, 255, 204, 0.15); font-weight: 800; }
+        .opt-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        
+        .res-correct { background: var(--primary) !important; color: var(--bg-dark) !important; border: none !important; font-weight: 800 !important; }
+        .res-wrong { background: var(--red) !important; color: #fff !important; border: none !important; font-weight: 800 !important;}
+        .res-actual { border: 2px solid var(--primary) !important; background: transparent !important; color: var(--primary) !important; font-weight: 700 !important;}
+
+        input { padding: 16px; border-radius: 12px; width: 100%; margin-bottom: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); color: #fff; outline: none; font-size: 14px; }
+        
+        .btn-green { background: var(--primary); color: var(--bg-dark); border: none; padding: 16px; border-radius: 14px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 14px; border-radius: 14px; width: 100%; cursor: pointer; margin-top: 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+
+        /* 📱 Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 68px; background: var(--glass); border-top: 1px solid rgba(255,255,255,0.04); display: grid; grid-template-columns: 1fr 1fr 1fr; z-index: 1500; backdrop-filter: blur(15px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; }
+        .nav-item span { font-size: 18px; }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 8px var(--primary-glow); }
+
+        .toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); padding: 16px 28px; border-radius: 12px; z-index: 2000; display: none; text-align:center; min-width: 300px; font-weight: 700; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
+        .hidden { display: none !important; }
+
+        .status-panel-title { font-size: 11px !important; color: #a0aec0 !important; text-transform: uppercase !important; font-weight: 700 !important; margin-bottom: 4px !important; display: block !important; }
+        .status-panel-value { color: #00ffcc !important; font-family: 'Rajdhani', sans-serif !important; font-size: 24px !important; font-weight: 700 !important; display: block !important; line-height: 1 !important; }
+        .status-panel-exit { font-size: 11px !important; color: #ff4d4d !important; text-transform: uppercase !important; font-weight: 700 !important; margin-bottom: 4px !important; display: block !important; }
+        .status-panel-out { color: #ff4d4d !important; font-family: 'Rajdhani', sans-serif !important; font-size: 16px !important; font-weight: 700 !important; display: block !important; }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    <header><img src="https://rolletto1.cc/content/125,24fb1440f33968.webp" alt="Rolletto" class="logo"></header>
+    
+    <div class="main-content">
+        <div id="my-status" class="hidden">
+            <div style="padding: 18px; margin-bottom: 15px; background: rgba(10, 25, 33, 0.9); border: 1px solid rgba(0, 255, 204, 0.25); border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 255, 204, 0.08);">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; text-align:center; align-items:center; width:100%;">
+                    <div><span class="status-panel-title">RANK</span><b id="my-rank" class="status-panel-value">-</b></div>
+                    <div style="border-left: 1px solid rgba(255,255,255,0.08) !important; border-right: 1px solid rgba(255,255,255,0.08) !important;"><span class="status-panel-title">SCORE</span><b id="my-score" class="status-panel-value">0</b></div>
+                    <div onclick="logout()" style="cursor:pointer;"><span class="status-panel-exit">EXIT</span><b class="status-panel-out">OUT</b></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="guest-float-bar" class="guest-top-bar hidden">
+            <div class="guest-text-block">
+                <div class="guest-title">Viewing as a Guest</div>
+                <div class="guest-subtitle">Sign in to play & win prizes</div>
+            </div>
+            <button class="guest-login-btn" onclick="switchPage('auth')">Login</button>
+        </div>
+
+        <div id="auth-page" class="page-view hidden">
+            <div id="login-section">
+                <h2 style="margin: 15px 0 20px 0; color: var(--primary); font-size: 24px; text-align:center; font-family:'Rajdhani'; font-weight:700;">LOGIN TO PREDICT</h2>
+                <div class="card-auth">
+                    <input type="text" id="username" placeholder="USERNAME" autocomplete="off">
+                    <input type="password" id="password" placeholder="PASSWORD">
+                    <button id="login-btn" class="btn-green" onclick="startGame(false, 'login')">LOGIN</button>
+                    <button class="btn-outline" onclick="toggleAuth('signup')">CREATE ACCOUNT</button>
+                </div>
+            </div>
+            <div id="signup-section" class="hidden">
+                <h2 style="margin: 15px 0 20px 0; color: var(--primary); font-size: 24px; text-align:center; font-family:'Rajdhani'; font-weight:700;">JOIN THE TOURNAMENT</h2>
+                <div class="card-auth">
+                    <input type="text" id="reg-username" placeholder="ROLLETTO USERNAME" autocomplete="off">
+                    <input type="password" id="reg-password" placeholder="CREATE PASSWORD">
+                    <button id="reg-btn" class="btn-green" onclick="startGame(false, 'signup')">SIGN UP / JOIN</button>
+                    <button class="btn-outline" onclick="toggleAuth('login')">BACK TO LOGIN</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="matches-page" class="page-view">
+            <div class="tabs-wrapper" id="day-tabs"></div>
+            <div class="filter-container">
+                <button class="filter-btn active" id="f-all" onclick="filterMatches('all')">All</button>
+                <button class="filter-btn" id="f-open" onclick="filterMatches('open')">To Play</button>
+                <button class="filter-btn" id="f-done" onclick="filterMatches('done')">Completed</button>
+            </div>
+            <div id="games-container"></div>
+            <button id="save-btn" class="btn-green hidden" onclick="saveCurrentDay()">SUBMIT PREDICTIONS</button>
+        </div>
+
+        <div id="leaderboard-page" class="page-view hidden">
+            <div class="leaderboard-container">
+                <div class="lb-list" id="lb-data-list"></div>
+            </div>
+        </div>
+
+        <div id="rules-page" class="page-view hidden">
+            <div class="rules-container">
+                <h3 class="rules-title">Terms & Conditions</h3>
+                <div class="rules-item"><div class="rules-num">1.</div><div class="rules-text">Participation is open only to verified Rolletto users in the Whitelist.</div></div>
+                <div class="rules-item"><div class="rules-num">2.</div><div class="rules-text">Users can submit 1 set of predictions per matchday. Edits are not allowed.</div></div>
+                <div class="rules-item"><div class="rules-num">3.</div><div class="rules-text">Submissions close at 00:00 server time on each matchday.</div></div>
+                <div class="rules-item"><div class="rules-num">4.</div><div class="rules-text">Points are based on full-time results (90 mins), excluding extra time/penalties.</div></div>
+                <div class="rules-item"><div class="rules-num">5.</div><div class="rules-text">Correct results award the PTS value shown in the matchday header.</div></div>
+                <div class="rules-item"><div class="rules-num">6.</div><div class="rules-text">In ties, the user who submitted their latest prediction earlier ranks higher.</div></div>
+                <div class="rules-item"><div class="rules-num">7.</div><div class="rules-text">Prizes will be credited to Rolletto accounts within 48 hours after campaign ends.</div></div>
+                <div class="rules-item"><div class="rules-num">8.</div><div class="rules-text">Fraud or multi-accounting results in immediate disqualification.</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-nav" class="bottom-nav">
+        <div class="nav-item active" id="nav-matches" onclick="switchPage('matches')"><span>⚽</span>MATCHES</div>
+        <div class="nav-item" id="nav-lb" onclick="switchPage('lb')"><span>🏆</span>RANKINGS</div>
+        <div class="nav-item" id="nav-rules" onclick="switchPage('rules')"><span>📜</span>TERMS</div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://rolletto-backend-1.onrender.com/api';
+        let GLOBAL_DATA = { allDays: {}, userPredictions: [] }; 
+        let SELECTED_DAY = ""; let TEMP_ANSWERS = {}; let CURRENT_FILTER = 'all';
+
+        function getFlagHtml(teamName, imgId) {
+            let name = teamName.trim().toLowerCase();
+            if (name === "england" || name === "scotland" || name === "wales") name = "united kingdom";
+            if (name === "usa") name = "united states";
+            fetch(`https://restcountries.com/v3.1/name/${name}?fullText=false`)
+                .then(r => r.json())
+                .then(data => { if (data && data[0] && data[0].flags && data[0].flags.png) { const imgEl = document.getElementById(imgId); if (imgEl) imgEl.src = data[0].flags.png; } })
+                .catch(e => { const imgEl = document.getElementById(imgId); if (imgEl) imgEl.src = "https://rolletto1.cc/content/125,24fb1440f33968.webp"; });
+            return `<img id="${imgId}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" class="flag-img" style="background:rgba(255,255,255,0.05);" alt="${teamName}">`;
+        }
+
+        function getCleanUrl(endpoint) { return `${BASE_URL}/${endpoint}?v=${Date.now()}`; }
+        function getLocalDateString() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+        function showToast(m, isErr = true) { const t = document.getElementById('toast'); t.innerText = m; t.style.background = isErr ? 'rgba(255, 77, 77, 0.95)' : 'rgba(0, 255, 204, 0.95)'; t.style.color = isErr ? '#fff' : '#061218'; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); }
+        function toggleAuth(v) { document.getElementById('login-section').classList.toggle('hidden', v!=='login'); document.getElementById('signup-section').classList.toggle('hidden', v!=='signup'); }
+
+        function switchPage(page) {
+            document.getElementById('matches-page').classList.toggle('hidden', page !== 'matches');
+            document.getElementById('leaderboard-page').classList.toggle('hidden', page !== 'lb');
+            document.getElementById('rules-page').classList.toggle('hidden', page !== 'rules');
+            document.getElementById('auth-page').classList.toggle('hidden', page !== 'auth');
+            
+            document.getElementById('nav-matches').classList.toggle('active', page === 'matches');
+            document.getElementById('nav-lb').classList.toggle('active', page === 'lb');
+            document.getElementById('nav-rules').classList.toggle('active', page === 'rules');
+            
+            const isLoggedIn = localStorage.getItem('wc_user') ? true : false;
+            if (!isLoggedIn) {
+                document.getElementById('guest-float-bar').classList.toggle('hidden', page === 'auth');
+            }
+            
+            if(page === 'lb') loadLB();
+        }
+
+        async function fetchInitialData() {
+            try {
+                const res = await fetch(getCleanUrl('leaderboard')).then(r => r.json());
+                renderLeaderboardList(res.topData);
+                const publicRes = await fetch(getCleanUrl('public-days')).then(r => r.json());
+                if(publicRes.allDays) { GLOBAL_DATA.allDays = publicRes.allDays; renderTabs(); }
+            } catch(e) { }
+        }
+
+        async function startGame(isAuto, type) {
+            const u = isAuto ? localStorage.getItem('wc_user') : (type === 'login' ? document.getElementById('username').value.trim() : document.getElementById('reg-username').value.trim());
+            const p = isAuto ? localStorage.getItem('wc_pass') : (type === 'login' ? document.getElementById('password').value.trim() : document.getElementById('reg-password').value.trim());
+            if(!u || !p) return;
+            const loginBtn = document.getElementById('login-btn'); const regBtn = document.getElementById('reg-btn');
+            if(!isAuto) { if(type === 'login') { loginBtn.innerText = "LOGGING IN..."; loginBtn.disabled = true; } else { regBtn.innerText = "SIGNING UP..."; regBtn.disabled = true; } }
+            try {
+                const res = await fetch(getCleanUrl(isAuto ? 'login' : type), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({user: u, password: p}) }).then(r => r.json());
+                if(res.success) {
+                    localStorage.setItem('wc_user', u); localStorage.setItem('wc_pass', p);
+                    GLOBAL_DATA = res;
+                    document.getElementById('my-rank').innerText = res.userRank ? `#${res.userRank}` : "-";
+                    document.getElementById('my-score').innerText = res.userScore !== undefined ? res.userScore : "0";
+                    document.getElementById('guest-float-bar').classList.add('hidden');
+                    document.getElementById('my-status').classList.remove('hidden');
+                    renderTabs(); switchPage('matches');
+                } else if(!isAuto) showToast(res.message);
+            } catch(e) { if(!isAuto) showToast("Connection error."); }
+            finally { if(loginBtn) { loginBtn.innerText = "LOGIN"; loginBtn.disabled = false; } if(regBtn) { regBtn.innerText = "SIGN UP / JOIN"; regBtn.disabled = false; } }
+        }
+
+        function renderTabs() {
+            if(!GLOBAL_DATA.allDays || Object.keys(GLOBAL_DATA.allDays).length === 0) return;
+            const container = document.getElementById('day-tabs'); container.innerHTML = "";
+            const now = getLocalDateString();
+            const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
+            const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
+            let todayDayId = visibleDays.find(id => GLOBAL_DATA.allDays[id].date === now);
+            if (!SELECTED_DAY) SELECTED_DAY = todayDayId || visibleDays[visibleDays.length - 1];
+            visibleDays.forEach(dayId => {
+                const btn = document.createElement('div');
+                btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
+                btn.innerText = (GLOBAL_DATA.allDays[dayId].date === now) ? "TODAY" : GLOBAL_DATA.allDays[dayId].title;
+                btn.onclick = () => { SELECTED_DAY = dayId; renderTabs(); };
+                container.appendChild(btn);
+                if (SELECTED_DAY === dayId) setTimeout(() => { btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 100);
+            });
+            if(visibleDays.length > 0) selectDay(SELECTED_DAY);
+        }
+
+        function filterMatches(type) { CURRENT_FILTER = type; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); document.getElementById(`f-${type}`).classList.add('active'); selectDay(SELECTED_DAY); }
+
+        function selectDay(dayId) {
+            const container = document.getElementById('games-container'); container.innerHTML = "";
+            if(!GLOBAL_DATA.allDays || !GLOBAL_DATA.allDays[dayId]) return;
+            const dInfo = GLOBAL_DATA.allDays[dayId];
+            const now = getLocalDateString();
+            const userPred = GLOBAL_DATA.userPredictions && GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
+            const isPast = dInfo.date < now;
+            const isLoggedIn = localStorage.getItem('wc_user') ? true : false;
+            
+            if(CURRENT_FILTER === 'open' && (userPred || isPast)) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No pending matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
+            if(CURRENT_FILTER === 'done' && !userPred && !isPast) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No completed matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
+
+            let realResultsArray = [];
+            if (dInfo.results) {
+                let cleanStr = dInfo.results.toString().replace(/["'\s]/g, ''); 
+                realResultsArray = cleanStr.includes('|') ? cleanStr.split('|') : (cleanStr.includes(',') ? cleanStr.split(',') : [cleanStr]);
+                realResultsArray = realResultsArray.map(res => res.trim().toLowerCase());
+            }
+            container.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><span style="font-size:11px; font-weight:700; color:var(--primary); font-family:'Rajdhani'; letter-spacing:1px; background:rgba(0,255,204,0.04); padding: 4px 12px; border-radius:6px;">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
+            
+            dInfo.matches.forEach((game, i) => {
+                const teams = game.split(' vs '); let opts = "";
+                let targetRes = realResultsArray[i] || null;
+                const realResRaw = (targetRes && ["1", "x", "2"].includes(targetRes)) ? targetRes : null;
+                ['1', 'X', '2'].forEach(opt => {
+                    let cls = "opt-btn";
+                    const myPick = userPred ? userPred.answers[i] : null;
+                    let myPickLower = myPick ? myPick.toString().toLowerCase().trim() : null;
+                    let optLower = opt.toString().toLowerCase().trim();
+                    if (realResRaw) {
+                        if (optLower === realResRaw) cls += (myPickLower === realResRaw) ? " res-correct" : " res-actual";
+                        else if (optLower === myPickLower) cls += " res-wrong";
+                    } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
+                    opts += `<button class="${cls}" ${(!isLoggedIn || isPast || userPred) ? 'disabled' : ''} onclick="pick(this, ${i}, '${opt}')">${opt}</button>`;
+                });
+                container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div></div><div class="options-grid">${opts}</div></div>`;
+            });
+            
+            document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast);
+        }
+
+        function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
+
+        async function saveCurrentDay() {
+            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
+            const saveBtn = document.getElementById('save-btn'); saveBtn.innerText = "SUBMITTING..."; saveBtn.disabled = true;
+            try {
+                const res = await fetch(getCleanUrl('save-prediction'), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
+                if(res.success) { showToast("Submitted!", false); if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = []; GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); TEMP_ANSWERS = {}; selectDay(SELECTED_DAY); }
+            } catch(e) { } finally { saveBtn.innerText = "SUBMIT PREDICTIONS"; saveBtn.disabled = false; }
+        }
+
+        async function loadLB() { try { const res = await fetch(getCleanUrl('leaderboard')).then(r => r.json()); renderLeaderboardList(res.topData); } catch(e) { } }
+
+        function renderLeaderboardList(data) {
+            const container = document.getElementById('lb-data-list'); if(!container) return;
+            const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
+            const frontPrizes = { 1: "3000 $", 2: "2000 $", 3: "1000 $", 4: "800 FB", 5: "600 FB", 6: "500 FB", 7: "300 FB", 8: "250 FB", 9: "200 FB", 10: "100 FB" };
+            container.innerHTML = data.map(u => {
+                const isMe = u.u.toLowerCase().trim() === cUser;
+                let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "***" + u.u[u.u.length - 1] : u.u[0] + "*");
+                let displayPrize = u.prize && u.prize !== "undefined" ? u.prize : (frontPrizes[u.rank] || "-");
+                let rankDisplay = u.rank === 1 ? '🥇' : (u.rank === 2 ? '🥈' : (u.rank === 3 ? '🥉' : u.rank));
+                return `<div class="lb-card ${isMe ? 'my-highlight' : ''}"><div class="lb-rank">${rankDisplay}</div><div class="lb-user">${disp}</div><div class="lb-score">${u.p} PTS</div><div class="lb-prize">${displayPrize.replace("freebet", "FB")}</div></div>`;
+            }).join('');
+        }
+
+        function logout() { localStorage.clear(); location.reload(); }
+        window.onload = async () => { 
+            if(localStorage.getItem('wc_user')) { await startGame(true); } 
+            else { document.getElementById('guest-float-bar').classList.remove('hidden'); await fetchInitialData(); }
+        };
+    </script>
+</body>
+</html>
