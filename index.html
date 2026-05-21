@@ -50,7 +50,7 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        /* 🔒 🛠️ განახლებული: დახვეწილი ზედა საჯარო პანელი (Top Guest Bar) */
+        /* 🔒 Top Guest Bar */
         .guest-top-bar {
             background: rgba(6, 20, 28, 0.85);
             border: 1px solid rgba(0, 255, 204, 0.25);
@@ -89,6 +89,7 @@
         .rules-text { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
         .rules-item { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
         .rules-num { color: var(--primary); font-weight: 700; font-family: 'Rajdhani'; font-size: 15px; }
+        .rules-subtitle { color: var(--primary); font-size: 14px; font-weight: 700; margin: 15px 0 10px 0; text-transform: uppercase; font-family: 'Rajdhani'; }
 
         /* 🏆 Leaderboard */
         .lb-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
@@ -214,14 +215,64 @@
         <div id="rules-page" class="page-view hidden">
             <div class="rules-container">
                 <h3 class="rules-title">Terms & Conditions</h3>
-                <div class="rules-item"><div class="rules-num">1.</div><div class="rules-text">Participation is open only to verified Rolletto users in the Whitelist.</div></div>
-                <div class="rules-item"><div class="rules-num">2.</div><div class="rules-text">Users can submit 1 set of predictions per matchday. Edits are not allowed.</div></div>
-                <div class="rules-item"><div class="rules-num">3.</div><div class="rules-text">Submissions close at 00:00 server time on each matchday.</div></div>
-                <div class="rules-item"><div class="rules-num">4.</div><div class="rules-text">Points are based on full-time results (90 mins), excluding extra time/penalties.</div></div>
-                <div class="rules-item"><div class="rules-num">5.</div><div class="rules-text">Correct results award the PTS value shown in the matchday header.</div></div>
-                <div class="rules-item"><div class="rules-num">6.</div><div class="rules-text">In ties, the user who submitted their latest prediction earlier ranks higher.</div></div>
-                <div class="rules-item"><div class="rules-num">7.</div><div class="rules-text">Prizes will be credited to Rolletto accounts within 48 hours after campaign ends.</div></div>
-                <div class="rules-item"><div class="rules-num">8.</div><div class="rules-text">Fraud or multi-accounting results in immediate disqualification.</div></div>
+                
+                <div class="rules-item">
+                    <div class="rules-num">1.</div>
+                    <div class="rules-text">Participation is open only to verified Rolletto users in the Whitelist.</div>
+                </div>
+                <div class="rules-item">
+                    <div class="rules-num">2.</div>
+                    <div class="rules-text">Users can submit 1 set of predictions per matchday. Edits are not allowed.</div>
+                </div>
+                <div class="rules-item">
+                    <div class="rules-num">3.</div>
+                    <div class="rules-text">Submissions close at 00:00 server time on each matchday.</div>
+                </div>
+                <div class="rules-item">
+                    <div class="rules-num">4.</div>
+                    <div class="rules-text">Points are based on full-time results (90 mins), excluding extra time/penalties.</div>
+                </div>
+
+                <div class="rules-subtitle">📊 Scoring System</div>
+                <div class="rules-item">
+                    <div class="rules-num">•</div>
+                    <div class="rules-text"><strong>Group Stage:</strong> 1 Point (PTS) awarded per correct prediction.</div>
+                </div>
+                <div class="rules-item">
+                    <div class="rules-num">•</div>
+                    <div class="rules-text"><strong>Knockout Stage (until Semifinals):</strong> 3 Points (PTS) awarded per correct prediction.</div>
+                </div>
+                <div class="rules-item">
+                    <div class="rules-num">•</div>
+                    <div class="rules-text"><strong>Semifinals & Finals:</strong> 5 Points (PTS) awarded per correct prediction.</div>
+                </div>
+
+                <div class="rules-subtitle">🎁 Prize Pool Structure (Top 20)</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.85); background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.03);">
+                    <div>1st Place: <strong>1,500 $</strong></div>   <div>11th Place: <strong>50 FB</strong></div>
+                    <div>2nd Place: <strong>1,000 $</strong></div>   <div>12th Place: <strong>50 FB</strong></div>
+                    <div>3rd Place: <strong>800 $</strong></div>     <div>13th Place: <strong>50 FB</strong></div>
+                    <div>4th Place: <strong>500 FB</strong></div>    <div>14th Place: <strong>30 FB</strong></div>
+                    <div>5th Place: <strong>400 FB</strong></div>    <div>15th Place: <strong>30 FB</strong></div>
+                    <div>6th Place: <strong>300 FB</strong></div>    <div>16th Place: <strong>25 FB</strong></div>
+                    <div>7th Place: <strong>250 FB</strong></div>    <div>17th Place: <strong>25 FB</strong></div>
+                    <div>8th Place: <strong>200 FB</strong></div>    <div>18th Place: <strong>20 FB</strong></div>
+                    <div>9th Place: <strong>150 FB</strong></div>    <div>19th Place: <strong>20 FB</strong></div>
+                    <div>10th Place: <strong>100 FB</strong></div>   <div>20th Place: <strong>20 FB</strong></div>
+                </div>
+
+                <div class="rules-item">
+                    <div class="rules-num">5.</div>
+                    <div class="rules-text">In case of a tie in the standings, the user who locked their last correct prediction earlier will be ranked higher.</div>
+                </div>
+                <div class="rules-item">
+                    <div class="rules-num">6.</div>
+                    <div class="rules-text">Prizes will be credited directly to Rolletto accounts within 48 hours after the tournament conclusion.</div>
+                </div>
+                <div class="rules-item">
+                    <div class="rules-num">7.</div>
+                    <div class="rules-text">Fraud or multi-accounting results in immediate disqualification.</div>
+                </div>
             </div>
         </div>
     </div>
@@ -267,7 +318,6 @@
             if (!isLoggedIn) {
                 document.getElementById('guest-float-bar').classList.toggle('hidden', page === 'auth');
             }
-            
             if(page === 'lb') loadLB();
         }
 
@@ -359,7 +409,6 @@
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div></div><div class="options-grid">${opts}</div></div>`;
             });
-            
             document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast);
         }
 
@@ -379,7 +428,14 @@
         function renderLeaderboardList(data) {
             const container = document.getElementById('lb-data-list'); if(!container) return;
             const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
-            const frontPrizes = { 1: "3000 $", 2: "2000 $", 3: "1000 $", 4: "800 FB", 5: "600 FB", 6: "500 FB", 7: "300 FB", 8: "250 FB", 9: "200 FB", 10: "100 FB" };
+            const frontPrizes = { 
+                1: "1500 $", 2: "1000 $", 3: "800 $", 
+                4: "500 FB", 5: "400 FB", 6: "300 FB", 
+                7: "250 FB", 8: "200 FB", 9: "150 FB", 10: "100 FB",
+                11: "50 FB", 12: "50 FB", 13: "50 FB", 
+                14: "30 FB", 15: "30 FB", 16: "25 FB", 
+                17: "25 FB", 18: "20 FB", 19: "20 FB", 20: "20 FB" 
+            };
             container.innerHTML = data.map(u => {
                 const isMe = u.u.toLowerCase().trim() === cUser;
                 let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "***" + u.u[u.u.length - 1] : u.u[0] + "*");
