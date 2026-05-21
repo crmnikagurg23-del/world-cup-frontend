@@ -50,7 +50,6 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        /* 🔒 🛠️ განახლებული: დახვეწილი ზედა საჯარო პანელი (Top Guest Bar) */
         .guest-top-bar {
             background: rgba(6, 20, 28, 0.85);
             border: 1px solid rgba(0, 255, 204, 0.25);
@@ -267,7 +266,6 @@
             if (!isLoggedIn) {
                 document.getElementById('guest-float-bar').classList.toggle('hidden', page === 'auth');
             }
-            
             if(page === 'lb') loadLB();
         }
 
@@ -359,7 +357,6 @@
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div></div><div class="options-grid">${opts}</div></div>`;
             });
-            
             document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast);
         }
 
@@ -379,7 +376,17 @@
         function renderLeaderboardList(data) {
             const container = document.getElementById('lb-data-list'); if(!container) return;
             const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
-            const frontPrizes = { 1: "3000 $", 2: "2000 $", 3: "1000 $", 4: "800 FB", 5: "600 FB", 6: "500 FB", 7: "300 FB", 8: "250 FB", 9: "200 FB", 10: "100 FB" };
+            
+            // 🛠️ განახლებული: ფრონტენდის პრიზების სია ტოპ 20 ადგილისთვის
+            const frontPrizes = { 
+                1: "1500 $", 2: "1000 $", 3: "800 $", 
+                4: "500 FB", 5: "400 FB", 6: "300 FB", 
+                7: "250 FB", 8: "200 FB", 9: "150 FB", 10: "100 FB",
+                11: "50 FB", 12: "50 FB", 13: "50 FB", 
+                14: "30 FB", 15: "30 FB", 16: "25 FB", 
+                17: "25 FB", 18: "20 FB", 19: "20 FB", 20: "20 FB" 
+            };
+
             container.innerHTML = data.map(u => {
                 const isMe = u.u.toLowerCase().trim() === cUser;
                 let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "***" + u.u[u.u.length - 1] : u.u[0] + "*");
