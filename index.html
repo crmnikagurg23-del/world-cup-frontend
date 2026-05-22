@@ -454,4 +454,31 @@
                     let dispName = isMe ? userMatch.u : (userMatch.u.length > 2 ? userMatch.u[0] + "***" + userMatch.u[userMatch.u.length - 1] : userMatch.u[0] + "*");
                     let customPrize = userMatch.prize && userMatch.prize !== "undefined" ? userMatch.prize : frontPrizes[rank];
 
-                    htmlString += `<div class="lb-card ${
+                    htmlString += `<div class="lb-card ${isMe ? 'my-highlight' : ''}">
+                        <div class="lb-rank">${rankDisplay}</div>
+                        <div class="lb-user">${dispName}</div>
+                        <div class="lb-score">${userMatch.p} PTS</div>
+                        <div class="lb-prize">${customPrize.replace("freebet", "FB")}</div>
+                    </div>`;
+                } else {
+                    // 🛠️ ფიქსი: თუ იუზერი ჯერ არ არის, მაინც ვსვამთ ლამაზ ცარიელ ველს
+                    htmlString += `<div class="lb-card">
+                        <div class="lb-rank">${rankDisplay}</div>
+                        <div class="lb-user empty">—</div>
+                        <div class="lb-score empty">0 PTS</div>
+                        <div class="lb-prize">${displayPrize}</div>
+                    </div>`;
+                }
+            }
+
+            container.innerHTML = htmlString;
+        }
+
+        function logout() { localStorage.clear(); location.reload(); }
+        window.onload = async () => { 
+            if(localStorage.getItem('wc_user')) { await startGame(true); } 
+            else { document.getElementById('guest-float-bar').classList.remove('hidden'); await fetchInitialData(); }
+        };
+    </script>
+</body>
+</html>
