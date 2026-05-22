@@ -275,7 +275,7 @@
         }
 
         function getCleanUrl(endpoint) { return `${BASE_URL}/${endpoint}?v=${Date.now()}`; }
-        function getLocalDateString() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+        function getLocalDateString() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0 flights')}`.replace(" flights", ""); }
         function showToast(m, isErr = true) { const t = document.getElementById('toast'); t.innerText = m; t.style.background = isErr ? 'rgba(255, 77, 77, 0.95)' : 'rgba(0, 255, 204, 0.95)'; t.style.color = isErr ? '#fff' : '#061218'; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); }
         function toggleAuth(v) { document.getElementById('login-section').classList.toggle('hidden', v!=='login'); document.getElementById('signup-section').classList.toggle('hidden', v!=='signup'); }
 
@@ -296,7 +296,6 @@
             if(page === 'lb') loadLB();
         }
 
-        // 🛠️ დამოუკიდებელი, პარალელური ჩატვირთვის სისტემა
         async function fetchInitialData() {
             fetch(getCleanUrl('public-days'))
                 .then(r => r.json())
@@ -335,15 +334,18 @@
             finally { if(loginBtn) { loginBtn.innerText = "LOGIN"; loginBtn.disabled = false; } if(regBtn) { regBtn.innerText = "SIGN UP / JOIN"; regBtn.disabled = false; } }
         }
 
+        // 🛠️ განახლებული: ფილტრი მოხსნილია, ახლა ტაბებში გამოჩნდება აბსოლუტურად ყველა დღე!
         function renderTabs() {
             if(!GLOBAL_DATA.allDays || Object.keys(GLOBAL_DATA.allDays).length === 0) return;
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
             const now = getLocalDateString();
             const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
-            const visibleDays = days.filter(id => GLOBAL_DATA.allDays[id].date <= now);
-            let todayDayId = visibleDays.find(id => GLOBAL_DATA.allDays[id].date === now);
-            if (!SELECTED_DAY) SELECTED_DAY = todayDayId || visibleDays[visibleDays.length - 1];
-            visibleDays.forEach(dayId => {
+            
+            // ვტოვებთ სრულ კალენდარს (ყველა დღეს)
+            let todayDayId = days.find(id => GLOBAL_DATA.allDays[id].date === now);
+            if (!SELECTED_DAY) SELECTED_DAY = todayDayId || days[0];
+
+            days.forEach(dayId => {
                 const btn = document.createElement('div');
                 btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
                 btn.innerText = (GLOBAL_DATA.allDays[dayId].date === now) ? "TODAY" : GLOBAL_DATA.allDays[dayId].title;
@@ -351,7 +353,7 @@
                 container.appendChild(btn);
                 if (SELECTED_DAY === dayId) setTimeout(() => { btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 100);
             });
-            if(visibleDays.length > 0) selectDay(SELECTED_DAY);
+            if(days.length > 0) selectDay(SELECTED_DAY);
         }
 
         function filterMatches(type) { CURRENT_FILTER = type; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); document.getElementById(`f-${type}`).classList.add('active'); selectDay(SELECTED_DAY); }
@@ -362,10 +364,14 @@
             const dInfo = GLOBAL_DATA.allDays[dayId];
             const now = getLocalDateString();
             const userPred = GLOBAL_DATA.userPredictions && GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
+            
+            // 🛠️ ლოგიკა: ვადგენთ არის თუ არა მომავლის, წარსულის თუ მიმდინარე დღე
             const isPast = dInfo.date < now;
+            const isFuture = dInfo.date > now;
+            const isToday = dInfo.date === now;
             const isLoggedIn = localStorage.getItem('wc_user') ? true : false;
             
-            if(CURRENT_FILTER === 'open' && (userPred || isPast)) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No pending matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
+            if(CURRENT_FILTER === 'open' && (userPred || isPast || isFuture)) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No pending matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
             if(CURRENT_FILTER === 'done' && !userPred && !isPast) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No completed matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
 
             let realResultsArray = [];
@@ -374,12 +380,20 @@
                 realResultsArray = cleanStr.includes('|') ? cleanStr.split('|') : (cleanStr.includes(',') ? cleanStr.split(',') : [cleanStr]);
                 realResultsArray = realResultsArray.map(res => res.trim().toLowerCase());
             }
-            container.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><span style="font-size:11px; font-weight:700; color:var(--primary); font-family:'Rajdhani'; letter-spacing:1px; background:rgba(0,255,204,0.04); padding: 4px 12px; border-radius:6px;">${dInfo.date} • ${dInfo.pointsPerGame} PTS</span></div>`;
+
+            // 🛠️ დინამიური ჰედერი სტატუსების მიხედვით (LOCKED მომავლის დღეებისთვის)
+            let statusBadge = `${dInfo.date} • ${dInfo.pointsPerGame} PTS`;
+            if (isToday) statusBadge = `TODAY • OPEN FOR PREDICTIONS (${dInfo.pointsPerGame} PTS)`;
+            else if (isFuture) statusBadge = `${dInfo.date} • UPCOMING • LOCKED 🔒`;
+            else if (isPast) statusBadge = `${dInfo.date} • COMPLETED`;
+
+            container.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><span style="font-size:11px; font-weight:700; color:${isFuture ? '#ff4d4d' : 'var(--primary)'}; font-family:'Rajdhani'; letter-spacing:1px; background:rgba(0,255,204,0.04); padding: 4px 12px; border-radius:6px;">${statusBadge}</span></div>`;
             
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
                 let targetRes = realResultsArray[i] || null;
                 const realResRaw = (targetRes && ["1", "x", "2"].includes(targetRes)) ? targetRes : null;
+                
                 ['1', 'X', '2'].forEach(opt => {
                     let cls = "opt-btn";
                     const myPick = userPred ? userPred.answers[i] : null;
@@ -389,11 +403,16 @@
                         if (optLower === realResRaw) cls += (myPickLower === realResRaw) ? " res-correct" : " res-actual";
                         else if (optLower === myPickLower) cls += " res-wrong";
                     } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
-                    opts += `<button class="${cls}" ${(!isLoggedIn || isPast || userPred) ? 'disabled' : ''} onclick="pick(this, ${i}, '${opt}')">${opt}</button>`;
+                    
+                    // 🛠️ ფიქსი: მომავლის დღეებზე (isFuture === true) ღილაკები იძულებით იბლოკება!
+                    let isBtnDisabled = !isLoggedIn || isPast || isFuture || (userPred ? true : false);
+                    opts += `<button class="${cls}" ${isBtnDisabled ? 'disabled' : ''} onclick="pick(this, ${i}, '${opt}')">${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div></div><div class="options-grid">${opts}</div></div>`;
             });
-            document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast);
+            
+            // 🛠️ SUBMIT ღილაკიც გამოჩნდება მხოლოდ მიმდინარე აქტიურ დღეს
+            document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast || isFuture);
         }
 
         function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
