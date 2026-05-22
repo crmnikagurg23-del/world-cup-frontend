@@ -122,13 +122,15 @@
         .filter-btn { flex: 1; padding: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
         .filter-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(0, 255, 204, 0.04); }
 
-        /* ⚽ Matches */
-        .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; padding: 0 8px; }
-        .team-home { flex: 1; display: flex; align-items: center; gap: 12px; justify-content: flex-start; }
-        .team-away { flex: 1; display: flex; align-items: center; gap: 12px; justify-content: flex-end; text-align: right; }
+        /* ⚽ Matches (🛠️ გაუმჯობესებული: ქვეყნების სრული ჩატევისთვის) */
+        .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; padding: 0 2px; gap: 4px; }
+        .team-home { flex: 1; display: flex; align-items: center; gap: 8px; justify-content: flex-start; overflow: hidden; }
+        .team-away { flex: 1; display: flex; align-items: center; gap: 8px; justify-content: flex-end; text-align: right; overflow: hidden; }
         .flag-img { width: 30px; height: 21px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 3px 6px rgba(0,0,0,0.5); flex-shrink: 0; }
-        .team-name { font-weight: 700; font-size: 14px; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
-        .vs-divider { font-size: 11px; color: var(--primary); padding: 4px 12px; background: rgba(0,255,204,0.08); border: 1px solid rgba(0,255,204,0.1); border-radius: 6px; font-weight: 700; font-family: 'Rajdhani'; }
+        
+        /* 🛠️ მოიხსნა ფიქსირებული 140px ლიმიტი, რომ ტექსტი ლამაზად გაიშალოს */
+        .team-name { font-weight: 700; font-size: 12px; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; white-space: normal; line-height: 1.2; word-break: break-word; }
+        .vs-divider { font-size: 11px; color: var(--primary); padding: 4px 10px; background: rgba(0,255,204,0.08); border: 1px solid rgba(0,255,204,0.1); border-radius: 6px; font-weight: 700; font-family: 'Rajdhani'; flex-shrink: 0; }
 
         .options-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
         .opt-btn { padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: #fff; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s; }
@@ -265,15 +267,26 @@
         let GLOBAL_DATA = { allDays: {}, userPredictions: [] }; 
         let SELECTED_DAY = ""; let TEMP_ANSWERS = {}; let CURRENT_FILTER = 'all';
 
+        // 🛠️ გაუმჯობესებული: ტექსტის სრული გასუფთავება და ლამაზი მსოფლიო დროშა კითხვის ნიშნების ნაცვლად
         function getFlagHtml(teamName, imgId) {
-            let name = teamName.trim().toLowerCase();
+            let name = teamName.replace(/["'\s]/g, ' ').trim().toLowerCase();
             if (name === "england" || name === "scotland" || name === "wales") name = "united kingdom";
             if (name === "usa") name = "united states";
-            fetch(`https://restcountries.com/v3.1/name/${name}?fullText=false`)
+            
+            fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(name)}?fullText=false`)
                 .then(r => r.json())
-                .then(data => { if (data && data[0] && data[0].flags && data[0].flags.png) { const imgEl = document.getElementById(imgId); if (imgEl) imgEl.src = data[0].flags.png; } })
-                .catch(e => { const imgEl = document.getElementById(imgId); if (imgEl) imgEl.src = "https://rolletto1.cc/content/125,24fb1440f33968.webp"; });
-            return `<img id="${imgId}" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" class="flag-img" style="background:rgba(255,255,255,0.05);" alt="${teamName}">`;
+                .then(data => { 
+                    if (data && data[0] && data[0].flags && data[0].flags.png) { 
+                        const imgEl = document.getElementById(imgId); 
+                        if (imgEl) imgEl.src = data[0].flags.png; 
+                    } 
+                })
+                .catch(e => { 
+                    const imgEl = document.getElementById(imgId); 
+                    if (imgEl) imgEl.src = "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=80&auto=format&fit=crop"; 
+                });
+                
+            return `<img id="${imgId}" src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=80&auto=format&fit=crop" class="flag-img" style="background:rgba(255,255,255,0.05);" alt="${teamName}">`;
         }
 
         function getCleanUrl(endpoint) { return `${BASE_URL}/${endpoint}?v=${Date.now()}`; }
@@ -424,7 +437,6 @@
 
         async function loadLB() { try { const res = await fetch(getCleanUrl('leaderboard')).then(r => r.json()); renderLeaderboardList(res.topData); } catch(e) { } }
 
-        // 🛠️ განახლებული: სრული ტოპ 20 ადგილის გენერაცია (ცარიელი ადგილების შევსებით)
         function renderLeaderboardList(data) {
             const container = document.getElementById('lb-data-list'); if(!container) return;
             const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
@@ -439,17 +451,12 @@
             };
 
             let htmlString = "";
-
-            // ვქმნით ციკლს ზუსტად 1-დან 20-მდე
             for (let rank = 1; rank <= 20; rank++) {
-                // ვეძებთ, გვყავს თუ არა ბექენდიდან წამოღებულ მონაცემებში იუზერი ამ რანკზე
                 const userMatch = data && data.find(u => parseInt(u.rank) === rank);
-
                 let rankDisplay = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : rank));
                 let displayPrize = frontPrizes[rank];
 
                 if (userMatch) {
-                    // თუ იუზერი არსებობს
                     const isMe = userMatch.u.toLowerCase().trim() === cUser;
                     let dispName = isMe ? userMatch.u : (userMatch.u.length > 2 ? userMatch.u[0] + "***" + userMatch.u[userMatch.u.length - 1] : userMatch.u[0] + "*");
                     let customPrize = userMatch.prize && userMatch.prize !== "undefined" ? userMatch.prize : frontPrizes[rank];
@@ -461,7 +468,6 @@
                         <div class="lb-prize">${customPrize.replace("freebet", "FB")}</div>
                     </div>`;
                 } else {
-                    // 🛠️ ფიქსი: თუ იუზერი ჯერ არ არის, მაინც ვსვამთ ლამაზ ცარიელ ველს
                     htmlString += `<div class="lb-card">
                         <div class="lb-rank">${rankDisplay}</div>
                         <div class="lb-user empty">—</div>
@@ -470,7 +476,6 @@
                     </div>`;
                 }
             }
-
             container.innerHTML = htmlString;
         }
 
