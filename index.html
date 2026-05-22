@@ -122,13 +122,12 @@
         .filter-btn { flex: 1; padding: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
         .filter-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(0, 255, 204, 0.04); }
 
-        /* ⚽ Matches (🛠️ გაუმჯობესებული: ქვეყნების სრული ჩატევისთვის) */
+        /* ⚽ Matches */
         .match-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; padding: 0 2px; gap: 4px; }
         .team-home { flex: 1; display: flex; align-items: center; gap: 8px; justify-content: flex-start; overflow: hidden; }
         .team-away { flex: 1; display: flex; align-items: center; gap: 8px; justify-content: flex-end; text-align: right; overflow: hidden; }
         .flag-img { width: 30px; height: 21px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 3px 6px rgba(0,0,0,0.5); flex-shrink: 0; }
         
-        /* 🛠️ მოიხსნა ფიქსირებული 140px ლიმიტი, რომ ტექსტი ლამაზად გაიშალოს */
         .team-name { font-weight: 700; font-size: 12px; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; white-space: normal; line-height: 1.2; word-break: break-word; }
         .vs-divider { font-size: 11px; color: var(--primary); padding: 4px 10px; background: rgba(0,255,204,0.08); border: 1px solid rgba(0,255,204,0.1); border-radius: 6px; font-weight: 700; font-family: 'Rajdhani'; flex-shrink: 0; }
 
@@ -267,7 +266,6 @@
         let GLOBAL_DATA = { allDays: {}, userPredictions: [] }; 
         let SELECTED_DAY = ""; let TEMP_ANSWERS = {}; let CURRENT_FILTER = 'all';
 
-        // 🛠️ გაუმჯობესებული: ტექსტის სრული გასუფთავება და ლამაზი მსოფლიო დროშა კითხვის ნიშნების ნაცვლად
         function getFlagHtml(teamName, imgId) {
             let name = teamName.replace(/["'\s]/g, ' ').trim().toLowerCase();
             if (name === "england" || name === "scotland" || name === "wales") name = "united kingdom";
@@ -328,6 +326,7 @@
                 }).catch(e => {});
         }
 
+        // 🛠️ ფიქსი: რეგისტრაციის/ლოგინის მერე იძულებითი გადატვირთვა მომენტალური სინქრონიზაციისთვის
         async function startGame(isAuto, type) {
             const u = isAuto ? localStorage.getItem('wc_user') : (type === 'login' ? document.getElementById('username').value.trim() : document.getElementById('reg-username').value.trim());
             const p = isAuto ? localStorage.getItem('wc_pass') : (type === 'login' ? document.getElementById('password').value.trim() : document.getElementById('reg-password').value.trim());
@@ -339,11 +338,18 @@
                 if(res.success) {
                     localStorage.setItem('wc_user', u); localStorage.setItem('wc_pass', p);
                     GLOBAL_DATA = res;
+                    
+                    // თუ იუზერმა ხელით გაიარა ავტორიზაცია/რეგისტრაცია, გვერდს მომენტალურად გადავტვირთავთ
+                    if(!isAuto) {
+                        location.reload(); 
+                        return;
+                    }
+
                     document.getElementById('my-rank').innerText = res.userRank ? `#${res.userRank}` : "-";
                     document.getElementById('my-score').innerText = res.userScore !== undefined ? res.userScore : "0";
                     document.getElementById('guest-float-bar').classList.add('hidden');
                     document.getElementById('my-status').classList.remove('hidden');
-                    renderTabs(); switchPage('matches');
+                    renderTabs(); selectDay(SELECTED_DAY);
                 } else if(!isAuto) showToast(res.message);
             } catch(e) { if(!isAuto) showToast("Connection error."); }
             finally { if(loginBtn) { loginBtn.innerText = "LOGIN"; loginBtn.disabled = false; } if(regBtn) { regBtn.innerText = "SIGN UP / JOIN"; regBtn.disabled = false; } }
