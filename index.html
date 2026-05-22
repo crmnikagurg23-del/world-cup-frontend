@@ -294,13 +294,24 @@
             if(page === 'lb') loadLB();
         }
 
+        // 🛠️ დამოუკიდებელი, პარალელური ჩატვირთვის სისტემა
         async function fetchInitialData() {
-            try {
-                const res = await fetch(getCleanUrl('leaderboard')).then(r => r.json());
-                renderLeaderboardList(res.topData);
-                const publicRes = await fetch(getCleanUrl('public-days')).then(r => r.json());
-                if(publicRes.allDays) { GLOBAL_DATA.allDays = publicRes.allDays; renderTabs(); }
-            } catch(e) { }
+            // 1. მატჩები ტვირთავს ეგრევე, ლიდერბორდის მოლოდინის გარეშე
+            fetch(getCleanUrl('public-days'))
+                .then(r => r.json())
+                .then(publicRes => {
+                    if(publicRes.allDays) { 
+                        GLOBAL_DATA.allDays = publicRes.allDays; 
+                        renderTabs(); 
+                    }
+                }).catch(e => {});
+
+            // 2. ლიდერბორდი იტვირთება პარალელურად
+            fetch(getCleanUrl('leaderboard'))
+                .then(r => r.json())
+                .then(res => {
+                    renderLeaderboardList(res.topData);
+                }).catch(e => {});
         }
 
         async function startGame(isAuto, type) {
@@ -318,7 +329,7 @@
                     document.getElementById('my-score').innerText = res.userScore !== undefined ? res.userScore : "0";
                     document.getElementById('guest-float-bar').classList.add('hidden');
                     document.getElementById('my-status').classList.remove('hidden');
-                    renderTabs(); selectDay(SELECTED_DAY);
+                    renderTabs(); switchPage('matches');
                 } else if(!isAuto) showToast(res.message);
             } catch(e) { if(!isAuto) showToast("Connection error."); }
             finally { if(loginBtn) { loginBtn.innerText = "LOGIN"; loginBtn.disabled = false; } if(regBtn) { regBtn.innerText = "SIGN UP / JOIN"; regBtn.disabled = false; } }
