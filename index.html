@@ -107,7 +107,9 @@
         .lb-rank-2 { color: #c0c0c0; font-size: 18px; }
         .lb-rank-3 { color: #cd7f32; font-size: 18px; }
         .lb-user { font-size: 14px; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; }
+        .lb-user.empty { color: rgba(255, 255, 255, 0.3) !important; font-weight: 400 !important; }
         .lb-score { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--primary); padding: 3px 12px; background: rgba(0, 255, 204, 0.06); border-radius: 8px; min-width: 50px; text-align: center; }
+        .lb-score.empty { color: rgba(0, 255, 204, 0.2) !important; background: transparent !important; }
         .lb-prize { font-size: 13px; font-weight: 700; color: var(--accent-gold); text-align: right; }
 
         /* 📅 Day Tabs */
@@ -275,7 +277,7 @@
         }
 
         function getCleanUrl(endpoint) { return `${BASE_URL}/${endpoint}?v=${Date.now()}`; }
-        function getLocalDateString() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0 flights')}`.replace(" flights", ""); }
+        function getLocalDateString() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
         function showToast(m, isErr = true) { const t = document.getElementById('toast'); t.innerText = m; t.style.background = isErr ? 'rgba(255, 77, 77, 0.95)' : 'rgba(0, 255, 204, 0.95)'; t.style.color = isErr ? '#fff' : '#061218'; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 4000); }
         function toggleAuth(v) { document.getElementById('login-section').classList.toggle('hidden', v!=='login'); document.getElementById('signup-section').classList.toggle('hidden', v!=='signup'); }
 
@@ -334,14 +336,12 @@
             finally { if(loginBtn) { loginBtn.innerText = "LOGIN"; loginBtn.disabled = false; } if(regBtn) { regBtn.innerText = "SIGN UP / JOIN"; regBtn.disabled = false; } }
         }
 
-        // 🛠️ განახლებული: ფილტრი მოხსნილია, ახლა ტაბებში გამოჩნდება აბსოლუტურად ყველა დღე!
         function renderTabs() {
             if(!GLOBAL_DATA.allDays || Object.keys(GLOBAL_DATA.allDays).length === 0) return;
             const container = document.getElementById('day-tabs'); container.innerHTML = "";
             const now = getLocalDateString();
             const days = Object.keys(GLOBAL_DATA.allDays).sort((a,b) => a-b);
             
-            // ვტოვებთ სრულ კალენდარს (ყველა დღეს)
             let todayDayId = days.find(id => GLOBAL_DATA.allDays[id].date === now);
             if (!SELECTED_DAY) SELECTED_DAY = todayDayId || days[0];
 
@@ -365,7 +365,6 @@
             const now = getLocalDateString();
             const userPred = GLOBAL_DATA.userPredictions && GLOBAL_DATA.userPredictions.find(p => p.dayId === dayId);
             
-            // 🛠️ ლოგიკა: ვადგენთ არის თუ არა მომავლის, წარსულის თუ მიმდინარე დღე
             const isPast = dInfo.date < now;
             const isFuture = dInfo.date > now;
             const isToday = dInfo.date === now;
@@ -381,7 +380,6 @@
                 realResultsArray = realResultsArray.map(res => res.trim().toLowerCase());
             }
 
-            // 🛠️ დინამიური ჰედერი სტატუსების მიხედვით (LOCKED მომავლის დღეებისთვის)
             let statusBadge = `${dInfo.date} • ${dInfo.pointsPerGame} PTS`;
             if (isToday) statusBadge = `TODAY • OPEN FOR PREDICTIONS (${dInfo.pointsPerGame} PTS)`;
             else if (isFuture) statusBadge = `${dInfo.date} • UPCOMING • LOCKED 🔒`;
@@ -404,14 +402,12 @@
                         else if (optLower === myPickLower) cls += " res-wrong";
                     } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
                     
-                    // 🛠️ ფიქსი: მომავლის დღეებზე (isFuture === true) ღილაკები იძულებით იბლოკება!
                     let isBtnDisabled = !isLoggedIn || isPast || isFuture || (userPred ? true : false);
                     opts += `<button class="${cls}" ${isBtnDisabled ? 'disabled' : ''} onclick="pick(this, ${i}, '${opt}')">${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div></div><div class="options-grid">${opts}</div></div>`;
             });
             
-            // 🛠️ SUBMIT ღილაკიც გამოჩნდება მხოლოდ მიმდინარე აქტიურ დღეს
             document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast || isFuture);
         }
 
@@ -428,9 +424,11 @@
 
         async function loadLB() { try { const res = await fetch(getCleanUrl('leaderboard')).then(r => r.json()); renderLeaderboardList(res.topData); } catch(e) { } }
 
+        // 🛠️ განახლებული: სრული ტოპ 20 ადგილის გენერაცია (ცარიელი ადგილების შევსებით)
         function renderLeaderboardList(data) {
             const container = document.getElementById('lb-data-list'); if(!container) return;
             const cUser = (localStorage.getItem('wc_user') || "").toLowerCase().trim();
+            
             const frontPrizes = { 
                 1: "1500 $", 2: "1000 $", 3: "800 $", 
                 4: "500 FB", 5: "400 FB", 6: "300 FB", 
@@ -439,20 +437,21 @@
                 14: "30 FB", 15: "30 FB", 16: "25 FB", 
                 17: "25 FB", 18: "20 FB", 19: "20 FB", 20: "20 FB" 
             };
-            container.innerHTML = data.map(u => {
-                const isMe = u.u.toLowerCase().trim() === cUser;
-                let disp = isMe ? u.u : (u.u.length > 2 ? u.u[0] + "***" + u.u[u.u.length - 1] : u.u[0] + "*");
-                let displayPrize = u.prize && u.prize !== "undefined" ? u.prize : (frontPrizes[u.rank] || "-");
-                let rankDisplay = u.rank === 1 ? '🥇' : (u.rank === 2 ? '🥈' : (u.rank === 3 ? '🥉' : u.rank));
-                return `<div class="lb-card ${isMe ? 'my-highlight' : ''}"><div class="lb-rank">${rankDisplay}</div><div class="lb-user">${disp}</div><div class="lb-score">${u.p} PTS</div><div class="lb-prize">${displayPrize.replace("freebet", "FB")}</div></div>`;
-            }).join('');
-        }
 
-        function logout() { localStorage.clear(); location.reload(); }
-        window.onload = async () => { 
-            if(localStorage.getItem('wc_user')) { await startGame(true); } 
-            else { document.getElementById('guest-float-bar').classList.remove('hidden'); await fetchInitialData(); }
-        };
-    </script>
-</body>
-</html>
+            let htmlString = "";
+
+            // ვქმნით ციკლს ზუსტად 1-დან 20-მდე
+            for (let rank = 1; rank <= 20; rank++) {
+                // ვეძებთ, გვყავს თუ არა ბექენდიდან წამოღებულ მონაცემებში იუზერი ამ რანკზე
+                const userMatch = data && data.find(u => parseInt(u.rank) === rank);
+
+                let rankDisplay = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : rank));
+                let displayPrize = frontPrizes[rank];
+
+                if (userMatch) {
+                    // თუ იუზერი არსებობს
+                    const isMe = userMatch.u.toLowerCase().trim() === cUser;
+                    let dispName = isMe ? userMatch.u : (userMatch.u.length > 2 ? userMatch.u[0] + "***" + userMatch.u[userMatch.u.length - 1] : userMatch.u[0] + "*");
+                    let customPrize = userMatch.prize && userMatch.prize !== "undefined" ? userMatch.prize : frontPrizes[rank];
+
+                    htmlString += `<div class="lb-card ${
