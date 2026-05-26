@@ -326,7 +326,6 @@
                 }).catch(e => {});
         }
 
-        // 🛠️ ფიქსი: რეგისტრაციის/ლოგინის მერე იძულებითი გადატვირთვა მომენტალური სინქრონიზაციისთვის
         async function startGame(isAuto, type) {
             const u = isAuto ? localStorage.getItem('wc_user') : (type === 'login' ? document.getElementById('username').value.trim() : document.getElementById('reg-username').value.trim());
             const p = isAuto ? localStorage.getItem('wc_pass') : (type === 'login' ? document.getElementById('password').value.trim() : document.getElementById('reg-password').value.trim());
@@ -339,7 +338,6 @@
                     localStorage.setItem('wc_user', u); localStorage.setItem('wc_pass', p);
                     GLOBAL_DATA = res;
                     
-                    // თუ იუზერმა ხელით გაიარა ავტორიზაცია/რეგისტრაცია, გვერდს მომენტალურად გადავტვირთავთ
                     if(!isAuto) {
                         location.reload(); 
                         return;
@@ -389,7 +387,10 @@
             const isToday = dInfo.date === now;
             const isLoggedIn = localStorage.getItem('wc_user') ? true : false;
             
-            if(CURRENT_FILTER === 'open' && (userPred || isPast || isFuture)) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No pending matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
+            // 🛠️ სპეციალური ფიქსი: თუ სულ პირველი დღეა ("day1"), ჩავთვალოთ რომ ღიაა წინასწარ შესავსებად
+            const isFirstDayEarlyOpen = (dayId === "day1" && isFuture);
+
+            if(CURRENT_FILTER === 'open' && (userPred || isPast || (isFuture && !isFirstDayEarlyOpen))) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No pending matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
             if(CURRENT_FILTER === 'done' && !userPred && !isPast) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No completed matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
 
             let realResultsArray = [];
@@ -400,11 +401,11 @@
             }
 
             let statusBadge = `${dInfo.date} • ${dInfo.pointsPerGame} PTS`;
-            if (isToday) statusBadge = `TODAY • OPEN FOR PREDICTIONS (${dInfo.pointsPerGame} PTS)`;
+            if (isToday || isFirstDayEarlyOpen) statusBadge = `${isFirstDayEarlyOpen ? 'EARLY BIRD • ' : 'TODAY • '}OPEN FOR PREDICTIONS (${dInfo.pointsPerGame} PTS)`;
             else if (isFuture) statusBadge = `${dInfo.date} • UPCOMING • LOCKED 🔒`;
             else if (isPast) statusBadge = `${dInfo.date} • COMPLETED`;
 
-            container.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><span style="font-size:11px; font-weight:700; color:${isFuture ? '#ff4d4d' : 'var(--primary)'}; font-family:'Rajdhani'; letter-spacing:1px; background:rgba(0,255,204,0.04); padding: 4px 12px; border-radius:6px;">${statusBadge}</span></div>`;
+            container.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><span style="font-size:11px; font-weight:700; color:${isFuture && !isFirstDayEarlyOpen ? '#ff4d4d' : 'var(--primary)'}; font-family:'Rajdhani'; letter-spacing:1px; background:rgba(0,255,204,0.04); padding: 4px 12px; border-radius:6px;">${statusBadge}</span></div>`;
             
             dInfo.matches.forEach((game, i) => {
                 const teams = game.split(' vs '); let opts = "";
@@ -421,13 +422,14 @@
                         else if (optLower === myPickLower) cls += " res-wrong";
                     } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
                     
-                    let isBtnDisabled = !isLoggedIn || isPast || isFuture || (userPred ? true : false);
+                    // 🛠️ პირველ დღეზე ბლოკირებას ვხსნით (isFirstDayEarlyOpen პირობით)
+                    let isBtnDisabled = !isLoggedIn || isPast || (isFuture && !isFirstDayEarlyOpen) || (userPred ? true : false);
                     opts += `<button class="${cls}" ${isBtnDisabled ? 'disabled' : ''} onclick="pick(this, ${i}, '${opt}')">${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div></div><div class="options-grid">${opts}</div></div>`;
             });
             
-            document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast || isFuture);
+            document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast || (isFuture && !isFirstDayEarlyOpen));
         }
 
         function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
