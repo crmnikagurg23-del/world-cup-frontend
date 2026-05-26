@@ -366,7 +366,10 @@
                 const btn = document.createElement('div');
                 btn.className = 'day-tab' + (SELECTED_DAY === dayId ? ' active' : '');
                 btn.innerText = (GLOBAL_DATA.allDays[dayId].date === now) ? "TODAY" : GLOBAL_DATA.allDays[dayId].title;
-                btn.onclick = () => { SELECTED_DAY = dayId; renderTabs(); };
+                btn.onclick = () => { 
+                    SELECTED_DAY = dayId; 
+                    renderTabs(); 
+                };
                 container.appendChild(btn);
                 if (SELECTED_DAY === dayId) setTimeout(() => { btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 100);
             });
@@ -387,7 +390,6 @@
             const isToday = dInfo.date === now;
             const isLoggedIn = localStorage.getItem('wc_user') ? true : false;
             
-            // 🛠️ სპეციალური ფიქსი: თუ სულ პირველი დღეა ("day1"), ჩავთვალოთ რომ ღიაა წინასწარ შესავსებად
             const isFirstDayEarlyOpen = (dayId === "day1" && isFuture);
 
             if(CURRENT_FILTER === 'open' && (userPred || isPast || (isFuture && !isFirstDayEarlyOpen))) { container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:13px; margin:20px 0;">No pending matches for this day.</p>`; document.getElementById('save-btn').classList.add('hidden'); return; }
@@ -417,14 +419,17 @@
                     const myPick = userPred ? userPred.answers[i] : null;
                     let myPickLower = myPick ? myPick.toString().toLowerCase().trim() : null;
                     let optLower = opt.toString().toLowerCase().trim();
+                    
+                    // 🛠️ განახლებული ლოგიკა: ვამოწმებთ კონკრეტულად ამ დღის უნიკალურ კოდს
+                    let currentKey = `${dayId}_${i}`;
+                    
                     if (realResRaw) {
                         if (optLower === realResRaw) cls += (myPickLower === realResRaw) ? " res-correct" : " res-actual";
                         else if (optLower === myPickLower) cls += " res-wrong";
-                    } else if (myPickLower === optLower || TEMP_ANSWERS[i] === opt) cls += " selected";
+                    } else if (myPickLower === optLower || TEMP_ANSWERS[currentKey] === opt) cls += " selected";
                     
-                    // 🛠️ პირველ დღეზე ბლოკირებას ვხსნით (isFirstDayEarlyOpen პირობით)
                     let isBtnDisabled = !isLoggedIn || isPast || (isFuture && !isFirstDayEarlyOpen) || (userPred ? true : false);
-                    opts += `<button class="${cls}" ${isBtnDisabled ? 'disabled' : ''} onclick="pick(this, ${i}, '${opt}')">${opt}</button>`;
+                    opts += `<button class="${cls}" ${isBtnDisabled ? 'disabled' : ''} onclick="pick(this, '${dayId}', ${i}, '${opt}')">${opt}</button>`;
                 });
                 container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div></div><div class="options-grid">${opts}</div></div>`;
             });
@@ -432,14 +437,39 @@
             document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast || (isFuture && !isFirstDayEarlyOpen));
         }
 
-        function pick(btn, idx, val) { btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); TEMP_ANSWERS[idx] = val; }
+        // 🛠️ ფუნქცია გადაკეთდა: ახლა მასივში ინახავს დღის ID-საც და მატჩის ინდექსსაც ერთად (`day1_0`)
+        function pick(btn, dayId, idx, val) { 
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
+            btn.classList.add('selected'); 
+            let currentKey = `${dayId}_${idx}`;
+            TEMP_ANSWERS[currentKey] = val; 
+        }
 
+        // 🛠️ ფუნქცია გადაკეთდა: გაგზავნისას მხოლოდ ამ კონკრეტული დღის პროგნოზებს ფილტრავს სუფთად
         async function saveCurrentDay() {
-            if(Object.keys(TEMP_ANSWERS).length < GLOBAL_DATA.allDays[SELECTED_DAY].matches.length) return showToast("Pick all matches!");
+            let cleanAnswers = {};
+            let matchCount = GLOBAL_DATA.allDays[SELECTED_DAY].matches.length;
+            
+            for(let i=0; i < matchCount; i++) {
+                let key = `${SELECTED_DAY}_${i}`;
+                if(TEMP_ANSWERS[key]) {
+                    cleanAnswers[i] = TEMP_ANSWERS[key];
+                }
+            }
+
+            if(Object.keys(cleanAnswers).length < matchCount) return showToast("Pick all matches!");
             const saveBtn = document.getElementById('save-btn'); saveBtn.innerText = "SUBMITTING..."; saveBtn.disabled = true;
             try {
-                const res = await fetch(getCleanUrl('save-prediction'), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: TEMP_ANSWERS}) }).then(r => r.json());
-                if(res.success) { showToast("Submitted!", false); if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = []; GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...TEMP_ANSWERS}}); TEMP_ANSWERS = {}; selectDay(SELECTED_DAY); }
+                const res = await fetch(getCleanUrl('save-prediction'), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: cleanAnswers}) }).then(r => r.json());
+                if(res.success) { 
+                    showToast("Submitted!", false); 
+                    if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = []; 
+                    GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...cleanAnswers}}); 
+                    
+                    // ვასუფთავებთ მხოლოდ ამ დღის მონაცემებს
+                    for(let i=0; i < matchCount; i++) { delete TEMP_ANSWERS[`${SELECTED_DAY}_${i}`]; }
+                    selectDay(SELECTED_DAY); 
+                }
             } catch(e) { } finally { saveBtn.innerText = "SUBMIT PREDICTIONS"; saveBtn.disabled = false; }
         }
 
