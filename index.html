@@ -266,25 +266,22 @@
         let GLOBAL_DATA = { allDays: {}, userPredictions: [] }; 
         let SELECTED_DAY = ""; let TEMP_ANSWERS = {}; let CURRENT_FILTER = 'all';
 
-        function getFlagHtml(teamName, imgId) {
+        // 🛠️ სრულიად განახლებული, 100%-ით მყარი ფუნქცია დროშებისთვის (Rate limit-ების გარეშე)
+        function getFlagHtml(teamName) {
             let name = teamName.replace(/["'\s]/g, ' ').trim().toLowerCase();
-            if (name === "england" || name === "scotland" || name === "wales") name = "united kingdom";
-            if (name === "usa") name = "united states";
             
-            fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(name)}?fullText=false`)
-                .then(r => r.json())
-                .then(data => { 
-                    if (data && data[0] && data[0].flags && data[0].flags.png) { 
-                        const imgEl = document.getElementById(imgId); 
-                        if (imgEl) imgEl.src = data[0].flags.png; 
-                    } 
-                })
-                .catch(e => { 
-                    const imgEl = document.getElementById(imgId); 
-                    if (imgEl) imgEl.src = "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=80&auto=format&fit=crop"; 
-                });
-                
-            return `<img id="${imgId}" src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=80&auto=format&fit=crop" class="flag-img" style="background:rgba(255,255,255,0.05);" alt="${teamName}">`;
+            // გლობალური ქვეყნების კოდების ბაზა 2026 წლის ჩემპიონატისთვის
+            const flagCodes = {
+                "mexico": "mx", "south africa": "za", "south korea": "kr", "czechia": "cz",
+                "canada": "ca", "bosnia and herzegovina": "ba", "usa": "us", "united states": "us",
+                "paraguay": "py", "argentina": "ar", "brazil": "br", "france": "fr", "germany": "de",
+                "spain": "es", "italy": "it", "england": "gb-eng", "scotland": "gb-sct", "wales": "gb-wls",
+                "portugal": "pt", "netherlands": "nl", "belgium": "be", "croatia": "hr", "uruguay": "uy",
+                "colombia": "co", "morocco": "ma", "japan": "jp", "australia": "au", "senegal": "sn"
+            };
+
+            let code = flagCodes[name] || "un"; // თუ ბაზაში არ არის, დასვამს გაეროს ნეიტრალურ დროშას
+            return `<img src="https://flagcdn.com/w80/${code}.png" class="flag-img" onerror="this.src='https://flagcdn.com/w80/un.png'" alt="${teamName}">`;
         }
 
         function getCleanUrl(endpoint) { return `${BASE_URL}/${endpoint}?v=${Date.now()}`; }
@@ -420,7 +417,6 @@
                     let myPickLower = myPick ? myPick.toString().toLowerCase().trim() : null;
                     let optLower = opt.toString().toLowerCase().trim();
                     
-                    // 🛠️ განახლებული ლოგიკა: ვამოწმებთ კონკრეტულად ამ დღის უნიკალურ კოდს
                     let currentKey = `${dayId}_${i}`;
                     
                     if (realResRaw) {
@@ -431,13 +427,12 @@
                     let isBtnDisabled = !isLoggedIn || isPast || (isFuture && !isFirstDayEarlyOpen) || (userPred ? true : false);
                     opts += `<button class="${cls}" ${isBtnDisabled ? 'disabled' : ''} onclick="pick(this, '${dayId}', ${i}, '${opt}')">${opt}</button>`;
                 });
-                container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0], `flag-L-${dayId}-${i}`)}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1], `flag-R-${dayId}-${i}`)}</div></div><div class="options-grid">${opts}</div></div>`;
+                container.innerHTML += `<div class="game-card"><div class="match-display"><div class="team-home">${getFlagHtml(teams[0])}<div class="team-name">${teams[0]}</div></div><div class="vs-divider">VS</div><div class="team-away"><div class="team-name">${teams[1]}</div>${getFlagHtml(teams[1])}</div></div><div class="options-grid">${opts}</div></div>`;
             });
             
             document.getElementById('save-btn').classList.toggle('hidden', !isLoggedIn || userPred || isPast || (isFuture && !isFirstDayEarlyOpen));
         }
 
-        // 🛠️ ფუნქცია გადაკეთდა: ახლა მასივში ინახავს დღის ID-საც და მატჩის ინდექსსაც ერთად (`day1_0`)
         function pick(btn, dayId, idx, val) { 
             btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected')); 
             btn.classList.add('selected'); 
@@ -445,7 +440,6 @@
             TEMP_ANSWERS[currentKey] = val; 
         }
 
-        // 🛠️ ფუნქცია გადაკეთდა: გაგზავნისას მხოლოდ ამ კონკრეტული დღის პროგნოზებს ფილტრავს სუფთად
         async function saveCurrentDay() {
             let cleanAnswers = {};
             let matchCount = GLOBAL_DATA.allDays[SELECTED_DAY].matches.length;
@@ -466,7 +460,6 @@
                     if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = []; 
                     GLOBAL_DATA.userPredictions.push({dayId: SELECTED_DAY, answers: {...cleanAnswers}}); 
                     
-                    // ვასუფთავებთ მხოლოდ ამ დღის მონაცემებს
                     for(let i=0; i < matchCount; i++) { delete TEMP_ANSWERS[`${SELECTED_DAY}_${i}`]; }
                     selectDay(SELECTED_DAY); 
                 }
