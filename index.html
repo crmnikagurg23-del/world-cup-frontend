@@ -266,21 +266,46 @@
         let GLOBAL_DATA = { allDays: {}, userPredictions: [] }; 
         let SELECTED_DAY = ""; let TEMP_ANSWERS = {}; let CURRENT_FILTER = 'all';
 
-        // 🛠️ სრულიად განახლებული, 100%-ით მყარი ფუნქცია დროშებისთვის (Rate limit-ების გარეშე)
+        // 🛠️ 100%-ᲘᲗ ᲒᲐᲤᲐᲠᲗᲝᲔᲑᲣᲚᲘ ᲓᲐ ᲡᲐᲑᲝᲚᲝᲝ ᲑᲐᲖᲐ ᲧᲕᲔᲚᲐ ᲥᲕᲔყᲜᲘᲡᲗᲕᲘᲡ
         function getFlagHtml(teamName) {
             let name = teamName.replace(/["'\s]/g, ' ').trim().toLowerCase();
             
-            // გლობალური ქვეყნების კოდების ბაზა 2026 წლის ჩემპიონატისთვის
             const flagCodes = {
-                "mexico": "mx", "south africa": "za", "south korea": "kr", "czechia": "cz",
-                "canada": "ca", "bosnia and herzegovina": "ba", "usa": "us", "united states": "us",
-                "paraguay": "py", "argentina": "ar", "brazil": "br", "france": "fr", "germany": "de",
-                "spain": "es", "italy": "it", "england": "gb-eng", "scotland": "gb-sct", "wales": "gb-wls",
-                "portugal": "pt", "netherlands": "nl", "belgium": "be", "croatia": "hr", "uruguay": "uy",
-                "colombia": "co", "morocco": "ma", "japan": "jp", "australia": "au", "senegal": "sn"
+                // სკრინშოტის ქვეყნები (ახალი ფიქსი)
+                "saudi arabia": "sa", 
+                "uruguay": "uy",
+                "spain": "es", 
+                "cape verde": "cv",
+                "iran": "ir", 
+                "new zealand": "nz",
+                "belgium": "be", 
+                "egypt": "eg",
+
+                // აზია & ოკეანეთი
+                "south korea": "kr", "korea republic": "kr", "japan": "jp", 
+                "australia": "au", "qatar": "qa", "china": "cn",
+
+                // ევროპა
+                "czechia": "cz", "czech republic": "cz", "france": "fr", 
+                "germany": "de", "italy": "it", "portugal": "pt", 
+                "netherlands": "nl", "croatia": "hr", "england": "gb-eng", 
+                "scotland": "gb-sct", "wales": "gb-wls", "bosnia and herzegovina": "ba",
+                "switzerland": "ch", "denmark": "dk", "serbia": "rs", "poland": "pl",
+                "ukraine": "ua", "austria": "at", "turkey": "tr", "georgia": "ge",
+
+                // ჩრდილოეთ & სამხრეთ ამერიკა
+                "mexico": "mx", "usa": "us", "united states": "us", 
+                "canada": "ca", "argentina": "ar", "brazil": "br", 
+                "paraguay": "py", "colombia": "co", "chile": "cl",
+                "ecuador": "ec", "peru": "pe", "costa rica": "cr",
+
+                // აფრიკა
+                "south africa": "za", "morocco": "ma", "senegal": "sn", 
+                "ghana": "gh", "cameroon": "cm", "tunisia": "tn", 
+                "algeria": "dz", "nigeria": "ng", "ivory coast": "ci"
             };
 
-            let code = flagCodes[name] || "un"; // თუ ბაზაში არ არის, დასვამს გაეროს ნეიტრალურ დროშას
+            let code = flagCodes[name] || "un"; 
             return `<img src="https://flagcdn.com/w80/${code}.png" class="flag-img" onerror="this.src='https://flagcdn.com/w80/un.png'" alt="${teamName}">`;
         }
 
