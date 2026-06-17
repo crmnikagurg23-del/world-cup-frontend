@@ -266,40 +266,24 @@
         let GLOBAL_DATA = { allDays: {}, userPredictions: [] }; 
         let SELECTED_DAY = ""; let TEMP_ANSWERS = {}; let CURRENT_FILTER = 'all';
 
-        // 🛠️ 100%-ᲘᲗ ᲒᲐᲤᲐᲠᲗᲝᲔᲑᲣᲚᲘ ᲓᲐ ᲡᲐᲑᲝᲚᲝᲝ ᲑᲐᲖᲐ ᲧᲕᲔᲚᲐ ᲥᲕᲔყᲜᲘᲡᲗᲕᲘᲡ
         function getFlagHtml(teamName) {
             let name = teamName.replace(/["'\s]/g, ' ').trim().toLowerCase();
             
             const flagCodes = {
-                // სკრინშოტის ქვეყნები (ახალი ფიქსი)
-                "saudi arabia": "sa", 
-                "uruguay": "uy",
-                "spain": "es", 
-                "cape verde": "cv",
-                "iran": "ir", 
-                "new zealand": "nz",
-                "belgium": "be", 
-                "egypt": "eg",
-
-                // აზია & ოკეანეთი
+                "saudi arabia": "sa", "uruguay": "uy", "spain": "es", "cape verde": "cv",
+                "iran": "ir", "new zealand": "nz", "belgium": "be", "egypt": "eg",
                 "south korea": "kr", "korea republic": "kr", "japan": "jp", 
                 "australia": "au", "qatar": "qa", "china": "cn",
-
-                // ევროპა
                 "czechia": "cz", "czech republic": "cz", "france": "fr", 
                 "germany": "de", "italy": "it", "portugal": "pt", 
                 "netherlands": "nl", "croatia": "hr", "england": "gb-eng", 
                 "scotland": "gb-sct", "wales": "gb-wls", "bosnia and herzegovina": "ba",
                 "switzerland": "ch", "denmark": "dk", "serbia": "rs", "poland": "pl",
                 "ukraine": "ua", "austria": "at", "turkey": "tr", "georgia": "ge",
-
-                // ჩრდილოეთ & სამხრეთ ამერიკა
                 "mexico": "mx", "usa": "us", "united states": "us", 
                 "canada": "ca", "argentina": "ar", "brazil": "br", 
                 "paraguay": "py", "colombia": "co", "chile": "cl",
                 "ecuador": "ec", "peru": "pe", "costa rica": "cr",
-
-                // აფრიკა
                 "south africa": "za", "morocco": "ma", "senegal": "sn", 
                 "ghana": "gh", "cameroon": "cm", "tunisia": "tn", 
                 "algeria": "dz", "nigeria": "ng", "ivory coast": "ci"
@@ -515,7 +499,9 @@
                 if (userMatch) {
                     const isMe = userMatch.u.toLowerCase().trim() === cUser;
                     let dispName = isMe ? userMatch.u : (userMatch.u.length > 2 ? userMatch.u[0] + "***" + userMatch.u[userMatch.u.length - 1] : userMatch.u[0] + "*");
-                    let customPrize = userMatch.prize && userMatch.prize !== "undefined" ? userMatch.prize : frontPrizes[rank];
+                    
+                    // 🎯 მყარი ფიქსი: ყოველთვის იღებს ფრონტზე ხელით გაწერილ სწორ პრიზს
+                    let customPrize = frontPrizes[rank];
 
                     htmlString += `<div class="lb-card ${isMe ? 'my-highlight' : ''}">
                         <div class="lb-rank">${rankDisplay}</div>
