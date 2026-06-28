@@ -449,6 +449,7 @@
             TEMP_ANSWERS[currentKey] = val; 
         }
 
+        // 🔒 განახლებული ფუნქცია: კითხულობს ბექენდის LOCKED შეტყობინებებს
         async function saveCurrentDay() {
             let cleanAnswers = {};
             let matchCount = GLOBAL_DATA.allDays[SELECTED_DAY].matches.length;
@@ -463,7 +464,12 @@
             if(Object.keys(cleanAnswers).length < matchCount) return showToast("Pick all matches!");
             const saveBtn = document.getElementById('save-btn'); saveBtn.innerText = "SUBMITTING..."; saveBtn.disabled = true;
             try {
-                const res = await fetch(getCleanUrl('save-prediction'), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: cleanAnswers}) }).then(r => r.json());
+                const res = await fetch(getCleanUrl('save-prediction'), { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({username: localStorage.getItem('wc_user'), dayId: SELECTED_DAY, answers: cleanAnswers}) 
+                }).then(r => r.json());
+                
                 if(res.success) { 
                     showToast("Submitted!", false); 
                     if(!GLOBAL_DATA.userPredictions) GLOBAL_DATA.userPredictions = []; 
@@ -471,8 +477,17 @@
                     
                     for(let i=0; i < matchCount; i++) { delete TEMP_ANSWERS[`${SELECTED_DAY}_${i}`]; }
                     selectDay(SELECTED_DAY); 
+                } else {
+                    // 🎯 თუ ბექენდმა დაბლოკა (Sheets-ში LOCKED უწერია), იუზერს ეგრევე ამოუგდებს შესაბამის მესიჯს წითლად
+                    showToast(res.message || "Predictions are closed for this day!", true);
+                    selectDay(SELECTED_DAY);
                 }
-            } catch(e) { } finally { saveBtn.innerText = "SUBMIT PREDICTIONS"; saveBtn.disabled = false; }
+            } catch(e) { 
+                showToast("Connection error."); 
+            } finally { 
+                saveBtn.innerText = "SUBMIT PREDICTIONS"; 
+                saveBtn.disabled = false; 
+            }
         }
 
         async function loadLB() { try { const res = await fetch(getCleanUrl('leaderboard')).then(r => r.json()); renderLeaderboardList(res.topData); } catch(e) { } }
@@ -500,7 +515,6 @@
                     const isMe = userMatch.u.toLowerCase().trim() === cUser;
                     let dispName = isMe ? userMatch.u : (userMatch.u.length > 2 ? userMatch.u[0] + "***" + userMatch.u[userMatch.u.length - 1] : userMatch.u[0] + "*");
                     
-                    // 🎯 მყარი ფიქსი: ყოველთვის იღებს ფრონტზე ხელით გაწერილ სწორ პრიზს
                     let customPrize = frontPrizes[rank];
 
                     htmlString += `<div class="lb-card ${isMe ? 'my-highlight' : ''}">
